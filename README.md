@@ -75,7 +75,7 @@ HopeVillage is a multi-location recreational facility management system that all
 2. Member 'Play' billiard in 'Billiard Hall' (amenity) at 'Cebu City Sports Club' → logs points
 3. Member 'Watch' basketball at 'Basketball Court' (amenity) at 'Paris City Sports Club' → logs points
 
-## Installation
+<!-- ## Installation
 
 1. Clone the repository
 2. Install dependencies:
@@ -104,7 +104,7 @@ HopeVillage is a multi-location recreational facility management system that all
 7. Build assets:
    ```bash
    npm run build
-   ```
+   ``` -->
 
 ## Project Status
 
