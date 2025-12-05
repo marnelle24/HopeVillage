@@ -1,0 +1,48 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Admin Dashboard - Only accessible by admin users
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    'admin',
+])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
+});
+
+// Member Dashboard - Only accessible by member users
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    'member',
+])->group(function () {
+    Route::get('/member/dashboard', function () {
+        return view('member.dashboard');
+    })->name('member.dashboard');
+});
+
+// Legacy dashboard route - redirects based on user type
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->isMember()) {
+            return redirect()->route('member.dashboard');
+        }
+        abort(403, 'Invalid user type');
+    })->name('dashboard');
+});
