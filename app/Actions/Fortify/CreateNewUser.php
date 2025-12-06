@@ -4,6 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Services\QrCodeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -29,11 +30,20 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         return DB::transaction(function () use ($input) {
-            return tap(User::create([
+            $userData = [
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
-            ]), function (User $user) {
+                'user_type' => $input['user_type'] ?? 'member', // Default to member
+            ];
+
+            // Generate QR code for members
+            if (($userData['user_type'] ?? 'member') === 'member') {
+                $qrCodeService = new QrCodeService();
+                $userData['qr_code'] = $qrCodeService->generateUniqueCode();
+            }
+
+            return tap(User::create($userData), function (User $user) {
                 if (Jetstream::userHasTeamFeatures($user)) {
                     $this->createTeam($user);
                 }

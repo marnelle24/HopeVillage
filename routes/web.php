@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\QrCodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,6 +29,10 @@ Route::middleware([
     Route::get('/member/dashboard', function () {
         return view('member.dashboard');
     })->name('member.dashboard');
+    
+    // QR Code routes
+    Route::get('/member/qr-code', [QrCodeController::class, 'show'])->name('member.qr-code');
+    Route::get('/member/qr-code/full', [QrCodeController::class, 'fullSize'])->name('member.qr-code.full');
 });
 
 // Legacy dashboard route - redirects based on user type
