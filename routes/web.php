@@ -4,7 +4,7 @@ use App\Http\Controllers\QrCodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Admin Dashboard - Only accessible by admin users
