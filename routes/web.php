@@ -17,6 +17,11 @@ Route::middleware([
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+    
+    // Location CRUD Routes
+    Route::get('/admin/locations', \App\Livewire\Locations\Index::class)->name('admin.locations.index');
+    Route::get('/admin/locations/create', \App\Livewire\Locations\Form::class)->name('admin.locations.create');
+    Route::get('/admin/locations/{id}/edit', \App\Livewire\Locations\Form::class)->name('admin.locations.edit');
 });
 
 // Member Dashboard - Only accessible by member users

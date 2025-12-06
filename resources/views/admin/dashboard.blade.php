@@ -3,6 +3,7 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Admin Dashboard') }}
         </h2>
+        <div class="flex items-center gap-2">
     </x-slot>
 
     <div class="py-12">
@@ -23,21 +24,21 @@
                     <!-- Stats Card 1 -->
                     <div class="bg-gray-50 p-6 rounded-lg shadow border border-gray-300">
                         <h3 class="lg:text-lg text-sm font-semibold text-gray-900 mb-2">Total Locations</h3>
-                        <p class="text-3xl font-bold text-gray-600">1</p>
+                        <p class="text-3xl font-bold text-gray-600">{{ \App\Models\Location::count() }}</p>
                         <p class="lg:text-sm text-xs text-gray-700 mt-2">Manage facility locations</p>
                     </div>
 
                     <!-- Stats Card 2 -->
                     <div class="bg-gray-50 p-6 rounded-lg shadow border border-gray-300">
                         <h3 class="lg:text-lg text-sm font-semibold text-gray-900 mb-2">Total Members</h3>
-                        <p class="text-3xl font-bold text-gray-600">50</p>
+                        <p class="text-3xl font-bold text-gray-600">{{ \App\Models\User::where('user_type', 'member')->count() }}</p>
                         <p class="lg:text-sm text-xs text-gray-700 mt-2">View all members</p>
                     </div>
 
                     <!-- Stats Card 3 -->
                     <div class="bg-gray-50 p-6 rounded-lg shadow border border-gray-300">
                         <h3 class="lg:text-lg text-sm font-semibold text-gray-900 mb-2">Active Amenities</h3>
-                        <p class="text-3xl font-bold text-gray-600">10</p>
+                        <p class="text-3xl font-bold text-gray-600">{{ \App\Models\Amenity::count() }}</p>
                         <p class="lg:text-sm text-xs text-gray-700 mt-2">Monitor amenities</p>
                     </div>
 
@@ -60,14 +61,15 @@
                             </svg>
                             <p class="lg:text-lg text-sm font-semibold text-blue-700/50 group-hover:text-blue-700 mb-2">Scan QR Code</p>
                         </div>
-                        <div 
+                        <a
+                            href="{{ route('admin.locations.index') }}"
                             class="group cursor-pointer bg-blue-50 hover:bg-blue-100 hover:shadow-lg hover:border-blue-600/80 hover:-translate-y-0.5 transition-all duration-200 rounded-lg shadow border border-blue-600/60 flex flex-col min-h-44 justify-center items-center gap-4">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10 stroke-blue-700/50 group-hover:stroke-blue-700">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                             </svg>
                             <p class="lg:text-lg text-sm font-semibold text-blue-700/50 group-hover:text-blue-700 mb-2">Manage Locations</p>
-                        </div>
+                        </a>
                         <div 
                             class="group cursor-pointer bg-blue-50 hover:bg-blue-100 hover:shadow-lg hover:border-blue-600/80 hover:-translate-y-0.5 transition-all duration-200 rounded-lg shadow border border-blue-600/60 flex flex-col min-h-44 justify-center items-center gap-4">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10 stroke-blue-700/50 group-hover:stroke-blue-700">
