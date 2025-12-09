@@ -34,9 +34,9 @@ class Index extends Component
     public function delete($id)
     {
         $location = Location::findOrFail($id);
-        $location->delete();
+        $location->delete(); // This will now perform a soft delete
         
-        session()->flash('message', 'Location deleted successfully.');
+        session()->flash('message', 'Location archived successfully.');
         $this->showMessage = true;
         $this->dispatch('location-deleted');
     }
