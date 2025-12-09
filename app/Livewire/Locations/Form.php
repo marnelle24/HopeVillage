@@ -22,6 +22,10 @@ class Form extends Component
     public $is_active = true;
     public $thumbnail;
     public $existingThumbnail = null;
+    public $latitude = null;
+    public $longitude = null;
+    public $country = 'SG'; // Default to Singapore (ISO 3166-1 alpha-2 country code)
+    public $showMessage = false;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -38,6 +42,8 @@ class Form extends Component
 
     public function mount($id = null)
     {
+        $this->showMessage = session()->has('message');
+        
         if ($id) {
             $this->locationId = $id;
             $location = Location::findOrFail($id);
@@ -108,6 +114,7 @@ class Form extends Component
         }
 
         session()->flash('message', $message);
+        $this->showMessage = true;
         return redirect()->route('admin.locations.index');
     }
 
@@ -119,6 +126,16 @@ class Form extends Component
             $this->existingThumbnail = null;
             $this->dispatch('thumbnail-removed');
         }
+    }
+
+    public function updateAddressFromMap($addressData)
+    {
+        $this->address = $addressData['address'] ?? '';
+        $this->city = $addressData['city'] ?? '';
+        $this->province = $addressData['province'] ?? '';
+        $this->postal_code = $addressData['postal_code'] ?? '';
+        $this->latitude = $addressData['latitude'] ?? null;
+        $this->longitude = $addressData['longitude'] ?? null;
     }
 
     public function render()

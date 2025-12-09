@@ -12,8 +12,14 @@ class Index extends Component
 
     public $search = '';
     public $statusFilter = 'all';
+    public $showMessage = false;
 
     protected $paginationTheme = 'tailwind';
+
+    public function mount()
+    {
+        $this->showMessage = session()->has('message');
+    }
 
     public function updatingSearch()
     {
@@ -31,6 +37,7 @@ class Index extends Component
         $location->delete();
         
         session()->flash('message', 'Location deleted successfully.');
+        $this->showMessage = true;
         $this->dispatch('location-deleted');
     }
 
