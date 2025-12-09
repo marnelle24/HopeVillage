@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Amenity extends Model
+class Amenity extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'location_id',
@@ -51,5 +54,23 @@ class Amenity extends Model
     public function pointLogs(): HasMany
     {
         return $this->hasMany(PointLog::class);
+    }
+
+    /**
+     * Register media collections for amenity images
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('images')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+    }
+
+    /**
+     * Get the thumbnail URL (first image)
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('images');
+        return $media ? $media->getUrl() : null;
     }
 }

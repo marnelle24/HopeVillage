@@ -22,6 +22,11 @@ Route::middleware([
     Route::get('/admin/locations', \App\Livewire\Locations\Index::class)->name('admin.locations.index');
     Route::get('/admin/locations/create', \App\Livewire\Locations\Form::class)->name('admin.locations.create');
     Route::get('/admin/locations/{id}/edit', \App\Livewire\Locations\Form::class)->name('admin.locations.edit');
+    
+    // Amenity CRUD Routes
+    Route::get('/admin/amenities', \App\Livewire\Amenities\Index::class)->name('admin.amenities.index');
+    Route::get('/admin/amenities/create', \App\Livewire\Amenities\Form::class)->name('admin.amenities.create');
+    Route::get('/admin/amenities/{id}/edit', \App\Livewire\Amenities\Form::class)->name('admin.amenities.edit');
 });
 
 // Member Dashboard - Only accessible by member users
