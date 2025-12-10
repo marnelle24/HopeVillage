@@ -31,9 +31,9 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function delete($id)
+    public function delete($location_code)
     {
-        $location = Location::findOrFail($id);
+        $location = Location::where('location_code', $location_code)->firstOrFail();
         $location->delete(); // This will now perform a soft delete
         
         session()->flash('message', 'Location archived successfully.');

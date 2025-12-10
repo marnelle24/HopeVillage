@@ -21,7 +21,13 @@ Route::middleware([
     // Location CRUD Routes
     Route::get('/admin/locations', \App\Livewire\Locations\Index::class)->name('admin.locations.index');
     Route::get('/admin/locations/create', \App\Livewire\Locations\Form::class)->name('admin.locations.create');
-    Route::get('/admin/locations/{id}/edit', \App\Livewire\Locations\Form::class)->name('admin.locations.edit');
+    Route::get('/admin/locations/{location_code}/edit', \App\Livewire\Locations\Form::class)->name('admin.locations.edit');
+    Route::get('/admin/locations/{location_code}/profile', \App\Livewire\Locations\Profile::class)->name('admin.locations.profile');
+    
+    // Event CRUD Routes (under Location)
+    Route::get('/admin/locations/{location_code}/events', \App\Livewire\Events\Index::class)->name('admin.locations.events.index');
+    Route::get('/admin/locations/{location_code}/events/create', \App\Livewire\Events\Form::class)->name('admin.locations.events.create');
+    Route::get('/admin/locations/{location_code}/events/{id}/edit', \App\Livewire\Events\Form::class)->name('admin.locations.events.edit');
     
     // Amenity CRUD Routes
     Route::get('/admin/amenities', \App\Livewire\Amenities\Index::class)->name('admin.amenities.index');

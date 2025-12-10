@@ -40,13 +40,13 @@ class Form extends Component
         'thumbnail' => 'nullable|image|max:2048',
     ];
 
-    public function mount($id = null)
+    public function mount($location_code = null)
     {
         $this->showMessage = session()->has('message');
         
-        if ($id) {
-            $this->locationId = $id;
-            $location = Location::findOrFail($id);
+        if ($location_code) {
+            $this->locationId = $location_code;
+            $location = Location::where('location_code', $location_code)->firstOrFail();
             $this->name = $location->name;
             $this->description = $location->description;
             $this->address = $location->address;

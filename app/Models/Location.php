@@ -24,6 +24,7 @@ class Location extends Model implements HasMedia
         'phone',
         'email',
         'is_active',
+        'location_code',
     ];
 
     protected function casts(): array
@@ -75,5 +76,33 @@ class Location extends Model implements HasMedia
     {
         $media = $this->getFirstMedia('thumbnail');
         return $media ? $media->getUrl() : null;
+    }
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($location) {
+            if (empty($location->location_code)) {
+                $location->location_code = static::generateUniqueLocationCode();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique location code.
+     *
+     * @return string
+     */
+    protected static function generateUniqueLocationCode(): string
+    {
+        do {
+            $code = 'LOC-' . strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
+        } while (static::where('location_code', $code)->exists());
+
+        return $code;
     }
 }
