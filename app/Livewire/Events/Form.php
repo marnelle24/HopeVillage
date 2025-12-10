@@ -103,7 +103,9 @@ class Form extends Component
 
             $event->update($updateData);
             $message = 'Event updated successfully.';
-        } else {
+        } 
+        else 
+        {
             $event = Event::create([
                 'location_id' => $this->location->id,
                 'created_by' => auth()->id(),
