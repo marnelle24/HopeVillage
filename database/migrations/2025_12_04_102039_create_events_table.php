@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->string('event_code')->unique();
             $table->foreignId('location_id')->constrained()->onDelete('cascade');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->string('title');
@@ -22,8 +23,8 @@ return new class extends Migration
             $table->string('venue')->nullable();
             $table->integer('max_participants')->nullable();
             $table->enum('status', ['draft', 'published', 'cancelled', 'completed'])->default('draft');
-            $table->string('image')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
