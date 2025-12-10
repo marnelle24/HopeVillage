@@ -2,15 +2,20 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <a href="{{ route('admin.locations.profile', $location->location_code) }}" class="text-gray-600 hover:text-gray-900">
-                    ← Back to Profile
-                </a>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Events - {{ $location->name }}
+                <h2 class="md:block hidden font-semibold text-xl text-gray-800 leading-tight">
+                    {{ 'Events in ' . $location->name }}
+                </h2>
+                <h2 class="md:hidden block font-semibold text-xl text-gray-800 leading-tight">
+                    {{ 'Events in ' . Str::words($location->name, 5, '...') }}
                 </h2>
             </div>
-            <a href="{{ route('admin.locations.events.create', $location->location_code) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
+            <a href="{{ route('admin.locations.events.create', $location->location_code) }}" class="md:block hidden bg-indigo-600 hover:bg-indigo-700 text-base text-white font-semibold py-2 px-4 rounded-lg">
                 Create New Event
+            </a>
+            <a href="{{ route('admin.locations.events.create', $location->location_code) }}" title="Create New Event" class="md:hidden block bg-indigo-600 hover:bg-indigo-500 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
             </a>
         </div>
     </x-slot>
@@ -56,8 +61,11 @@
                 </div>
             @endif
 
+            <a href="{{ route('admin.locations.profile', $location->location_code) }}" class="text-gray-600 hover:text-gray-900 mb-4 inline-block md:mx-0 mx-4">
+                ← Back to Profile
+            </a>
             <!-- Search and Filter -->
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 mb-6">
+            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 mb-6 md:mx-0 mx-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <input 
@@ -83,7 +91,7 @@
             </div>
 
             <!-- Events Table -->
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg md:mx-0 mx-4">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -91,7 +99,6 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Venue</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registrations</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -101,10 +108,18 @@
                             @forelse($events as $event)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $event->title }}</div>
-                                        @if($event->description)
-                                            <div class="text-sm text-gray-500 truncate max-w-xs">{{ Str::limit($event->description, 50) }}</div>
-                                        @endif
+                                        <div class="flex items-center gap-3">
+                                            @if($event->thumbnail_url)
+                                                <img src="{{ $event->thumbnail_url }}" alt="{{ $event->title }}" class="w-10 h-10 border border-gray-300 rounded-full object-cover">
+                                            @else
+                                                <div class="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-400">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                                    </svg>
+                                                </div>
+                                            @endif
+                                            <div class="text-md font-medium text-gray-900">{{ Str::words($event->title, 5, '...') }}</div>
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
@@ -116,9 +131,6 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">{{ $event->venue ?? 'N/A' }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-mono text-gray-900">{{ $event->event_code }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @php

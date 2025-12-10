@@ -143,29 +143,38 @@
                         @if($location->events->count() > 0)
                             <div class="space-y-3">
                                 @foreach($location->events as $event)
-                                    <div class="border-l-4 border-indigo-500 pl-3 py-2">
-                                        <a href="{{ route('admin.locations.events.edit', [$location->location_code, $event->id]) }}" class="text-sm font-semibold text-gray-900 hover:text-indigo-600">
+                                    <div class="border-l-4 border-indigo-500 pl-3 py-2 group hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
+                                        <a href="{{ route('admin.locations.events.edit', [$location->location_code, $event->id]) }}" class="group-hover:text-indigo-600 text-md font-semibold text-indigo-400 hover:text-indigo-600 transition-colors duration-300">
                                             {{ $event->title }}
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                {{ $event->start_date->format('M d, Y') }}
+                                                @if($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d'))
+                                                    {{ $event->start_date->format('g:i A') }} - {{ $event->end_date->format('g:i A') }}
+                                                @else
+                                                    - {{ $event->end_date->format('M d, Y g:i A') }}
+                                                @endif
+                                            </p>
+                                            @php
+                                                $statusClass = match($event->status) {
+                                                    'published' => 'bg-green-100 text-green-800 group-hover:bg-green-200 transition-colors duration-300',
+                                                    'cancelled' => 'bg-red-100 text-red-800 group-hover:bg-red-200 trasition-colors duration-300',
+                                                    'completed' => 'bg-gray-100 text-gray-800 group-hover:bg-gray-200 trasition-colors duration-300',
+                                                    default => 'bg-yellow-100 text-yellow-800 group-hover:bg-yellow-200 trasition-colors duration-300',
+                                                };
+                                            @endphp
+                                            
+                                            <div class="mt-2">
+                                                <span class="inline-flex text-xs leading-5 font-semibold rounded-full mt-1 px-2.5 py-1 {{ $statusClass }}">
+                                                    {{ ucfirst($event->status) }}
+                                                </span>
+                                                
+                                                @if($event->end_date > now())
+                                                <span class="inline-flex text-xs leading-5 font-semibold rounded-full mt-1 px-2.5 py-1 bg-yellow-100 text-yellow-800">
+                                                    Still Accepting Registrations
+                                                </span>
+                                                @endif
+                                            </div>
                                         </a>
-                                        <p class="text-xs text-gray-500 mt-1">
-                                            {{ $event->start_date->format('M d, Y') }}
-                                            @if($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d'))
-                                                {{ $event->start_date->format('g:i A') }} - {{ $event->end_date->format('g:i A') }}
-                                            @else
-                                                - {{ $event->end_date->format('M d, Y g:i A') }}
-                                            @endif
-                                        </p>
-                                        @php
-                                            $statusClass = match($event->status) {
-                                                'published' => 'bg-green-100 text-green-800',
-                                                'cancelled' => 'bg-red-100 text-red-800',
-                                                'completed' => 'bg-gray-100 text-gray-800',
-                                                default => 'bg-yellow-100 text-yellow-800',
-                                            };
-                                        @endphp
-                                        <span class="inline-flex text-xs leading-5 font-semibold rounded-full mt-1 px-2 py-0.5 {{ $statusClass }}">
-                                            {{ ucfirst($event->status) }}
-                                        </span>
                                     </div>
                                 @endforeach
                             </div>

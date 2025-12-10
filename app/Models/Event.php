@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Event extends Model
+class Event extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $fillable = [
         'location_id',
@@ -74,5 +77,24 @@ class Event extends Model
         } while (static::where('event_code', $code)->exists());
 
         return $code;
+    }
+
+    /**
+     * Register media collections for event images
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('thumbnail')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+    }
+
+    /**
+     * Get the thumbnail URL
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('thumbnail');
+        return $media ? $media->getUrl() : null;
     }
 }
