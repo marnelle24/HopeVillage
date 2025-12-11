@@ -65,6 +65,23 @@ Route::middleware([
     Route::get('/member/qr-code/full', [QrCodeController::class, 'fullSize'])->name('member.qr-code.full');
 });
 
+// Merchant Dashboard - Only accessible by merchant users
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+    'merchant_user',
+])->group(function () {
+    Route::get('/merchant/dashboard', function () {
+        return view('merchant.dashboard');
+    })->name('merchant.dashboard');
+    
+    // Merchant Voucher CRUD Routes
+    Route::get('/merchant/vouchers', \App\Livewire\Merchant\Vouchers\Index::class)->name('merchant.vouchers.index');
+    Route::get('/merchant/vouchers/create', \App\Livewire\Merchant\Vouchers\Form::class)->name('merchant.vouchers.create');
+    Route::get('/merchant/vouchers/{voucher_code}/edit', \App\Livewire\Merchant\Vouchers\Form::class)->name('merchant.vouchers.edit');
+});
+
 // Legacy dashboard route - redirects based on user type
 Route::middleware([
     'auth:sanctum',
@@ -77,6 +94,8 @@ Route::middleware([
             return redirect()->route('admin.dashboard');
         } elseif ($user->isMember()) {
             return redirect()->route('member.dashboard');
+        } elseif ($user->isMerchantUser()) {
+            return redirect()->route('merchant.dashboard');
         }
         abort(403, 'Invalid user type');
     })->name('dashboard');

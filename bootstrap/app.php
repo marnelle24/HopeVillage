@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureAdmin::class,
             'member' => \App\Http\Middleware\EnsureMember::class,
+            'merchant_user' => \App\Http\Middleware\EnsureMerchantUser::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

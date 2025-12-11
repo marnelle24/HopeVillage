@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        // Check if deleted_at column already exists (events table may have been created with soft deletes)
+        if (!Schema::hasColumn('events', 'deleted_at')) {
+            Schema::table('events', function (Blueprint $table) {
+                $table->softDeletes();
+            });
+        }
     }
 
     /**
@@ -21,8 +24,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        // Only drop if column exists
+        if (Schema::hasColumn('events', 'deleted_at')) {
+            Schema::table('events', function (Blueprint $table) {
+                $table->dropSoftDeletes();
+            });
+        }
     }
 };

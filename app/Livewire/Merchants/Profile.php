@@ -10,6 +10,8 @@ class Profile extends Component
     public $merchantCode;
     public $merchant;
 
+    protected $listeners = ['refresh-users' => 'loadMerchant'];
+
     public function mount($merchant_code)
     {
         $this->merchantCode = $merchant_code;
@@ -20,7 +22,7 @@ class Profile extends Component
     {
         $this->merchant = Merchant::with(['vouchers' => function ($query) {
             $query->latest()->take(10);
-        }])->where('merchant_code', $this->merchantCode)->firstOrFail();
+        }, 'users'])->where('merchant_code', $this->merchantCode)->firstOrFail();
     }
 
     public function render()

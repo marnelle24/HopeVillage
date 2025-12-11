@@ -11,34 +11,52 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.*')">
-                        {{ __('Locations') }}
-                    </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.*')">
-                        {{ __('Events') }}
-                    </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
-                        {{ __('Amenities') }}
-                    </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants.*')">
-                        {{ __('Merchants') }}
-                    </x-nav-link>
-                </div>
+                @if(auth()->user()->isAdmin())
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.*')">
+                            {{ __('Locations') }}
+                        </x-nav-link>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.*')">
+                            {{ __('Events') }}
+                        </x-nav-link>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
+                            {{ __('Amenities') }}
+                        </x-nav-link>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants.*')">
+                            {{ __('Merchants') }}
+                        </x-nav-link>
+                    </div>
+                @elseif(auth()->user()->isMerchantUser())
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('merchant.vouchers.index') }}" :active="request()->routeIs('merchant.vouchers.*')">
+                            {{ __('My Vouchers') }}
+                        </x-nav-link>
+                    </div>
+                @endif
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <!-- Merchant Switcher for Merchant Users -->
+                @if(auth()->check() && auth()->user()->isMerchantUser() && auth()->user()->merchants->count() > 1)
+                    @livewire('merchant.merchant-switcher-dropdown', key('merchant-switcher-nav'))
+                @endif
+
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                     <div class="ms-3 relative">
@@ -159,21 +177,30 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.*')">
-                {{ __('Locations') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.*')">
-                {{ __('Events') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
-                {{ __('Amenities') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants.*')">
-                {{ __('Merchants') }}
-            </x-responsive-nav-link>
+            @if(auth()->user()->isAdmin())
+                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.*')">
+                    {{ __('Locations') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.*')">
+                    {{ __('Events') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
+                    {{ __('Amenities') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants.*')">
+                    {{ __('Merchants') }}
+                </x-responsive-nav-link>
+            @elseif(auth()->user()->isMerchantUser())
+                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('merchant.vouchers.index') }}" :active="request()->routeIs('merchant.vouchers.*')">
+                    {{ __('My Vouchers') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

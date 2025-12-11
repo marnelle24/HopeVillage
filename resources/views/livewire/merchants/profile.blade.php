@@ -128,6 +128,20 @@
                                 <svg class="size-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m-8.25 3.75h16.5m-16.5 3.75h16.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"></path> </g></svg>
                                 View All Vouchers
                             </a>
+                            <button 
+                                wire:click="$dispatch('open-manage-users-modal')"
+                                class="flex items-center justify-center gap-2 w-full bg-purple-500 hover:bg-purple-600 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200"
+                            >
+                                <svg class="size-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                @if($merchant->users->count() > 0)
+                                    Manage Users ({{ $merchant->users->count() }})
+                                @else
+                                    Add User
+                                @endif
+                            </button>
+                            @livewire('merchants.manage-users', ['merchant_code' => $merchant->merchant_code], key('manage-users-' . $merchant->id))
                         </div>
                     </div>
 

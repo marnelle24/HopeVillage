@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,6 +40,7 @@ class User extends Authenticatable
         'qr_code',
         'is_verified',
         'total_points',
+        'current_merchant_id',
     ];
 
     /**
@@ -91,7 +94,71 @@ class User extends Authenticatable
         return $this->user_type === 'member';
     }
 
+    /**
+     * Check if user is merchant user
+     */
+    public function isMerchantUser(): bool
+    {
+        return $this->user_type === 'merchant_user';
+    }
+
     // Relationships
+    public function merchants(): BelongsToMany
+    {
+        return $this->belongsToMany(Merchant::class, 'merchant_user')
+            ->withPivot('is_default')
+            ->withTimestamps();
+    }
+
+    public function defaultMerchant()
+    {
+        return $this->merchants()->wherePivot('is_default', true)->first();
+    }
+
+    public function currentMerchant()
+    {
+        // Check session first (for immediate updates)
+        $sessionMerchantId = session('current_merchant_id');
+        if ($sessionMerchantId && $this->merchants()->where('merchants.id', $sessionMerchantId)->exists()) {
+            return $this->merchants()->where('merchants.id', $sessionMerchantId)->first();
+        }
+
+        // Fall back to database value
+        if ($this->current_merchant_id) {
+            $merchant = $this->merchants()->where('merchants.id', $this->current_merchant_id)->first();
+            if ($merchant) {
+                return $merchant;
+            }
+        }
+
+        // Fall back to default merchant
+        $default = $this->defaultMerchant();
+        if ($default) {
+            // Update current_merchant_id to default if not set
+            if (!$this->current_merchant_id) {
+                $this->update(['current_merchant_id' => $default->id]);
+            }
+            return $default;
+        }
+
+        // Last resort: first merchant
+        $first = $this->merchants()->first();
+        if ($first && !$this->current_merchant_id) {
+            $this->update(['current_merchant_id' => $first->id]);
+        }
+        return $first;
+    }
+
+    public function setCurrentMerchant($merchantId)
+    {
+        // Verify user has access to this merchant
+        if ($this->merchants()->where('merchants.id', $merchantId)->exists()) {
+            $this->update(['current_merchant_id' => $merchantId]);
+            session(['current_merchant_id' => $merchantId]);
+            return true;
+        }
+        return false;
+    }
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);

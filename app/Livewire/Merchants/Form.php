@@ -114,9 +114,11 @@ class Form extends Component
             // Clear existing logo
             $merchant->clearMediaCollection('logo');
             
-            // Add new logo
-            $merchant->addMedia($this->logo->getRealPath())
+            // Add new logo - for Livewire temporary files, use getPathname() or getRealPath()
+            // Both should work, but getPathname() is more reliable for Livewire temp files
+            $merchant->addMedia($this->logo->getPathname())
                 ->usingName($merchant->name . ' - Logo')
+                ->usingFileName($this->logo->getClientOriginalName())
                 ->toMediaCollection('logo');
         }
 
