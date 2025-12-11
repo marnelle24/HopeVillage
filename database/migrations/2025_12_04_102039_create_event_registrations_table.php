@@ -15,16 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('event_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('program_id')->nullable()->constrained()->onDelete('cascade');
-            $table->enum('type', ['event', 'program'])->default('event');
+            $table->enum('type', ['app', 'event_qr_code', 'user_qr_code', 'manual'])->default('app');
             $table->enum('status', ['registered', 'attended', 'cancelled', 'no_show'])->default('registered');
             $table->timestamp('registered_at');
             $table->timestamp('attended_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
             
-            $table->unique(['user_id', 'event_id', 'type']);
-            $table->unique(['user_id', 'program_id', 'type']);
+            $table->unique(['user_id', 'event_id']);
         });
     }
 

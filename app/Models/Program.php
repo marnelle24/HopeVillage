@@ -47,4 +47,5 @@ class Program extends Model
     {
         return $this->hasMany(EventRegistration::class)->where('type', 'program');
     }
+
 }
