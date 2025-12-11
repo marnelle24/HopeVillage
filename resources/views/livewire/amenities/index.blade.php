@@ -108,7 +108,7 @@
             <div class="grid grid-cols-1 gap-4 md:px-0 px-4">
                 @forelse($amenities as $amenity)
 
-                    @switch($amenity->type)
+                    @switch($amenity->display_type)
                         @case('Basketball')
                             @php
                                 $amenityTypeClass = 'bg-green-50 text-green-800';
@@ -159,11 +159,7 @@
                                 <img src="{{ $amenity->thumbnail_url }}" alt="{{ $amenity->name }}" class="w-24 h-full object-cover rounded-lg">
                             @else
                                 @php
-                                    $typeLabel = $amenity->type;
-                                    if (str_starts_with($typeLabel, 'others-')) {
-                                        $typeLabel = substr($typeLabel, 7); // Remove "others-" prefix
-                                    }
-                                    $typeLabel = strtoupper(substr($typeLabel, 0, 2));
+                                    $typeLabel = strtoupper(substr($amenity->formatted_type, 0, 2));
                                 @endphp
                                 <span class="{{ $imgTextColor }} opacity-50 drop-shadow-lg text-3xl font-bold w-32 h-full {{ $imgBgColor }} rounded-l-lg flex items-center justify-center">
                                     {{ $typeLabel }}
@@ -178,7 +174,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.469.469 1.229.469 1.698 0l4.318-4.318c.469-.469.469-1.229 0-1.698l-9.581-9.581A2.25 2.25 0 0 0 9.568 3Z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
                                             </svg>
-                                            <span class="text-xs capitalize">{{ $amenity->type }}</span>
+                                            <span class="text-xs capitalize">{{ $amenity->formatted_type }}</span>
                                         </span>
                                     </div>
                                     <p class="text-sm text-gray-600 mt-2">{{ $amenity->description }}</p>

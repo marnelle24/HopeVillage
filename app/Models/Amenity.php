@@ -73,4 +73,27 @@ class Amenity extends Model implements HasMedia
         $media = $this->getFirstMedia('images');
         return $media ? $media->getUrl() : null;
     }
+
+    /**
+     * Get the formatted type for display
+     */
+    public function getFormattedTypeAttribute(): string
+    {
+        if (str_starts_with($this->type, 'others-')) {
+            $parts = explode('-', $this->type, 2);
+            return $parts[1] ?? $this->type;
+        }
+        return $this->type;
+    }
+
+    /**
+     * Get the display type (for badges/colors)
+     */
+    public function getDisplayTypeAttribute(): string
+    {
+        if (str_starts_with($this->type, 'others-')) {
+            return 'Others';
+        }
+        return $this->type;
+    }
 }

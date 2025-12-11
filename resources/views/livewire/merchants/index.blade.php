@@ -85,7 +85,7 @@
                     <div class="w-full bg-blue-50 overflow-hidden border-2 border-gray-300 flex md:flex-row flex-col md:justify-between justify-start items-center rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                         <div class="flex-1 flex items-start h-full w-full">
                             @if($merchant->logo_url)
-                                <img src="{{ $merchant->logo_url }}" alt="{{ $merchant->name }}" class="w-24 h-full object-cover rounded-lg">
+                                <img src="{{ $merchant->logo_url }}" alt="{{ $merchant->name }}" class="w-32 h-full object-cover rounded-lg">
                             @else
                                 <span class="text-blue-800 opacity-50 drop-shadow-lg text-3xl font-bold w-32 h-full bg-blue-200 rounded-l-lg flex items-center justify-center">
                                     {{ strtoupper(substr($merchant->name, 0, 2)) }}

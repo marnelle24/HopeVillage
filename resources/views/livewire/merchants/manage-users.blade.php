@@ -29,21 +29,21 @@
                     <button
                         wire:click="switchTab('create')"
                         type="button"
-                        class="@if($activeTab === 'create') border-indigo-500 text-indigo-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                        class="{{ $activeTab === 'create' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                     >
                         Create New User
                     </button>
                     <button
                         wire:click="switchTab('assign')"
                         type="button"
-                        class="@if($activeTab === 'assign') border-indigo-500 text-indigo-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                        class="{{ $activeTab === 'assign' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                     >
                         Assign Existing User
                     </button>
                     <button
                         wire:click="switchTab('list')"
                         type="button"
-                        class="@if($activeTab === 'list') border-indigo-500 text-indigo-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                        class="{{ $activeTab === 'list' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                     >
                         Assigned Users ({{ $merchant->users->count() }})
                     </button>

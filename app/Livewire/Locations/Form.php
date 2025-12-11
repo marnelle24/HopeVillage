@@ -74,7 +74,7 @@ class Form extends Component
         $this->validate();
 
         if ($this->locationId) {
-            $location = Location::findOrFail($this->locationId);
+            $location = Location::where('location_code', $this->locationId)->firstOrFail();
             $location->update([
                 'name' => $this->name,
                 'description' => $this->description,
@@ -121,7 +121,7 @@ class Form extends Component
     public function removeThumbnail()
     {
         if ($this->locationId) {
-            $location = Location::findOrFail($this->locationId);
+            $location = Location::where('location_code', $this->locationId)->firstOrFail();
             $location->clearMediaCollection('thumbnail');
             $this->existingThumbnail = null;
             $this->dispatch('thumbnail-removed');
