@@ -41,6 +41,10 @@ class Form extends Component
             abort(403, 'No merchant associated with your account. Please contact an administrator.');
         }
 
+        if (!$merchant->is_active) {
+            abort(403, 'Your merchant account is pending approval. You cannot create or edit vouchers until your account is approved.');
+        }
+
         $this->showMessage = session()->has('message');
         
         if ($voucher_code) {
@@ -73,6 +77,10 @@ class Form extends Component
         $merchant = auth()->user()->currentMerchant();
         if (!$merchant) {
             abort(403, 'No merchant associated with your account. Please contact an administrator.');
+        }
+
+        if (!$merchant->is_active) {
+            abort(403, 'Your merchant account is pending approval. You cannot create or edit vouchers until your account is approved.');
         }
 
         $this->validate();

@@ -7,6 +7,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Public Merchant Application Route
+Route::get('/merchant/apply', \App\Livewire\Merchant\Apply::class)->name('merchant.apply');
+
 // Admin Dashboard - Only accessible by admin users
 Route::middleware([
     'auth:sanctum',

@@ -9,29 +9,33 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @livewire('merchant.merchant-switcher')
             
+            @php
+                $currentMerchant = auth()->user()->currentMerchant();
+            @endphp
+            
             <div class="mb-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-start gap-3">
-                        @php
-                            $currentMerchant = auth()->user()->currentMerchant();
-                        @endphp
-                        @if($currentMerchant && $currentMerchant->logo_url)
+                        {{-- @if($currentMerchant && $currentMerchant->logo_url)
                             <img src="{{ $currentMerchant->logo_url }}" alt="{{ $currentMerchant->name }}" class="w-16 h-16 object-contain rounded-lg border border-gray-300">
-                        @endif
+                        @endif --}}
                         <div>
                             <h1 class="text-3xl font-bold text-gray-900">Welcome, {{ auth()->user()->name }}!</h1>
-                            @if($currentMerchant)
+                            {{-- @if($currentMerchant)
                                 <p class="text-gray-600 mt-1">{{ $currentMerchant->name }}</p>
-                            @endif
+                            @endif --}}
                         </div>
                     </div>
-                    @if($currentMerchant)
+                    @if($currentMerchant && $currentMerchant->is_active)
+                        @livewire('merchant.register-merchant')
+                    @endif
+                    {{-- @if($currentMerchant)
                         <div class="flex items-center gap-3">
                             <div class="px-4 py-2 bg-blue-100 text-blue-800 border border-blue-300 rounded-lg">
                                 <span class="font-semibold text-sm">Merchant User</span>
                             </div>
                         </div>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
 
@@ -56,19 +60,25 @@
                         <h3 class="text-lg font-semibold text-blue-900 mb-2">Merchant Status</h3>
                         <p class="text-lg font-bold text-blue-600">
                             <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {{ $currentMerchant->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ $currentMerchant->is_active ? 'Active' : 'Inactive' }}
+                                {{ $currentMerchant->is_active ? 'Approved' : 'Pending Approval' }}
                             </span>
                         </p>
-                        <p class="text-sm text-blue-700 mt-2">{{ $currentMerchant->merchant_code }}</p>
+                        {{-- <p class="text-sm text-blue-700 mt-2">{{ $currentMerchant->merchant_code }}</p> --}}
                     </div>
                 </div>
 
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold text-gray-900">Recent Vouchers</h2>
-                        <a href="{{ route('merchant.vouchers.index') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
-                            Manage Vouchers
-                        </a>
+                        @if($currentMerchant->is_active)
+                            <a href="{{ route('merchant.vouchers.index') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
+                                Manage Vouchers
+                            </a>
+                        @else
+                            <span class="bg-gray-400 cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg" title="Your merchant account is pending approval">
+                                Manage Vouchers
+                            </span>
+                        @endif
                     </div>
 
                     @php
@@ -96,9 +106,15 @@
                                                 </span>
                                             </div>
                                         </div>
-                                        <a href="{{ route('merchant.vouchers.edit', $voucher->voucher_code) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                                            Edit →
-                                        </a>
+                                        @if($currentMerchant->is_active)
+                                            <a href="{{ route('merchant.vouchers.edit', $voucher->voucher_code) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                                Edit →
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400 cursor-not-allowed text-sm font-medium" title="Your merchant account is pending approval">
+                                                Edit →
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
@@ -106,9 +122,18 @@
                     @else
                         <div class="text-center py-8">
                             <p class="text-gray-500 mb-4">No vouchers yet</p>
-                            <a href="{{ route('merchant.vouchers.create') }}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
-                                Create Your First Voucher
-                            </a>
+                            @if($currentMerchant->is_active)
+                                <a href="{{ route('merchant.vouchers.create') }}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
+                                    Create Your First Voucher
+                                </a>
+                            @else
+                                <div class="inline-block">
+                                    <span class="bg-gray-400 cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg" title="Your merchant account is pending approval. You cannot create vouchers until your account is approved.">
+                                        Create Your First Voucher
+                                    </span>
+                                    <p class="text-sm text-yellow-600 mt-8">Your merchant account is pending approval</p>
+                                </div>
+                            @endif
                         </div>
                     @endif
                 </div>

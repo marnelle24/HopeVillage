@@ -11,7 +11,7 @@ class Index extends Component
     use WithPagination;
 
     public $search = '';
-    public $statusFilter = 'all';
+    public $statusFilter = 'all'; // 'all', 'active', 'inactive', 'pending'
     public $showMessage = false;
 
     protected $paginationTheme = 'tailwind';
@@ -46,6 +46,24 @@ class Index extends Component
         $this->dispatch('merchant-deleted');
     }
 
+    public function approve($merchant_code)
+    {
+        $merchant = Merchant::where('merchant_code', $merchant_code)->firstOrFail();
+        $merchant->update(['is_active' => true]);
+        
+        session()->flash('message', 'Merchant approved successfully.');
+        $this->showMessage = true;
+    }
+
+    public function reject($merchant_code)
+    {
+        $merchant = Merchant::where('merchant_code', $merchant_code)->firstOrFail();
+        $merchant->delete(); // Soft delete to reject
+        
+        session()->flash('message', 'Merchant application rejected.');
+        $this->showMessage = true;
+    }
+
     public function render()
     {
         $query = Merchant::query();
@@ -60,17 +78,26 @@ class Index extends Component
             });
         }
 
-        if ($this->statusFilter !== 'all') {
-            $query->where('is_active', $this->statusFilter === 'active');
+        if ($this->statusFilter === 'pending') {
+            $query->where('is_active', false);
+        } elseif ($this->statusFilter === 'active') {
+            $query->where('is_active', true);
+        } elseif ($this->statusFilter === 'inactive') {
+            $query->onlyTrashed(); // Soft deleted merchants
         }
+        // 'all' - show all non-deleted merchants (no additional filter needed)
 
         $merchants = $query->with('media')
             ->withCount('vouchers')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        // Count pending applications (non-deleted, inactive)
+        $pendingCount = Merchant::where('is_active', false)->count();
+
         return view('livewire.merchants.index', [
             'merchants' => $merchants,
+            'pendingCount' => $pendingCount,
         ])->layout('components.layouts.app');
     }
 }

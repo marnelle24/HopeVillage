@@ -74,6 +74,7 @@
                         >
                             <option value="all">All Status</option>
                             <option value="active">Active</option>
+                            <option value="pending">Pending Approval @if($pendingCount > 0)({{ $pendingCount }})@endif</option>
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>
@@ -101,8 +102,26 @@
                                             </svg>
                                             <span class="text-xs">{{ $merchant->merchant_code }}</span>
                                         </span>
+                                        {{-- @if(!$merchant->is_active)
+                                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg text-xs font-semibold">
+                                                Pending Approval
+                                            </span>
+                                        @endif --}}
                                     </div>
-                                    <p class="text-sm text-gray-600 mt-2">{{ $merchant->description }}</p>
+                                    <p class="text-sm flex items-center gap-1 text-gray-600 mt-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 stroke-gray-600">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                        </svg>
+                                        @if($merchant->address)
+                                            {{ $merchant->address }}
+                                            @if($merchant->city || $merchant->province || $merchant->postal_code)
+                                                {{ trim(implode(', ', array_filter([$merchant->city, $merchant->province, $merchant->postal_code]))) }}
+                                            @endif
+                                        @else
+                                            <span class="text-gray-400">No address provided</span>
+                                        @endif
+                                    </p>
                                     <div class="flex md:flex-row flex-col md:items-center items-start gap-1 md:space-x-2 space-x-0 mt-2">
                                         @if($merchant->email)
                                             <div class="flex items-center gap-1 mt-2">
@@ -121,25 +140,54 @@
                                             </div>
                                         @endif
                                         <div class="flex">
-                                            <span class="flex items-center gap-1 text-gray-600 mt-2 bg-gray-200 rounded-lg py-1 px-3 text-xs">
+                                            <span class="flex items-center gap-1 text-gray-600 mt-2 bg-gray-200 border border-gray-300 rounded-lg py-1 px-3 text-xs">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m-8.25 3.75h16.5m-16.5 3.75h16.5" />
                                                 </svg>
                                                 <span class="text-sm">{{ $merchant->vouchers_count }} Voucher(s)</span>
                                             </span>
                                         </div>
-                                        <div class="flex">
+                                        <div class="flex gap-1 items-end">
                                             @php
-                                                $status = $merchant->is_active ? 'Active' : 'Inactive';
-                                                $statusClass = $merchant->is_active ? 'bg-green-100 text-green-800 border border-green-300/50' : 'bg-red-100 text-red-800 border border-red-300';
+                                                if ($merchant->is_active) {
+                                                    $status = 'Active';
+                                                    $statusClass = 'bg-green-100 text-green-800 border border-green-300/50';
+                                                } else {
+                                                    $status = 'Pending Approval';
+                                                    $statusClass = 'bg-red-100 text-red-800 border border-red-300';
+                                                }
                                             @endphp
                                             <span class="flex items-center gap-1 {{ $statusClass }} mt-2 rounded-lg px-2.5 py-1 text-xs">
                                                 <span class="text-sm">{{ $status }}</span>
                                             </span>
+
+                                            @if(!$merchant->is_active)
+                                                <button 
+                                                    wire:click="approve('{{ $merchant->merchant_code }}')"
+                                                    wire:confirm="Are you sure you want to approve this merchant application?"
+                                                    title="Approve Merchant"
+                                                    class="flex items-center gap-1 hover:drop-shadow hover:-translate-y-0.5 justify-center text-green-600 transition-all duration-300">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                                                    </svg>
+                                                    <span class="text-xs">Approve</span>
+                                                </button>
+                                                <span class="text-xs">|</span>
+                                                <button 
+                                                    wire:click="reject('{{ $merchant->merchant_code }}')"
+                                                    wire:confirm="Are you sure you want to reject this merchant application?"
+                                                    title="Reject Merchant"
+                                                    class="flex items-center gap-1 hover:drop-shadow hover:-translate-y-0.5 justify-center text-red-600 transition-all duration-300">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54" />
+                                                    </svg>
+                                                    <span class="text-xs">Reject</span>
+                                                </button>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
-                                <div class="p-4 flex items-start justify-end gap-2">
+                                <div class="p-4 flex items-start justify-end gap-2 flex-wrap">
                                     <a href="{{ route('admin.merchants.profile', $merchant->merchant_code) }}" 
                                         title="View Profile"
                                         class="rounded-full p-3 flex items-center hover:scale-110 justify-center bg-indigo-500 hover:bg-indigo-600 text-white transition-all duration-300">
@@ -156,15 +204,17 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                         </svg>
                                     </button>
-                                    <button 
-                                        wire:confirm="Are you sure you want to delete this merchant?" 
-                                        title="Delete Merchant"
-                                        wire:click="delete('{{ $merchant->merchant_code }}')"
-                                        class="rounded-full p-3 flex items-center hover:scale-110 justify-center bg-red-400 hover:bg-red-500 text-white transition-all duration-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
-                                    </button>
+                                    @if($merchant->is_active)
+                                        <button 
+                                            wire:confirm="Are you sure you want to archive this merchant?" 
+                                            title="Archive Merchant"
+                                            wire:click="delete('{{ $merchant->merchant_code }}')"
+                                            class="rounded-full p-3 flex items-center hover:scale-110 justify-center bg-red-400 hover:bg-red-500 text-white transition-all duration-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
