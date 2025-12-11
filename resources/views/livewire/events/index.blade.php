@@ -106,7 +106,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($events as $event)
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location.href='{{ route('admin.events.profile', $event->event_code) }}'">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center gap-3">
                                             @if($event->thumbnail_url)
@@ -118,7 +118,7 @@
                                                     </svg>
                                                 </div>
                                             @endif
-                                            <div class="text-md font-medium text-gray-900">{{ Str::words($event->title, 5, '...') }}</div>
+                                            <div class="text-md font-medium text-gray-900 hover:text-indigo-600 transition-colors">{{ Str::words($event->title, 5, '...') }}</div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -153,7 +153,7 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onclick="event.stopPropagation()">
                                         <div class="flex justify-end gap-2">
                                             <a 
                                                 href="{{ route('admin.locations.events.edit', [$location->location_code, $event->id]) }}" 

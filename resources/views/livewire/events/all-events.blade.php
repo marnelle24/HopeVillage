@@ -63,7 +63,7 @@
 
             <!-- Search and Filter -->
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <input 
                             type="text" 
@@ -71,6 +71,17 @@
                             placeholder="Search events..." 
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         >
+                    </div>
+                    <div>
+                        <select 
+                            wire:model.live="locationFilter" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                            <option value="">All Locations</option>
+                            @foreach($locations as $location)
+                                <option value="{{ $location->id }}">{{ $location->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div>
                         <select 
@@ -99,8 +110,9 @@
                             default => 'bg-yellow-100 text-yellow-800',
                         };
                     @endphp
-                    <div class="bg-white overflow-hidden shadow-md flex flex-col rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                        <div class="w-full {{ $thumbnailHeight }} border border-gray-300 rounded-t-lg">
+                    <div class="bg-white group overflow-hidden shadow-md flex flex-col rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative">
+                        <a href="{{ route('admin.events.profile', $event->event_code) }}" class="absolute inset-0 z-0"></a>
+                        <div class="w-full {{ $thumbnailHeight }} border border-gray-300 rounded-t-lg relative z-10">
                             @if($event->thumbnail_url)
                                 <img src="{{ $event->thumbnail_url }}" alt="{{ $event->title }}" class="w-full {{ $thumbnailHeight }} border-b border-gray-300 object-cover rounded-t-lg">
                             @else
@@ -111,9 +123,9 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="p-4 flex flex-col h-full group-hover:bg-orange-50 transition-all duration-300">
-                            <div class="flex-1">
-                                <h3 class="md:text-lg text-xl font-bold text-gray-900 mb-2 line-clamp-2">{{ $event->title }}</h3>
+                        <div class="p-4 flex flex-col h-full group-hover:bg-orange-50 transition-all duration-300 relative z-10">
+                            <a href="{{ route('admin.events.profile', $event->event_code) }}" class="flex-1">
+                                <h3 class="group-hover:text-orange-400 transition-colors duration-300 md:text-lg text-xl font-bold text-gray-900 mb-2 line-clamp-2 cursor-pointer">{{ $event->title }}</h3>
                                 <table class="w-full">
                                     <tr>
                                         <td class="md:text-sm text-xs text-gray-600 flex items-center py-1">
@@ -164,15 +176,15 @@
                                         </td>
                                     </tr>
                                 </table>
-                            </div>
+                            </a>
                             <div class="mt-2 flex justify-between items-baseline">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">{{ $status }}</span>
 
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
                                     <a 
                                         href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" 
                                         title="Edit Event"
-                                        class="bg-blue-700/60 hover:bg-sky-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                                        class="bg-blue-700/60 hover:bg-sky-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200 relative z-20">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                         </svg>
@@ -181,7 +193,7 @@
                                         wire:click="delete({{ $event->id }})" 
                                         title="Delete Event"
                                         wire:confirm="Are you sure you want to delete this event?"
-                                        class="bg-red-600/60 hover:bg-red-700 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                                        class="bg-red-600/60 hover:bg-red-700 hover:scale-105 text-white p-2 rounded-full transition-all duration-200 relative z-20">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                         </svg>

@@ -26,6 +26,7 @@ Route::middleware([
     
     // Event CRUD Routes
     Route::get('/admin/events', \App\Livewire\Events\AllEvents::class)->name('admin.events.index');
+    Route::get('/admin/events/{event_code}/profile', \App\Livewire\Events\Profile::class)->name('admin.events.profile');
     Route::get('/admin/locations/{location_code}/events', \App\Livewire\Events\Index::class)->name('admin.locations.events.index');
     Route::get('/admin/locations/{location_code}/events/create', \App\Livewire\Events\Form::class)->name('admin.locations.events.create');
     Route::get('/admin/locations/{location_code}/events/{id}/edit', \App\Livewire\Events\Form::class)->name('admin.locations.events.edit');

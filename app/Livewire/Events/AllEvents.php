@@ -3,6 +3,7 @@
 namespace App\Livewire\Events;
 
 use App\Models\Event;
+use App\Models\Location;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,6 +13,7 @@ class AllEvents extends Component
 
     public $search = '';
     public $statusFilter = 'all';
+    public $locationFilter = '';
     public $showMessage = false;
 
     protected $paginationTheme = 'tailwind';
@@ -27,6 +29,11 @@ class AllEvents extends Component
     }
 
     public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingLocationFilter()
     {
         $this->resetPage();
     }
@@ -61,11 +68,18 @@ class AllEvents extends Component
             $query->where('status', $this->statusFilter);
         }
 
+        if ($this->locationFilter) {
+            $query->where('location_id', $this->locationFilter);
+        }
+
         $events = $query->orderBy('start_date', 'desc')
             ->paginate(12);
 
+        $locations = Location::orderBy('name')->get();
+
         return view('livewire.events.all-events', [
             'events' => $events,
+            'locations' => $locations,
         ])->layout('components.layouts.app');
     }
 }
