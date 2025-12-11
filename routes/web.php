@@ -35,6 +35,18 @@ Route::middleware([
     Route::get('/admin/amenities', \App\Livewire\Amenities\Index::class)->name('admin.amenities.index');
     Route::get('/admin/amenities/create', \App\Livewire\Amenities\Form::class)->name('admin.amenities.create');
     Route::get('/admin/amenities/{id}/edit', \App\Livewire\Amenities\Form::class)->name('admin.amenities.edit');
+    
+    // Merchant CRUD Routes
+    Route::get('/admin/merchants', \App\Livewire\Merchants\Index::class)->name('admin.merchants.index');
+    Route::get('/admin/merchants/create', \App\Livewire\Merchants\Form::class)->name('admin.merchants.create');
+    Route::get('/admin/merchants/{merchant_code}/edit', \App\Livewire\Merchants\Form::class)->name('admin.merchants.edit');
+    Route::get('/admin/merchants/{merchant_code}', \App\Livewire\Merchants\Profile::class)->name('admin.merchants.profile');
+    
+    // Voucher CRUD Routes
+    Route::get('/admin/vouchers', \App\Livewire\Vouchers\Index::class)->name('admin.vouchers.index');
+    Route::get('/admin/vouchers/create', \App\Livewire\Vouchers\Form::class)->name('admin.vouchers.create');
+    Route::get('/admin/vouchers/{voucher_code}/edit', \App\Livewire\Vouchers\Form::class)->name('admin.vouchers.edit');
+    Route::get('/admin/vouchers/{voucher_code}', \App\Livewire\Vouchers\Profile::class)->name('admin.vouchers.profile');
 });
 
 // Member Dashboard - Only accessible by member users

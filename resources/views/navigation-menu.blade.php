@@ -17,18 +17,23 @@
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.index')">
+                    <x-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.*')">
                         {{ __('Locations') }}
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.index')">
+                    <x-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.*')">
                         {{ __('Events') }}
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.index')">
+                    <x-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
                         {{ __('Amenities') }}
+                    </x-nav-link>
+                </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants.*')">
+                        {{ __('Merchants') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -157,14 +162,17 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.index')">
+            <x-responsive-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations.*')">
                 {{ __('Locations') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.index')">
+            <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.*')">
                 {{ __('Events') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.index')">
+            <x-responsive-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
                 {{ __('Amenities') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants.*')">
+                {{ __('Merchants') }}
             </x-responsive-nav-link>
         </div>
 

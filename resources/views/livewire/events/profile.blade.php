@@ -6,14 +6,6 @@
                     {{ $event->title }} - Profile
                 </h2>
             </div>
-            <div class="flex gap-2">
-                <a href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" class="bg-slate-600 md:text-base text-xs hover:bg-slate-700 text-white font-normal py-2 px-4 rounded-lg">
-                    Edit Event
-                </a>
-                <a href="{{ route('admin.locations.profile', $event->location->location_code) }}" class="bg-indigo-600 md:text-base text-xs hover:bg-indigo-700 text-white font-normal py-2 px-4 rounded-lg">
-                    View Location
-                </a>
-            </div>
         </div>
     </x-slot>
 

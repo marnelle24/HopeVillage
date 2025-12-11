@@ -154,7 +154,7 @@
                     @endswitch
 
                     <div class="w-full {{ $amenityTypeClass }} overflow-hidden border-2 border-gray-300 flex md:flex-row flex-col md:justify-between justify-start items-center rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                        <div class="flex-1 flex items-start h-full">
+                        <div class="flex-1 flex items-start h-full w-full">
                             @if($amenity->thumbnail_url)
                                 <img src="{{ $amenity->thumbnail_url }}" alt="{{ $amenity->name }}" class="w-24 h-full object-cover rounded-lg">
                             @else
@@ -189,7 +189,7 @@
                                         </svg>
                                         <span class="text-sm text-gray-600">{{ $amenity->location->name }}</span>
                                     </div>
-                                    <div class="flex md:flex-row flex-col md:items-center items-start gap-1 mt-2">
+                                    <div class="flex md:flex-row flex-col md:items-center items-start md:space-x-2 space-x-0 gap-1 mt-2">
                                         <div class="flex">
                                             <span class="flex items-center gap-1 text-gray-600 mt-2 bg-gray-200 rounded-lg py-1 px-3 text-xs">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
