@@ -24,7 +24,7 @@
                         </svg>
                         <div>
                             <h3 class="text-lg font-semibold">Merchant Registration Submitted Successfully!</h3>
-                            <p class="mt-1">The merchant application has been submitted and is pending admin approval. The contact person will be notified via email once the application is reviewed.</p>
+                            <p class="mt-1">The merchant application has been submitted and is pending admin approval. You have been automatically linked to this merchant and can switch to it once approved.</p>
                         </div>
                     </div>
                 </div>

@@ -3,9 +3,6 @@
 namespace App\Livewire\Merchant;
 
 use App\Models\Merchant;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -137,48 +134,7 @@ class RegisterMerchant extends Component
                 ->toMediaCollection('logo');
         }
 
-        // Create or get merchant user
-        $user = User::where('email', $this->email)->first();
-        
-        if (!$user) {
-            // Create new user with random password
-            $randomPassword = Str::random(12);
-            $user = User::create([
-                'name' => $this->contact_name,
-                'email' => $this->email,
-                'password' => Hash::make($randomPassword),
-                'whatsapp_number' => $this->phone,
-                'user_type' => 'merchant_user',
-                'current_merchant_id' => $merchant->id,
-            ]);
-        } else {
-            // Update existing user if needed
-            if (!$user->whatsapp_number && $this->phone) {
-                $user->update(['whatsapp_number' => $this->phone]);
-            }
-            
-            // Update user type if not already merchant_user
-            if ($user->user_type !== 'merchant_user') {
-                $user->update(['user_type' => 'merchant_user']);
-            }
-        }
-
-        // Attach user to merchant if not already attached
-        if (!$merchant->users()->where('user_id', $user->id)->exists()) {
-            // Check if this is the user's first merchant
-            $isFirstMerchant = $user->merchants()->count() === 0;
-            
-            $merchant->users()->attach($user->id, [
-                'is_default' => $isFirstMerchant,
-            ]);
-
-            // Set as current merchant if it's their first merchant
-            if ($isFirstMerchant) {
-                $user->update(['current_merchant_id' => $merchant->id]);
-            }
-        }
-
-        // Also attach the current user to the new merchant
+        // Attach the current user to the new merchant (skip merchant user creation for modal registrations)
         $currentUser = auth()->user();
         if (!$merchant->users()->where('user_id', $currentUser->id)->exists()) {
             $merchant->users()->attach($currentUser->id, [

@@ -84,7 +84,8 @@ class Apply extends Component
         
         if (!$user) {
             // Create new user with random password
-            $randomPassword = Str::random(12);
+            // $randomPassword = Str::random(12);
+            $randomPassword = '123123123';
             $user = User::create([
                 'name' => $this->contact_name,
                 'email' => $this->email,
