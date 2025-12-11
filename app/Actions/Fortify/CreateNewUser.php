@@ -37,10 +37,18 @@ class CreateNewUser implements CreatesNewUsers
                 'user_type' => $input['user_type'] ?? 'member', // Default to member
             ];
 
-            // Generate QR code for members
+            // Generate FIN and QR code for members
             if (($userData['user_type'] ?? 'member') === 'member') {
-                $qrCodeService = new QrCodeService();
-                $userData['qr_code'] = $qrCodeService->generateUniqueCode();
+                // Generate FIN if not provided
+                if (isset($input['fin']) && !empty($input['fin'])) {
+                    $userData['fin'] = $input['fin'];
+                } else {
+                    $qrCodeService = new QrCodeService();
+                    $userData['fin'] = $qrCodeService->generateUniqueCode();
+                }
+                
+                // Set QR code to FIN value
+                $userData['qr_code'] = $userData['fin'];
             }
 
             return tap(User::create($userData), function (User $user) {

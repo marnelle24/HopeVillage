@@ -22,11 +22,11 @@ Route::middleware([
     Route::get('/admin/locations', \App\Livewire\Locations\Index::class)->name('admin.locations.index');
     Route::get('/admin/locations/create', \App\Livewire\Locations\Form::class)->name('admin.locations.create');
     Route::get('/admin/locations/{location_code}/edit', \App\Livewire\Locations\Form::class)->name('admin.locations.edit');
-    Route::get('/admin/locations/{location_code}/profile', \App\Livewire\Locations\Profile::class)->name('admin.locations.profile');
+    Route::get('/admin/locations/{location_code}', \App\Livewire\Locations\Profile::class)->name('admin.locations.profile');
     
     // Event CRUD Routes
     Route::get('/admin/events', \App\Livewire\Events\AllEvents::class)->name('admin.events.index');
-    Route::get('/admin/events/{event_code}/profile', \App\Livewire\Events\Profile::class)->name('admin.events.profile');
+    Route::get('/admin/events/{event_code}', \App\Livewire\Events\Profile::class)->name('admin.events.profile');
     Route::get('/admin/locations/{location_code}/events', \App\Livewire\Events\Index::class)->name('admin.locations.events.index');
     Route::get('/admin/locations/{location_code}/events/create', \App\Livewire\Events\Form::class)->name('admin.locations.events.create');
     Route::get('/admin/locations/{location_code}/events/{id}/edit', \App\Livewire\Events\Form::class)->name('admin.locations.events.edit');
