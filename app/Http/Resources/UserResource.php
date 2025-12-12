@@ -21,6 +21,8 @@ class UserResource extends JsonResource
             'whatsapp_number' => $this->whatsapp_number,
             'user_type' => $this->user_type,
             'fin' => $this->fin,
+            'age' => $this->age,
+            'gender' => $this->gender,
             'qr_code' => $this->qr_code,
             'is_verified' => $this->is_verified,
             'total_points' => $this->total_points,

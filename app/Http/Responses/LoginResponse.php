@@ -18,6 +18,10 @@ class LoginResponse implements LoginResponseContract
     {
         $user = $request->user();
         
+        if ($user && $user->isMember() && !$user->is_verified) {
+            return redirect()->route('verification.code.show');
+        }
+
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->isMember()) {

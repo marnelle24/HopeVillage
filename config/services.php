@@ -39,4 +39,19 @@ return [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+
+        // Alternative auth (recommended): API Key (SK...) + Secret
+        'api_key_sid' => env('TWILIO_API_KEY_SID'),
+        'api_key_secret' => env('TWILIO_API_KEY_SECRET'),
+
+        // For sandbox, this is usually: whatsapp:+14155238886
+        'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
+
+        // Optional: if user enters 91234567, we can prepend +65 (set to 65 for Singapore).
+        'default_country_code' => env('TWILIO_DEFAULT_COUNTRY_CODE'),
+    ],
+
 ];

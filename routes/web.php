@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\VerificationCodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -9,6 +10,16 @@ Route::get('/', function () {
 
 // Public Merchant Application Route
 Route::get('/merchant/apply', \App\Livewire\Merchant\Apply::class)->name('merchant.apply');
+
+// Member verification (OTP via email / WhatsApp)
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+])->group(function () {
+    Route::get('/verify-account', [VerificationCodeController::class, 'show'])->name('verification.code.show');
+    Route::post('/verify-account', [VerificationCodeController::class, 'verify'])->name('verification.code.verify');
+    Route::post('/verify-account/resend', [VerificationCodeController::class, 'resend'])->name('verification.code.resend');
+});
 
 // Admin Dashboard - Only accessible by admin users
 Route::middleware([
@@ -58,6 +69,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
     'member',
+    'hv_verified',
 ])->group(function () {
     Route::get('/member/dashboard', function () {
         return view('member.dashboard');

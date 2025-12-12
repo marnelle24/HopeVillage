@@ -20,6 +20,33 @@
             </div>
 
             <div class="mt-4">
+                <x-label for="fin" value="{{ __('FIN (Foreign Identification Number)') }}" />
+                <x-input id="fin" class="block mt-1 w-full" type="text" name="fin" :value="old('fin')" required autocomplete="off" placeholder="F1234567X" />
+                <p class="mt-1 text-xs text-gray-500">
+                    Format: F/G/M + 7 digits + checksum letter.
+                </p>
+            </div>
+
+            <div class="mt-4">
+                <x-label for="whatsapp_number" value="{{ __('Contact Number (WhatsApp)') }}" />
+                <x-input id="whatsapp_number" class="block mt-1 w-full" type="text" name="whatsapp_number" :value="old('whatsapp_number')" autocomplete="tel" placeholder="+65XXXXXXXX" />
+                <p class="mt-1 text-xs text-gray-500">
+                    Optional. If the number is on WhatsApp, we’ll send your verification code there too.
+                </p>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <x-label for="age" value="{{ __('Age') }}" />
+                    <x-input id="age" class="block mt-1 w-full" type="number" name="age" :value="old('age')" min="0" max="120" />
+                </div>
+                <div>
+                    <x-label for="gender" value="{{ __('Gender') }}" />
+                    <x-input id="gender" class="block mt-1 w-full" type="text" name="gender" :value="old('gender')" placeholder="Optional" />
+                </div>
+            </div>
+
+            <div class="mt-4">
                 <x-label for="password" value="{{ __('Password') }}" />
                 <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
             </div>

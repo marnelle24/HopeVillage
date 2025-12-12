@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('whatsapp_number')->nullable()->unique()->after('email');
-            $table->enum('user_type', ['admin', 'member'])->default('member')->after('password');
+            $table->string('whatsapp_number')->nullable()->after('email');
+            $table->enum('user_type', ['admin', 'member', 'merchant_user'])->default('member')->after('password');
             $table->string('qr_code')->nullable()->unique()->after('user_type');
             $table->boolean('is_verified')->default(false)->after('qr_code');
             $table->integer('total_points')->default(0)->after('is_verified');

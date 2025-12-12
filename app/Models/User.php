@@ -37,6 +37,8 @@ class User extends Authenticatable
         'whatsapp_number',
         'user_type',
         'fin',
+        'age',
+        'gender',
         'qr_code',
         'is_verified',
         'total_points',
