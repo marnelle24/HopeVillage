@@ -93,8 +93,13 @@
 
             <div class="grid grid-cols-1 gap-4 md:px-0 px-4">
                 @forelse($vouchers as $voucher)
-                    <div class="w-full bg-purple-50 overflow-hidden border-2 border-gray-300 flex md:flex-row flex-col md:justify-between justify-start items-center rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                    <div class="w-full bg-white hover:bg-gray-50 overflow-hidden border-2 border-gray-300 flex md:flex-row flex-col md:justify-between justify-start items-center rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                         <div class="flex-1 flex items-start h-full p-4">
+                            <div class="w-28 opacity-60 flex items-start justify-center mr-4">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M16 2H0V6C1.10457 6 2 6.89543 2 8C2 9.10457 1.10457 10 0 10V14H16V10C14.8954 10 14 9.10457 14 8C14 6.89543 14.8954 6 16 6V2ZM8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" fill="#ababab"></path> </g>
+                                </svg>
+                            </div>
                             <div class="flex-1">
                                 <div class="flex md:flex-row flex-col md:items-center items-start gap-2">
                                     <h3 class="md:text-lg text-xl font-bold text-gray-500">{{ $voucher->name }}</h3>

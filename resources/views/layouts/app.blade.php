@@ -5,8 +5,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
+        {{-- <title>{{ config('app.name', 'Laravel') }}</title> --}}
+        <title>Hope Village | Guest Workers & Migrants Online Support Community</title>
+        <meta name="description" content="{{ 'Hope Village is the online community for Migrants & Guest Workers. It is a platform for the community to connect with each other and to share their stories and experiences.' }}">
+        <favicon href="{{ asset('favicon.ico') }}">
+        <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+        <link rel="apple-touch-icon" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon-precomposed" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon-precomposed-180x180" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon-precomposed-120x120" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon-precomposed-76x76" href="{{ asset('favicon.ico') }}">
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />

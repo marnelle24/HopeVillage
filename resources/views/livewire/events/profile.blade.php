@@ -90,27 +90,56 @@
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Location Information</h3>
                         
+                        @php
+                            $location = $event->location;
+                            $mapThumbnailUrl = null;
+                            if ($location) {
+                                $apiKey = config('services.google_maps.api_key');
+                                if ($apiKey) {
+                                    if (isset($location->latitude) && isset($location->longitude) && $location->latitude && $location->longitude) {
+                                        $lat = $location->latitude;
+                                        $lng = $location->longitude;
+                                        $mapThumbnailUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$lat},{$lng}&zoom=15&size=800x300&markers=color:red|{$lat},{$lng}&key={$apiKey}";
+                                    } elseif (!empty($location->address)) {
+                                        $address = urlencode(trim($location->address . ', ' . $location->city . ', ' . $location->province . ', ' . $location->postal_code, ', '));
+                                        $mapThumbnailUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$address}&zoom=15&size=800x300&markers=color:red|{$address}&key={$apiKey}";
+                                    }
+                                }
+                            }
+                        @endphp
+
                         <div class="space-y-4">
-                            @if($event->location->address)
+                            @if($location && $location->address)
                             <div class="flex flex-col items-start gap-1">
                                 <div class="flex items-center gap-1">
                                     <svg class="size-5" version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve" fill="#000000">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path fill="#394240" d="M32,0C18.745,0,8,10.745,8,24c0,5.678,2.502,10.671,5.271,15l17.097,24.156C30.743,63.686,31.352,64,32,64 s1.257-0.314,1.632-0.844L50.729,39C53.375,35.438,56,29.678,56,24C56,10.745,45.255,0,32,0z M48.087,39h-0.01L32,61L15.923,39 h-0.01C13.469,35.469,10,29.799,10,24c0-12.15,9.85-22,22-22s22,9.85,22,22C54,29.799,50.281,35.781,48.087,39z"></path> <path fill="#394240" d="M32,14c-5.523,0-10,4.478-10,10s4.477,10,10,10s10-4.478,10-10S37.523,14,32,14z M32,32 c-4.418,0-8-3.582-8-8s3.582-8,8-8s8,3.582,8,8S36.418,32,32,32z"></path> <path fill="#394240" d="M32,10c-7.732,0-14,6.268-14,14s6.268,14,14,14s14-6.268,14-14S39.732,10,32,10z M32,36 c-6.627,0-12-5.373-12-12s5.373-12,12-12s12,5.373,12,12S38.627,36,32,36z"></path> </g> <g> <path fill="#F76D57" d="M32,12c-6.627,0-12,5.373-12,12s5.373,12,12,12s12-5.373,12-12S38.627,12,32,12z M32,34 c-5.522,0-10-4.477-10-10s4.478-10,10-10s10,4.477,10,10S37.522,34,32,34z"></path> <path fill="#F76D57" d="M32,2c-12.15,0-22,9.85-22,22c0,5.799,3.469,11.469,5.913,15h0.01L32,61l16.077-22h0.01 C50.281,35.781,54,29.799,54,24C54,11.85,44.15,2,32,2z M32,38c-7.732,0-14-6.268-14-14s6.268-14,14-14s14,6.268,14,14 S39.732,38,32,38z"></path> </g> <path opacity="0.2" fill="#231F20" d="M32,12c-6.627,0-12,5.373-12,12s5.373,12,12,12s12-5.373,12-12S38.627,12,32,12z M32,34 c-5.522,0-10-4.477-10-10s4.478-10,10-10s10,4.477,10,10S37.522,34,32,34z"></path> </g> </g>
                                     </svg>
                                     <p class="text-gray-900 font-bold text-lg">
-                                        <a href="{{ route('admin.locations.profile', $event->location->location_code) }}" class="text-indigo-500 hover:text-indigo-600">
-                                            {{ $event->location->name }}
+                                        <a href="{{ route('admin.locations.profile', $location->location_code) }}" class="text-indigo-500 hover:text-indigo-600">
+                                            {{ $location->name }}
                                         </a>
                                     </p>
                                 </div>
                                 <p class="text-gray-900 text-sm pl-6">
-                                    {{ $event->location->address }}
-                                    @if($event->location->city || $event->location->province || $event->location->postal_code)
+                                    {{ $location->address }}
+                                    @if($location->city || $location->province || $location->postal_code)
                                         <br>
-                                        {{ trim(implode(', ', array_filter([$event->location->city, $event->location->province, $event->location->postal_code]))) }}
+                                        {{ trim(implode(', ', array_filter([$location->city, $location->province, $location->postal_code]))) }}
                                     @endif
                                 </p>
                             </div>
+                            @endif
+
+                            @if($mapThumbnailUrl)
+                                <div class="pt-2">
+                                    <img
+                                        src="{{ $mapThumbnailUrl }}"
+                                        alt="{{ $location?->name ?? 'Location' }} map"
+                                        class="w-full h-56 object-cover rounded-lg border border-gray-200"
+                                        loading="lazy"
+                                    >
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -178,6 +207,41 @@
 
                 <!-- Right Column - Quick Actions & Registrations -->
                 <div class="space-y-6">
+                    @php
+                        $eventQrImage = app(\App\Services\QrCodeService::class)->generateQrCodeImage($event->event_code, 260);
+                    @endphp
+
+                    <!-- Event QR Code Card -->
+                    <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
+                        <div class="flex flex-col items-center">
+                            <img
+                                id="event-qr-image"
+                                src="{{ $eventQrImage }}"
+                                alt="Event QR Code"
+                                class="w-64 h-64 object-contain border border-gray-200 rounded-lg bg-white"
+                            >
+                        </div>
+                        <div class="flex items-center justify-center mt-4">
+                            <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onclick="shareEventQrCode()"
+                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
+                                >
+                                    Share QR Code
+                                </button>
+                                <a
+                                    id="event-qr-download"
+                                    href="{{ $eventQrImage }}"
+                                    download="event-{{ $event->event_code }}.png"
+                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
+                                >
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Quick Actions</h3>
@@ -209,6 +273,35 @@
                             </a>
                         </div>
                     </div>
+
+                    <script>
+                        async function shareEventQrCode() {
+                            const img = document.getElementById('event-qr-image');
+                            const downloadLink = document.getElementById('event-qr-download');
+                            if (!img || !downloadLink) return;
+
+                            const dataUrl = img.src;
+                            const filename = downloadLink.getAttribute('download') || 'event-qr.png';
+                            const title = 'Event QR Code';
+                            const text = 'Scan this QR code to get the event code.';
+
+                            try {
+                                const response = await fetch(dataUrl);
+                                const blob = await response.blob();
+                                const file = new File([blob], filename, { type: blob.type || 'image/png' });
+
+                                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                                    await navigator.share({ title, text, files: [file] });
+                                } else {
+                                    // Fallback: trigger download
+                                    downloadLink.click();
+                                }
+                            } catch (e) {
+                                // Fallback: trigger download
+                                downloadLink.click();
+                            }
+                        }
+                    </script>
 
                     <!-- Event Statistics Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">

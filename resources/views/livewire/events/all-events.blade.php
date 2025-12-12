@@ -109,6 +109,23 @@
                             'completed' => 'bg-gray-100 text-gray-800',
                             default => 'bg-yellow-100 text-yellow-800',
                         };
+
+                        // Location map thumbnail (static image)
+                        $mapThumbnailUrl = null;
+                        $location = $event->location;
+                        if ($location) {
+                            $apiKey = config('services.google_maps.api_key');
+                            if ($apiKey) {
+                                if (isset($location->latitude) && isset($location->longitude) && $location->latitude && $location->longitude) {
+                                    $lat = $location->latitude;
+                                    $lng = $location->longitude;
+                                    $mapThumbnailUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$lat},{$lng}&zoom=15&size=400x200&markers=color:red|{$lat},{$lng}&key={$apiKey}";
+                                } elseif (!empty($location->address)) {
+                                    $address = urlencode(trim($location->address . ', ' . $location->city . ', ' . $location->province . ', ' . $location->postal_code, ', '));
+                                    $mapThumbnailUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$address}&zoom=15&size=400x200&markers=color:red|{$address}&key={$apiKey}";
+                                }
+                            }
+                        }
                     @endphp
                     <div class="bg-white group overflow-hidden shadow-md flex flex-col rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative">
                         <a href="{{ route('admin.events.profile', $event->event_code) }}" class="absolute inset-0 z-0"></a>
@@ -168,11 +185,12 @@
                                             </svg>
                                         </td>
                                         <td class="md:text-sm text-md text-gray-500 pl-1">
-                                            {{ $event->registrations->count() }}
-                                            @if($event->max_participants)
-                                                / {{ $event->max_participants }}
+                                            @if($event->max_participants && $event->max_participants > 0)
+                                                {{ $event->registrations->count() }} / {{ $event->max_participants }}
+                                            @else
+                                                Open to all
+                                                <span class="text-sm text-gray-400 italic">(no limit)</span>
                                             @endif
-                                            participants
                                         </td>
                                     </tr>
                                 </table>

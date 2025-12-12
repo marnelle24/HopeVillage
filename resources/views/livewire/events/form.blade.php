@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ $eventId ? __('Update') . ' ' . '"'.trim($title).'"' : __('Create new event') . ' ' . 'in ' . $location->name }}
+                    {{ $eventId ? __('Update') . ' ' . '"'.trim($title).'"' : __('Create new event') . ' ' . 'in ' . $location->name . ' location' }}
                 </h2>
             </div>
         </div>
@@ -194,9 +194,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <!-- Max Participants -->
                         <div>
-                            <label for="max_participants" class="block text-sm font-medium text-gray-700 mb-2">Max Participants (set 0 for no limit)</label>
+                            <label for="max_participants" class="block text-sm font-medium text-gray-700 mb-2">
+                                Max Participants
+                                <span class="text-sm text-gray-400 italic">(leave blank for no limit)</span>
+                            </label>
                             <input 
-                                placeholder="Maximum number of participants"
+                                placeholder="Leave blank for no limit"
                                 type="number" 
                                 id="max_participants"
                                 wire:model.blur="max_participants" 
