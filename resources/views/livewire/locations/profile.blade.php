@@ -27,6 +27,35 @@
             <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 md:mx-0 mx-4">
                 <!-- Left Column - Location Details -->
                 <div class="lg:col-span-2 space-y-6">
+                    @php
+                        // Map thumbnail fallback if no uploaded thumbnail
+                        $mapThumbnailUrl = null;
+                        if (!$location->thumbnail_url) {
+                            $apiKey = config('services.google_maps.api_key');
+                            if ($apiKey) {
+                                if (isset($location->latitude) && isset($location->longitude) && $location->latitude && $location->longitude) {
+                                    $lat = $location->latitude;
+                                    $lng = $location->longitude;
+                                    $mapThumbnailUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$lat},{$lng}&zoom=15&size=1200x450&markers=color:red|{$lat},{$lng}&key={$apiKey}";
+                                } elseif ($location->address) {
+                                    $address = urlencode(trim($location->address . ', ' . $location->city . ', ' . $location->province . ', ' . $location->postal_code, ', '));
+                                    $mapThumbnailUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$address}&zoom=15&size=1200x450&markers=color:red|{$address}&key={$apiKey}";
+                                }
+                            }
+                        }
+                    @endphp
+
+                    @if($location->thumbnail_url || $mapThumbnailUrl)
+                        <div class="bg-white overflow-hidden shadow-md sm:rounded-lg">
+                            <img
+                                src="{{ $location->thumbnail_url ?: $mapThumbnailUrl }}"
+                                alt="{{ $location->name }} {{ $location->thumbnail_url ? 'thumbnail' : 'map' }}"
+                                class="w-full h-72 object-cover"
+                                loading="lazy"
+                            >
+                        </div>
+                    @endif
+
                     <!-- Location Information Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Location Information</h3>
@@ -115,6 +144,41 @@
 
                 <!-- Right Column - Quick Actions & Recent Events -->
                 <div class="space-y-6">
+                    @php
+                        $locationQrImage = app(\App\Services\QrCodeService::class)->generateQrCodeImage($location->location_code, 260);
+                    @endphp
+
+                    <!-- Location QR Code Card -->
+                    <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
+                        <div class="flex flex-col items-center">
+                            <img
+                                id="location-qr-image"
+                                src="{{ $locationQrImage }}"
+                                alt="Location QR Code"
+                                class="w-64 h-64 object-contain border border-gray-200 rounded-lg bg-white"
+                            >
+                        </div>
+                        <div class="flex items-center justify-center mt-4">
+                            <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onclick="shareLocationQrCode()"
+                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
+                                >
+                                    Share QR Code
+                                </button>
+                                <a
+                                    id="location-qr-download"
+                                    href="{{ $locationQrImage }}"
+                                    download="location-{{ $location->location_code }}.png"
+                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
+                                >
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Quick Actions</h3>
@@ -131,6 +195,35 @@
                         </div>
                     </div>
 
+                    <script>
+                        async function shareLocationQrCode() {
+                            const img = document.getElementById('location-qr-image');
+                            const downloadLink = document.getElementById('location-qr-download');
+                            if (!img || !downloadLink) return;
+
+                            const dataUrl = img.src;
+                            const filename = downloadLink.getAttribute('download') || 'location-qr.png';
+                            const title = 'Location QR Code';
+                            const text = 'Scan this QR code to get the location code.';
+
+                            try {
+                                const response = await fetch(dataUrl);
+                                const blob = await response.blob();
+                                const file = new File([blob], filename, { type: blob.type || 'image/png' });
+
+                                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                                    await navigator.share({ title, text, files: [file] });
+                                } else {
+                                    // Fallback: trigger download
+                                    downloadLink.click();
+                                }
+                            } catch (e) {
+                                // Fallback: trigger download
+                                downloadLink.click();
+                            }
+                        }
+                    </script>
+
                     <!-- Recent Events Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
@@ -144,7 +237,7 @@
                             <div class="space-y-3">
                                 @foreach($location->events as $event)
                                     <div class="border-l-4 border-indigo-500 pl-3 py-2 group hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
-                                        <a href="{{ route('admin.locations.events.edit', [$location->location_code, $event->id]) }}" class="group-hover:text-indigo-600 text-md font-semibold text-indigo-400 hover:text-indigo-600 transition-colors duration-300">
+                                        <a href="{{ route('admin.events.profile', $event->event_code) }}" class="group-hover:text-indigo-600 text-md font-semibold text-indigo-400 hover:text-indigo-600 transition-colors duration-300">
                                             {{ $event->title }}
                                             <p class="text-xs text-gray-500 mt-1">
                                                 {{ $event->start_date->format('M d, Y') }}
