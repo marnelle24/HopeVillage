@@ -13,6 +13,7 @@
     }
 @endphp
 
+@if(auth()->check() && !auth()->user()->isMember())
 <nav x-data="{ open: false }" class="{{ $navBgClass }} border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,6 +63,28 @@
                         <x-nav-link href="{{ route('merchant.vouchers.index') }}" :active="request()->routeIs('merchant.vouchers.*')">
                             {{ __('My Vouchers') }}
                         </x-nav-link>
+                    </div>
+                @else
+                    <!-- Member -->
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('member.dashboard') }}" :active="request()->routeIs('member.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <a href="{{ route('member.dashboard') }}#my-vouchers" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                            {{ __('My Vouchers') }}
+                        </a>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <a href="{{ route('member.dashboard') }}#my-events" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                            {{ __('My Events') }}
+                        </a>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <a href="{{ route('member.dashboard') }}#my-activities" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                            {{ __('My Recent Activities') }}
+                        </a>
                     </div>
                 @endif
             </div>
@@ -178,18 +201,21 @@
             </div>
 
             <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="size-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+            @if(!auth()->user()->isMember())
+                <div class="-me-2 flex items-center sm:hidden">
+                    <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                        <svg class="size-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            @endif
         </div>
     </div>
 
     <!-- Responsive Navigation Menu -->
+    @if(!auth()->user()->isMember())
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             @if(auth()->user()->isAdmin())
@@ -214,6 +240,20 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link href="{{ route('merchant.vouchers.index') }}" :active="request()->routeIs('merchant.vouchers.*')">
                     {{ __('My Vouchers') }}
+                </x-responsive-nav-link>
+            @else
+                <!-- Member -->
+                <x-responsive-nav-link href="{{ route('member.dashboard') }}" :active="request()->routeIs('member.dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('member.dashboard') }}#my-vouchers">
+                    {{ __('My Vouchers') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('member.dashboard') }}#my-events">
+                    {{ __('My Events') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('member.dashboard') }}#my-activities">
+                    {{ __('My Recent Activities') }}
                 </x-responsive-nav-link>
             @endif
         </div>
@@ -290,4 +330,68 @@
             </div>
         </div>
     </div>
+    @endif
 </nav>
+@else
+    <!-- Member Mobile Bottom Navigation -->
+    <nav x-data="{ settingsOpen: false }" class="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-200">
+        <!-- Settings submenu -->
+        <div
+            x-show="settingsOpen"
+            x-transition.opacity
+            @click.away="settingsOpen = false"
+            class="absolute inset-x-0 bottom-full mb-2 px-4"
+            style="display: none;"
+        >
+            <div class="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                <a href="{{ route('profile.show') }}" class="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                    My Profile
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full text-left px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-4">
+            <a href="{{ route('member.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 {{ request()->routeIs('member.dashboard') ? 'text-indigo-600' : 'text-gray-600' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.5A2.25 2.25 0 0 0 6.75 21.75h3.75v-4.5A2.25 2.25 0 0 1 12.75 15h-1.5A2.25 2.25 0 0 1 13.5 17.25v4.5h3.75A2.25 2.25 0 0 0 19.5 19.5V9.75" />
+                </svg>
+                <span class="text-[11px] font-semibold">Home</span>
+            </a>
+
+            <a href="{{ route('member.dashboard') }}#my-vouchers" class="flex flex-col items-center justify-center py-3 gap-1 text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75h6m-6 3h6m-6 3h6m-6 3h6M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Z" />
+                </svg>
+                <span class="text-[11px] font-semibold">My Vouchers</span>
+            </a>
+
+            <a href="{{ route('member.dashboard') }}#my-events" class="flex flex-col items-center justify-center py-3 gap-1 text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5A2.25 2.25 0 0 1 5.25 5.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75Zm3-9h.008v.008H6v-.008Zm3 0h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Z" />
+                </svg>
+                <span class="text-[11px] font-semibold">My Events</span>
+            </a>
+
+            <button
+                type="button"
+                @click="settingsOpen = !settingsOpen"
+                :class="settingsOpen ? 'text-indigo-600' : '{{ request()->routeIs('profile.show') ? 'text-indigo-600' : 'text-gray-600' }}'"
+                aria-haspopup="menu"
+                :aria-expanded="settingsOpen.toString()"
+                aria-label="Open settings menu"
+                class="flex flex-col items-center justify-center py-3 gap-1"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                <span class="text-[11px] font-semibold">Settings</span>
+            </button>
+        </div>
+    </nav>
+@endif

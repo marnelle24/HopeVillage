@@ -1,18 +1,26 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Member Dashboard') }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Dashboard') }}
+            </h2>
+            <button type="button" title="My Points" class="flex items-center gap-1 text-sm text-gray-500 border border-gray-300 rounded-lg px-2 py-1">
+                <svg class="w-5 h-5" fill="#000000" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256 S397.391,0,256,0z M256,472c-119.297,0-216-96.703-216-216S136.703,40,256,40s216,96.703,216,216S375.297,472,256,472z"></path> <g> <path d="M256,336.219c-30.031,0-61.438-6.328-79.844-19.703c0,0.219-0.156,0.438-0.156,0.641c0,3.359,0,15.719,0,19.062 C176,353.781,211.812,368,256,368s80-14.219,80-31.781c0-3.344,0-15.703,0-19.062c0-0.203-0.156-0.422-0.156-0.641 C317.438,329.891,286.016,336.219,256,336.219z"></path> <path d="M256,288.547c-30.031,0-61.438-6.312-79.844-19.688c0,0.219-0.156,0.422-0.156,0.641c0,3.359,0,15.703,0,19.047 c0,17.562,35.812,31.797,80,31.797s80-14.234,80-31.797c0-3.344,0-15.688,0-19.047c0-0.219-0.156-0.422-0.156-0.641 C317.438,282.234,286.016,288.547,256,288.547z"></path> <path d="M176,222.656c0,4.031,0,15.078,0,18.25c0,17.562,35.812,31.781,80,31.781s80-14.219,80-31.781c0-3.172,0-14.219,0-18.25 c-18.375,13.469-49.891,19.844-80,19.844S194.375,236.125,176,222.656z"></path> <path d="M256,144c-44.188,0-80,14.219-80,31.781c0,3.344,0,15.703,0,19.062c0,17.531,35.812,31.766,80,31.766s80-14.234,80-31.766 c0-3.359,0-15.719,0-19.062C336,158.219,300.188,144,256,144z"></path> </g> </g>
+                </svg>
+                <span class="font-semibold text-gray-900 text-sm">{{ auth()->user()->total_points ? number_format(auth()->user()->total_points, 0) : '0 point' }}</span>
+            </button>
+        </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 md:px-0 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-6">
-                <div class="flex items-center justify-between">
+            <div class="mb-12">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex items-start gap-3">
                         <div 
                             id="qr-code-container" 
-                            class="cursor-pointer hover:opacity-80 transition-opacity lg:scale-100 scale-75"
+                            class="cursor-pointer hover:opacity-80 transition-opacity"
                             onclick="openQrCodeModal()"
                         >
                             <div class="bg-white p-0.5 rounded-none shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
@@ -25,19 +33,13 @@
                                 >
                             </div>
                         </div>
-                        <h1 class="text-3xl font-bold text-gray-900">Welcome, {{ auth()->user()->name }}!</h1>
-                    </div>
-                    @if(auth()->user()->qr_code)
-                    <div class="flex items-center gap-3">
-                        <div class="px-4 py-2 bg-blue-100 text-blue-800 border lg:scale-100 scale-75 border-blue-300 rounded-lg">
-                            <span class="font-semibold text-sm">Verified Member</span>
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Welcome, {{ auth()->user()->name }}!</h1>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Your member overview and quick access.
+                            </p>
                         </div>
                     </div>
-                    @else
-                    <div class="px-4 py-2 bg-blue-100 text-blue-800 border lg:scale-100 scale-75 border-blue-300 rounded-lg">
-                        <span class="font-semibold text-sm">Verified Member</span>
-                    </div>
-                    @endif
                 </div>
             </div>
 
@@ -73,102 +75,208 @@
                 </div>
             </div>
             @endif
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Points Card -->
-                    <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
-                        <h3 class="text-lg font-semibold text-yellow-900 mb-2">Total Points</h3>
-                        <p class="text-3xl font-bold text-yellow-600">{{ auth()->user()->total_points ?? 0 }}</p>
-                        <p class="text-sm text-yellow-700 mt-2">Earn points with activities</p>
-                    </div>
-
-                    <!-- Bookings Card -->
-                    <div class="bg-green-50 p-6 rounded-lg border border-green-200">
-                        <h3 class="text-lg font-semibold text-green-900 mb-2">My Bookings</h3>
-                        <p class="text-3xl font-bold text-green-600">0</p>
-                        <p class="text-sm text-green-700 mt-2">View your reservations</p>
-                    </div>
-
-                    <!-- Events Card -->
-                    <div class="bg-purple-50 p-6 rounded-lg border border-purple-200">
-                        <h3 class="text-lg font-semibold text-purple-900 mb-2">Registered Events</h3>
-                        <p class="text-3xl font-bold text-purple-600">0</p>
-                        <p class="text-sm text-purple-700 mt-2">Upcoming events</p>
-                    </div>
+            <!-- Anchor targets for bottom navigation -->
+            <div id="my-vouchers">
+                <div>
+                    <p class="text-xl font-bold text-gray-700 mb-1">My Vouchers</p>
+                    <p class="text-xs text-gray-600">Your claimed vouchers will appear here.</p>
                 </div>
 
-                {{-- <div class="mt-8">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-                            Book Amenity
-                        </button>
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-                            View Events
-                        </button>
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-                            My Activities
-                        </button>
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-                            View QR Code
-                        </button>
-                    </div>
-                </div> --}}
+                @php
+                    // If you later pass real claimed vouchers from backend, provide `$claimedVouchers`.
+                    // For now we keep sample items unless `$claimedVouchers` is explicitly set to an empty array/collection.
+                    $claimedVouchers = auth()->user()->claimedVouchers ?? ['10', '20', '30', '40', '50'];
+                @endphp
 
-                {{-- <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p class="text-yellow-800">
-                        <strong>Note:</strong> This is a test UI dashboard for Member users. Full functionality will be implemented later.
-                    </p>
-                </div> --}}
+                <div class="flex flex-nowrap gap-2 min-h-[140px] items-center overflow-x-auto overflow-y-hidden">
+                    @forelse($claimedVouchers as $value)
+                        <div class="hover:-translate-y-1 hover:shadow-lg hover:bg-orange-50 transition-all duration-300 shrink-0 flex flex-col w-24 h-24 rounded-full items-center justify-center border border-gray-200 bg-white">
+                            <p class="text-md text-gray-400 font-bold">P{{ $value }}</p>
+                            <p class="text-xs text-gray-400 font-semibold">Voucher</p>
+                        </div>
+                    @empty
+                        <div class="border border-dashed border-gray-300 rounded-lg bg-gray-50/50 p-4 w-full text-center py-8 text-sm text-gray-400/60 font-semibold">
+                            No Voucher found
+                        </div>
+                    @endforelse
+                </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mt-10">
-                <p class="lg:text-lg text-sm font-bold text-gray-900 mb-6">My Recent Activities</p>
-                <table class="w-full text-sm">
-                    <tbody>
-                        <tr class="border-b border-gray-200">
-                            <td class="py-4">
-                                <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">Entry</span>
-                            </td>
-                            <td class="py-2">Cebu City Sports Club</td>
-                            <td class="py-2">December 03, 2025 - 8:00</td>
-                            <td class="py-2">
-                                <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">100 Points</span>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-200">
-                            <td class="py-4">
-                                <span class="text-blue-600 bg-blue-50 px-2 py-1 border border-blue-600/60 rounded-lg">Use</span>
-                            </td>
-                            <td class="py-2">Cebu City Sports Club - Swimming Pool</td>
-                            <td class="py-2">December 03, 2025 - 10:00</td>
-                            <td class="py-2">
-                                <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">50 Points</span>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-200">
-                            <td class="py-4">
-                                <span class="text-yellow-600 bg-yellow-50 px-2 py-1 border border-yellow-600/60 rounded-lg">Join</span>
-                            </td>
-                            <td class="py-2">Cebu City Sports Club - Badminton Court</td>
-                            <td class="py-2">December 03, 2025 - 15:00</td>
-                            <td class="py-2">
-                                <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">10 Points</span>
-                            </td>
-                        </tr>
-                        <tr class="border-b border-gray-200">
-                            <td class="py-4">
-                                <span class="text-yellow-600 bg-yellow-50 px-2 py-1 border border-yellow-600/60 rounded-lg">Join</span>
-                            </td>
-                            <td class="py-2">Cebu City Sports Club - Basketball Game</td>
-                            <td class="py-2">December 05, 2025 - 17:00</td>
-                            <td class="py-2">
-                                <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">10 Points</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="my-events"class="mt-12">
+                <div class="mb-8">
+                    <p class="text-xl font-bold text-gray-700 mb-1">My Events</p>
+                    <p class="text-xs text-gray-600">Events you have registered for will appear here.</p>
+                </div>
+
+                @php
+                    $registeredEvents = auth()->user()
+                        ->eventRegistrations()
+                        ->with('event.location')
+                        ->latest('registered_at')
+                        ->get();
+                @endphp
+
+                <div class="flex flex-nowrap gap-2 min-h-[120px] items-center overflow-x-auto overflow-y-hidden">
+                    @forelse($registeredEvents as $registration)
+                        @php
+                            $event = $registration->event;
+                            if (!$event) {
+                                continue;
+                            }
+
+                            $eventImageUrl = $event->thumbnail_url ?? null;
+                            if (!$eventImageUrl) {
+                                $apiKey = config('services.google_maps.api_key');
+                                $location = $event->location;
+                                if ($apiKey && $location) {
+                                    if (isset($location->latitude) && isset($location->longitude) && $location->latitude && $location->longitude) {
+                                        $lat = $location->latitude;
+                                        $lng = $location->longitude;
+                                        $eventImageUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$lat},{$lng}&zoom=15&size=420x220&markers=color:red|{$lat},{$lng}&key={$apiKey}";
+                                    } elseif (!empty($location->address)) {
+                                        $address = urlencode(trim($location->address . ', ' . $location->city . ', ' . $location->province . ', ' . $location->postal_code, ', '));
+                                        $eventImageUrl = "https://maps.googleapis.com/maps/api/staticmap?center={$address}&zoom=15&size=420x220&markers=color:red|{$address}&key={$apiKey}";
+                                    }
+                                }
+                            }
+
+                            $start = $event->start_date;
+                            $end = $event->end_date;
+                            $schedule = 'TBA';
+                            if ($start && $end) {
+                                $schedule = $start->format('M d, Y');
+                                if ($start->format('Y-m-d') === $end->format('Y-m-d')) {
+                                    $schedule .= ' • ' . $start->format('g:i A') . ' - ' . $end->format('g:i A');
+                                } else {
+                                    $schedule = $start->format('M d, Y g:i A') . ' - ' . $end->format('M d, Y g:i A');
+                                }
+                            } elseif ($start) {
+                                $schedule = $start->format('M d, Y g:i A');
+                            }
+                        @endphp
+
+                        <a href="#" class="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 shrink-0 w-62 rounded-xl border border-gray-200 bg-white overflow-hidden">
+                            <div class="h-32 w-full bg-gray-100">
+                                @if(!empty($eventImageUrl ?? null))
+                                    <img
+                                        src="{{ $eventImageUrl ?? '' }}"
+                                        alt="{{ $event->title }}"
+                                        class="h-32 w-full object-cover"
+                                        loading="lazy"
+                                    >
+                                @else
+                                    <div class="h-28 w-full flex items-center justify-center text-xs text-gray-400">
+                                        No image
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-3">
+                                <p class="text-sm font-bold text-gray-900 leading-snug">
+                                    {{ \Illuminate\Support\Str::words($event->title, 5, '...') }}
+                                </p>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    {{ $schedule }}
+                                </p>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="border border-dashed border-gray-300 rounded-lg bg-gray-50/50 p-4 w-full text-center py-8 text-sm text-gray-400/60 font-semibold">
+                            No Event found
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+
+            <div id="activities-table" class="mt-12 mb-3">
+                <p class="text-lg font-bold text-gray-900">My Recent Activities</p>
+                <p class="text-xs text-gray-600">Your recent activities will appear here.</p>
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mt-4">
+    
+                    <!-- Mobile-first list -->
+                    <div class="space-y-3 sm:hidden">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg text-xs font-semibold">Entry</span>
+                                    <p class="text-xs text-gray-600">+100 Points</p>
+                                </div>
+    
+                                <span class="text-xs text-gray-500">Dec 03, 2025 • 8:00</span>
+                            </div>
+                            <p class="mt-2 text-sm font-semibold text-gray-900">Cebu City Sports Club</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-blue-600 bg-blue-50 px-2 py-1 border border-blue-600/60 rounded-lg text-xs font-semibold">Use</span>
+                                    <p class="text-xs text-gray-600">+50 Points</p>
+                                </div>
+                                <span class="text-xs text-gray-500">Dec 03, 2025 • 10:00</span>
+                            </div>
+                            <p class="mt-2 text-sm font-semibold text-gray-900">Cebu City Sports Club - Swimming Pool</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-yellow-600 bg-yellow-50 px-2 py-1 border border-yellow-600/60 rounded-lg text-xs font-semibold">Join</span>
+                                    <p class="text-xs text-gray-600">+10 Points</p>
+                                </div>
+                                <span class="text-xs text-gray-500">Dec 03, 2025 • 15:00</span>
+                            </div>
+                            <p class="mt-2 text-sm font-semibold text-gray-900">Cebu City Sports Club - Badminton Court</p>
+                        </div>
+                    </div>
+    
+                    <!-- Table for larger screens -->
+                    <div class="hidden sm:block overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <tbody>
+                                <tr class="border-b border-gray-200">
+                                    <td class="py-4">
+                                        <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">Entry</span>
+                                    </td>
+                                    <td class="py-2">Cebu City Sports Club</td>
+                                    <td class="py-2">December 03, 2025 - 8:00</td>
+                                    <td class="py-2">
+                                        <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">100 Points</span>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="py-4">
+                                        <span class="text-blue-600 bg-blue-50 px-2 py-1 border border-blue-600/60 rounded-lg">Use</span>
+                                    </td>
+                                    <td class="py-2">Cebu City Sports Club - Swimming Pool</td>
+                                    <td class="py-2">December 03, 2025 - 10:00</td>
+                                    <td class="py-2">
+                                        <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">50 Points</span>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="py-4">
+                                        <span class="text-yellow-600 bg-yellow-50 px-2 py-1 border border-yellow-600/60 rounded-lg">Join</span>
+                                    </td>
+                                    <td class="py-2">Cebu City Sports Club - Badminton Court</td>
+                                    <td class="py-2">December 03, 2025 - 15:00</td>
+                                    <td class="py-2">
+                                        <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">10 Points</span>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="py-4">
+                                        <span class="text-yellow-600 bg-yellow-50 px-2 py-1 border border-yellow-600/60 rounded-lg">Join</span>
+                                    </td>
+                                    <td class="py-2">Cebu City Sports Club - Basketball Game</td>
+                                    <td class="py-2">December 05, 2025 - 17:00</td>
+                                    <td class="py-2">
+                                        <span class="text-green-600 bg-green-50 px-2 py-1 border border-green-600/60 rounded-lg">10 Points</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

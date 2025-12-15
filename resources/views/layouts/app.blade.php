@@ -42,7 +42,7 @@
             @endif
 
             <!-- Page Content -->
-            <main>
+            <main class="{{ auth()->check() && auth()->user()->isMember() ? 'pb-24 sm:pb-0' : '' }}">
                 {{ $slot }}
             </main>
         </div>
