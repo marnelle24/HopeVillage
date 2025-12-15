@@ -156,17 +156,17 @@
                             }
                         @endphp
 
-                        <a href="#" class="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 shrink-0 w-62 rounded-xl border border-gray-200 bg-white overflow-hidden">
-                            <div class="h-32 w-full bg-gray-100">
+                        <a href="#" class="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 shrink-0 w-56 rounded-xl border border-gray-200 bg-white overflow-hidden">
+                            <div class="h-36 w-full bg-gray-100">
                                 @if(!empty($eventImageUrl ?? null))
                                     <img
                                         src="{{ $eventImageUrl ?? '' }}"
                                         alt="{{ $event->title }}"
-                                        class="h-32 w-full object-cover"
+                                        class="h-36 w-full object-cover"
                                         loading="lazy"
                                     >
                                 @else
-                                    <div class="h-28 w-full flex items-center justify-center text-xs text-gray-400">
+                                    <div class="h-36 w-full flex items-center justify-center text-xs text-gray-400">
                                         No image
                                     </div>
                                 @endif
