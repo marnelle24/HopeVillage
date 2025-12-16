@@ -44,6 +44,11 @@
                         </x-nav-link>
                     </div>
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
+                            {{ __('Raffle Draw') }}
+                        </x-nav-link>
+                    </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
                             {{ __('Amenities') }}
                         </x-nav-link>
@@ -227,6 +232,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events.*')">
                     {{ __('Events') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
+                    {{ __('Raffle Draw') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link href="{{ route('admin.amenities.index') }}" :active="request()->routeIs('admin.amenities.*')">
                     {{ __('Amenities') }}

@@ -61,6 +61,9 @@ Route::middleware([
     Route::get('/admin/vouchers/create', \App\Livewire\Vouchers\Form::class)->name('admin.vouchers.create');
     Route::get('/admin/vouchers/{voucher_code}/edit', \App\Livewire\Vouchers\Form::class)->name('admin.vouchers.edit');
     Route::get('/admin/vouchers/{voucher_code}', \App\Livewire\Vouchers\Profile::class)->name('admin.vouchers.profile');
+
+    // Raffle / Roulette
+    Route::get('/admin/raffle', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle');
 });
 
 // Member Dashboard - Only accessible by member users
