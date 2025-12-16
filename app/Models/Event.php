@@ -48,7 +48,10 @@ class Event extends Model implements HasMedia
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(EventRegistration::class)->where('type', 'event');
+        // Event registrations are linked via event_registrations.event_id.
+        // Note: event_registrations.type is used to describe registration source (app/qr/manual),
+        // not whether the record is for an Event vs Program.
+        return $this->hasMany(EventRegistration::class);
     }
 
     /**

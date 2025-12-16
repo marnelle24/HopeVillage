@@ -103,22 +103,29 @@
                 </div>
             </div>
 
-            <div id="my-events"class="mt-12">
-                <div class="mb-8">
-                    <p class="text-xl font-bold text-gray-700 mb-1">My Events</p>
-                    <p class="text-xs text-gray-600">Events you have registered for will appear here.</p>
+            <div id="my-recent-events" class="mt-12">
+                <div class="mb-8 flex items-end justify-between gap-3">
+                    <div>
+                        <p class="text-xl font-bold text-gray-700 mb-1">My Recent Events</p>
+                        <p class="text-xs text-gray-600">Your most recently registered events.</p>
+                    </div>
+                    <a href="{{ route('member.events') }}" class="border border-indigo-600/60 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                        View all
+                    </a>
                 </div>
 
                 @php
-                    $registeredEvents = auth()->user()
+                    $recentRegistrations = auth()->user()
                         ->eventRegistrations()
-                        ->with('event.location')
+                        ->whereNotNull('event_id')
+                        ->with('event.location', 'event.media')
                         ->latest('registered_at')
+                        ->limit(5)
                         ->get();
                 @endphp
 
-                <div class="flex flex-nowrap gap-2 min-h-[120px] items-center overflow-x-auto overflow-y-hidden">
-                    @forelse($registeredEvents as $registration)
+                <div class="flex flex-nowrap gap-4 min-h-[120px] items-center overflow-x-auto overflow-y-hidden">
+                    @forelse($recentRegistrations as $registration)
                         @php
                             $event = $registration->event;
                             if (!$event) {
@@ -156,7 +163,7 @@
                             }
                         @endphp
 
-                        <a href="#" class="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 shrink-0 w-56 rounded-xl border border-gray-200 bg-white overflow-hidden">
+                        <a href="{{ route('member.events.profile', $event->event_code) }}" class="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 shrink-0 w-56 rounded-xl border border-gray-300 bg-white hover:bg-orange-50 overflow-hidden">
                             <div class="h-36 w-full bg-gray-100">
                                 @if(!empty($eventImageUrl ?? null))
                                     <img
@@ -171,8 +178,8 @@
                                     </div>
                                 @endif
                             </div>
-                            <div class="p-3">
-                                <p class="text-sm font-bold text-gray-900 leading-snug">
+                            <div class="p-3 min-h-24">
+                                <p class="text-md font-bold text-gray-900 leading-snug">
                                     {{ \Illuminate\Support\Str::words($event->title, 5, '...') }}
                                 </p>
                                 <p class="mt-1 text-xs text-gray-500">
@@ -187,7 +194,6 @@
                     @endforelse
                 </div>
             </div>
-
 
             <div id="activities-table" class="mt-12 mb-3">
                 <p class="text-lg font-bold text-gray-900">My Recent Activities</p>
@@ -216,6 +222,16 @@
                                 <span class="text-xs text-gray-500">Dec 03, 2025 • 10:00</span>
                             </div>
                             <p class="mt-2 text-sm font-semibold text-gray-900">Cebu City Sports Club - Swimming Pool</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-yellow-600 bg-yellow-50 px-2 py-1 border border-yellow-600/60 rounded-lg text-xs font-semibold">Join</span>
+                                    <p class="text-xs text-gray-600">+10 Points</p>
+                                </div>
+                                <span class="text-xs text-gray-500">Dec 03, 2025 • 15:00</span>
+                            </div>
+                            <p class="mt-2 text-sm font-semibold text-gray-900">Cebu City Sports Club - Badminton Court</p>
                         </div>
                         <div class="border border-gray-200 rounded-lg p-4">
                             <div class="flex items-center justify-between">

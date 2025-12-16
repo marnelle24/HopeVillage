@@ -22,7 +22,8 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-mark class="block h-9 w-auto" />
+                        {{-- <x-application-mark class="block h-9 w-auto" /> --}}
+                        <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-16">
                     </a>
                 </div>
 
@@ -82,8 +83,8 @@
                         </a>
                     </div>
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <a href="{{ route('member.dashboard') }}#my-events" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                            {{ __('My Events') }}
+                        <a href="{{ route('member.events') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
+                            {{ __('Events') }}
                         </a>
                     </div>
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -257,8 +258,8 @@
                 <x-responsive-nav-link href="{{ route('member.dashboard') }}#my-vouchers">
                     {{ __('My Vouchers') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link href="{{ route('member.dashboard') }}#my-events">
-                    {{ __('My Events') }}
+                <x-responsive-nav-link href="{{ route('member.events') }}" :active="request()->routeIs('member.events')">
+                    {{ __('Events') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link href="{{ route('member.dashboard') }}#my-activities">
                     {{ __('My Recent Activities') }}
@@ -342,7 +343,7 @@
 </nav>
 @else
     <!-- Member Mobile Bottom Navigation -->
-    <nav x-data="{ settingsOpen: false }" class="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-200">
+    <nav x-data="{ settingsOpen: false }" class="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-slate-600 border-t border-gray-200">
         <!-- Settings submenu -->
         <div
             x-show="settingsOpen"
@@ -365,35 +366,35 @@
         </div>
 
         <div class="grid grid-cols-4">
-            <a href="{{ route('member.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 {{ request()->routeIs('member.dashboard') ? 'text-indigo-600' : 'text-gray-600' }}">
+            <a href="{{ route('member.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-slate-700 {{ request()->routeIs('member.dashboard') ? 'text-white bg-slate-700' : 'text-slate-200' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.5A2.25 2.25 0 0 0 6.75 21.75h3.75v-4.5A2.25 2.25 0 0 1 12.75 15h-1.5A2.25 2.25 0 0 1 13.5 17.25v4.5h3.75A2.25 2.25 0 0 0 19.5 19.5V9.75" />
                 </svg>
                 <span class="text-[11px] font-semibold">Home</span>
             </a>
 
-            <a href="{{ route('member.dashboard') }}#my-vouchers" class="flex flex-col items-center justify-center py-3 gap-1 text-gray-600">
+            <a href="{{ route('member.dashboard') }}#my-vouchers" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-slate-700 {{ request()->routeIs('member.my-vouchers') ? 'text-white bg-slate-700' : 'text-slate-200' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75h6m-6 3h6m-6 3h6m-6 3h6M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Z" />
                 </svg>
                 <span class="text-[11px] font-semibold">My Vouchers</span>
             </a>
 
-            <a href="{{ route('member.dashboard') }}#my-events" class="flex flex-col items-center justify-center py-3 gap-1 text-gray-600">
+            <a href="{{ route('member.events') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-slate-700 {{ request()->routeIs('member.events') ? 'text-white bg-slate-700' : 'text-slate-200' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5A2.25 2.25 0 0 1 5.25 5.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75Zm3-9h.008v.008H6v-.008Zm3 0h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Z" />
                 </svg>
-                <span class="text-[11px] font-semibold">My Events</span>
+                <span class="text-[11px] font-semibold">Events</span>
             </a>
 
             <button
                 type="button"
                 @click="settingsOpen = !settingsOpen"
-                :class="settingsOpen ? 'text-indigo-600' : '{{ request()->routeIs('profile.show') ? 'text-indigo-600' : 'text-gray-600' }}'"
+                :class="settingsOpen ? 'text-white bg-slate-700' : '{{ request()->routeIs('profile.show') ? 'text-white bg-slate-700' : 'text-slate-200' }}'"
                 aria-haspopup="menu"
                 :aria-expanded="settingsOpen.toString()"
                 aria-label="Open settings menu"
-                class="flex flex-col items-center justify-center py-3 gap-1"
+                class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-slate-700"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />

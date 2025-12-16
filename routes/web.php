@@ -77,6 +77,13 @@ Route::middleware([
     Route::get('/member/dashboard', function () {
         return view('member.dashboard');
     })->name('member.dashboard');
+
+    Route::get('/member/events', function () {
+        return view('member.events');
+    })->name('member.events');
+
+    Route::get('/member/event/{event_code}', \App\Livewire\Member\Events\Profile::class)
+        ->name('member.events.profile');
     
     // QR Code routes
     Route::get('/member/qr-code', [QrCodeController::class, 'show'])->name('member.qr-code');
