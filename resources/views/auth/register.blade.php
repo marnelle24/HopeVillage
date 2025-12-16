@@ -1,23 +1,13 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo />
+            <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-32">
         </x-slot>
 
         <x-validation-errors class="mb-4" />
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
-
-            <div>
-                <x-label for="name" value="{{ __('Name') }}" />
-                <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            </div>
-
-            <div class="mt-4">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            </div>
 
             <div class="mt-4">
                 <x-label for="fin" value="{{ __('FIN (Foreign Identification Number)') }}" />
@@ -28,6 +18,16 @@
             </div>
 
             <div class="mt-4">
+                <x-label for="name" value="{{ __('Name') }}" />
+                <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+            </div>
+
+            <div class="mt-4">
+                <x-label for="email" value="{{ __('Email') }}" />
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+            </div>
+
+            <div class="mt-4">
                 <x-label for="whatsapp_number" value="{{ __('Contact Number (WhatsApp)') }}" />
                 <x-input id="whatsapp_number" class="block mt-1 w-full" type="text" name="whatsapp_number" :value="old('whatsapp_number')" autocomplete="tel" placeholder="+65XXXXXXXX" />
                 <p class="mt-1 text-xs text-gray-500">
@@ -35,10 +35,10 @@
                 </p>
             </div>
 
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="mt-4 grid grid-cols-2 gap-4">
                 <div>
                     <x-label for="age" value="{{ __('Age') }}" />
-                    <x-input id="age" class="block mt-1 w-full" type="number" name="age" :value="old('age')" min="0" max="120" />
+                    <x-input id="age" class="block mt-1 w-full" type="number" name="age" :value="old('age')" placeholder="Optional" min="0" max="120" />
                 </div>
                 <div>
                     <x-label for="gender" value="{{ __('Gender') }}" />

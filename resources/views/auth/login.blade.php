@@ -1,7 +1,7 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo />
+            <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-32">
         </x-slot>
 
         <x-validation-errors class="mb-4" />
