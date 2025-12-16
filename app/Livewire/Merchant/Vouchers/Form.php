@@ -24,7 +24,7 @@ class Form extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
-        'discount_type' => 'required|in:percentage,fixed',
+        'discount_type' => 'required|in:percentage,fixed,item',
         'discount_value' => 'required|numeric|min:0',
         'min_purchase' => 'nullable|numeric|min:0',
         'max_discount' => 'nullable|numeric|min:0',
@@ -120,6 +120,7 @@ class Form extends Component
         $discountTypes = [
             'percentage' => 'Percentage',
             'fixed' => 'Fixed Amount',
+            'item' => 'Free Item',
         ];
 
         return view('livewire.merchant.vouchers.form', [

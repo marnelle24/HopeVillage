@@ -11,7 +11,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -80,7 +80,7 @@
                     </div>
 
                     <!-- Discount Type and Value -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div>
                             <label for="discount_type" class="block text-sm font-medium text-gray-700 mb-2">Discount Type <span class="text-red-500">*</span></label>
                             <select 
@@ -105,15 +105,40 @@
                                 min="0"
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('discount_value') border-red-500 @enderror"
                             >
-                            <p class="text-xs text-gray-500 mt-1">
-                                {{ $discount_type === 'percentage' ? 'Enter percentage (e.g., 10 for 10%)' : 'Enter fixed amount (e.g., 5.00 for $5)' }}
-                            </p>
+                            @if($discount_type === 'item')
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Enter the amount of the item eligible for the discount (e.g., 10.00 for $10)
+                                </p>
+                            @elseif($discount_type === 'percentage')
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Enter percentage (e.g., 10 for 10%)
+                                </p>
+                            @elseif($discount_type === 'fixed')
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Enter fixed amount (e.g., 5.00 for $5)
+                                </p>
+                            @endif
                             @error('discount_value') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
+
+                        <!-- Usage Limit -->
+                        <div class="mb-4">
+                            <label for="usage_limit" class="block text-sm font-medium text-gray-700 mb-2">Usage Limit</label>
+                            <input 
+                                placeholder="Leave empty for unlimited"
+                                type="number" 
+                                id="usage_limit"
+                                wire:model.blur="usage_limit" 
+                                min="1"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('usage_limit') border-red-500 @enderror"
+                            >
+                            @error('usage_limit') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
                     </div>
 
                     <!-- Min Purchase and Max Discount -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {{-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="min_purchase" class="block text-sm font-medium text-gray-700 mb-2">Minimum Purchase</label>
                             <input 
@@ -141,7 +166,7 @@
                             <p class="text-xs text-gray-500 mt-1">Only applicable for percentage discounts</p>
                             @error('max_discount') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
-                    </div>
+                    </div> --}}
 
                     <!-- Valid From and Valid Until -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -165,20 +190,6 @@
                             >
                             @error('valid_until') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
-                    </div>
-
-                    <!-- Usage Limit -->
-                    <div class="mb-4">
-                        <label for="usage_limit" class="block text-sm font-medium text-gray-700 mb-2">Usage Limit</label>
-                        <input 
-                            placeholder="Leave empty for unlimited"
-                            type="number" 
-                            id="usage_limit"
-                            wire:model.blur="usage_limit" 
-                            min="1"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('usage_limit') border-red-500 @enderror"
-                        >
-                        @error('usage_limit') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Is Active -->

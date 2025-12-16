@@ -14,7 +14,7 @@
     </x-slot>
 
     <div class="py-12 md:px-0 px-4">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="mb-12">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex items-start gap-3">
@@ -79,7 +79,7 @@
             <!-- Anchor targets for bottom navigation -->
             <div id="my-vouchers">
                 <div>
-                    <p class="text-xl font-bold text-gray-700 mb-1">My Vouchers</p>
+                    <p class="text-xl font-bold text-gray-700 mb-1">My Claimed Vouchers</p>
                     <p class="text-xs text-gray-600">Your claimed vouchers will appear here.</p>
                 </div>
 
@@ -91,10 +91,7 @@
 
                 <div class="flex flex-nowrap gap-2 min-h-[140px] items-center overflow-x-auto overflow-y-hidden">
                     @forelse($claimedVouchers as $value)
-                        <div class="hover:-translate-y-1 hover:shadow-lg hover:bg-orange-50 transition-all duration-300 shrink-0 flex flex-col w-24 h-24 rounded-full items-center justify-center border border-gray-200 bg-white">
-                            <p class="text-md text-gray-400 font-bold">P{{ $value }}</p>
-                            <p class="text-xs text-gray-400 font-semibold">Voucher</p>
-                        </div>
+                        @livewire('member.vouchers.card', ['value' => (string) $value], key('member-voucher-card-' . $loop->index . '-' . $value))
                     @empty
                         <div class="border border-dashed border-gray-300 rounded-lg bg-gray-50/50 p-4 w-full text-center py-8 text-sm text-gray-400/60 font-semibold">
                             No Voucher found

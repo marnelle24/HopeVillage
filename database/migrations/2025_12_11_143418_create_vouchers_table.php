@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('voucher_code')->unique();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
+            $table->enum('discount_type', ['percentage', 'fixed', 'item'])->default('percentage');
             $table->decimal('discount_value', 10, 2);
             $table->decimal('min_purchase', 10, 2)->nullable();
             $table->decimal('max_discount', 10, 2)->nullable();
