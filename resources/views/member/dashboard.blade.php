@@ -79,7 +79,7 @@
             <!-- Anchor targets for bottom navigation -->
             <div id="my-vouchers">
                 <div>
-                    <p class="text-xl font-bold text-gray-700 mb-1">My Claimed Vouchers</p>
+                    <p class="text-xl font-bold text-gray-700 mb-1">My Vouchers</p>
                     <p class="text-xs text-gray-600">Your claimed vouchers will appear here.</p>
                 </div>
 

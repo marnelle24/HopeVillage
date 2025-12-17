@@ -23,7 +23,7 @@ class Card extends Component
         $userId = (string) auth()->id();
 
         // NOTE: This is a UI-only QR payload for now (no server-side redemption flow exists yet).
-        $this->qrPayload = "HV_VOUCHER:{$this->value}|USER:{$userId}";
+        $this->qrPayload = "HV_VOUCHER:{$this->value}";
         $this->qrImage = app(QrCodeService::class)->generateQrCodeImage($this->qrPayload, 420);
         $this->showQr = true;
     }

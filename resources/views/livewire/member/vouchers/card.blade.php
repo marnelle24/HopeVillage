@@ -1,5 +1,5 @@
 <div
-    x-data="{ flipped: false }"
+    x-data="{ flipped: false, payloadFull: false }"
     class="shrink-0"
     style="perspective: 1000px;"
 >
@@ -31,9 +31,9 @@
                     type="button"
                     wire:click="redeem"
                     @click.stop
-                    class="mt-2 px-3 py-1.5 text-[10px] font-semibold rounded-lg bg-slate-500 border border-white hover:bg-slate-600 text-white"
+                    class="mt-2 px-2 py-1.5 text-[12px] font-semibold rounded-lg bg-[#1990a7] border border-white hover:bg-slate-600 text-white"
                 >
-                    Redeem Now
+                    Redeem
                 </button>
                 <p class="mt-2 text-[10px] text-white">Tap to flip back</p>
             </div>
@@ -41,28 +41,41 @@
     </div>
 
     @if($showQr)
-        <div class="fixed inset-0 z-[80] bg-black/70 flex items-center justify-center p-4" wire:click="closeQr">
-            <div class="bg-white rounded-2xl p-5 w-full max-w-sm" wire:click.stop>
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-bold text-gray-800">Voucher QR Code</p>
-                    <button type="button" class="text-gray-500 hover:text-gray-700" wire:click="closeQr" aria-label="Close">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="mt-4 flex flex-col items-center gap-3">
-                    @if($qrImage)
-                        <div class="bg-white p-3 rounded-xl border border-gray-200">
-                            <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64 h-64">
-                        </div>
-                    @endif
-                    <p class="text-[11px] text-gray-500 font-mono break-all">{{ $qrPayload }}</p>
-                </div>
+        <div class="fixed inset-0 z-[80] bg-white flex items-center justify-center p-4 overflow-hidden rounded-full" wire:click="closeQr">
+            <div class="bg-white rounded-full p-2 w-full max-w-sm flex flex-col items-center justify-center" @click.stop>
+                @if($qrImage)
+                    <div class="bg-white rounded-full border border-gray-200">
+                        <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64">
+                    </div>
+                @endif
+                <p
+                    class="text-[7px] text-gray-500 cursort-pointer font-mono break-all text-center cursor-pointer select-all"
+                    role="button"
+                    tabindex="0"
+                    title="Tap to view fullscreen"
+                    @click.stop="payloadFull = true"
+                    @keydown.enter.prevent.stop="payloadFull = true"
+                    @keydown.space.prevent.stop="payloadFull = true"
+                >See fullscreen</p>
             </div>
         </div>
     @endif
+
+    <template x-teleport="body">
+        <div
+            x-cloak
+            x-show="payloadFull"
+            x-transition.opacity
+            class="fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-6"
+            @click="payloadFull = false"
+            @keydown.escape.window="payloadFull = false"
+        >
+            <div class="bg-white w-full max-w-lg flex flex-col items-center justify-center rounded-2xl p-5" @click.stop>
+                <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64">
+                <p class="mt-4 text-xs text-gray-600 text-center">{{ $qrPayload }}</p>
+            </div>
+        </div>
+    </template>
 </div>
 
 
