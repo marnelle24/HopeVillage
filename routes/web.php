@@ -51,6 +51,10 @@ Route::middleware([
     Route::get('/admin/amenities/create', \App\Livewire\Amenities\Form::class)->name('admin.amenities.create');
     Route::get('/admin/amenities/{id}/edit', \App\Livewire\Amenities\Form::class)->name('admin.amenities.edit');
     
+    // Members
+    Route::get('/admin/members', \App\Livewire\Members\Index::class)->name('admin.members.index');
+    Route::get('/admin/members/{fin}', \App\Livewire\Members\Profile::class)->name('admin.members.profile');
+
     // Merchant CRUD Routes
     Route::get('/admin/merchants', \App\Livewire\Merchants\Index::class)->name('admin.merchants.index');
     Route::get('/admin/merchants/create', \App\Livewire\Merchants\Form::class)->name('admin.merchants.create');
