@@ -31,7 +31,7 @@ class VoucherLandscape extends Component
                 $dt = Carbon::parse($dt);
             }
             if ($dt instanceof CarbonInterface) {
-                $this->redeemedDate = $dt->format('M d, Y');
+                $this->redeemedDate = $dt->format('M d, Y - g:i A');
             }
         }
     }

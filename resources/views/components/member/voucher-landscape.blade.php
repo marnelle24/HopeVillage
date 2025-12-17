@@ -56,7 +56,7 @@
                 @endif
                 @if($redeemed)
                     <span class="shrink-0 text-[11px] font-semibold px-2 py-1 rounded-lg bg-slate-100 text-slate-800 border border-slate-200">
-                        Redeemed @if($redeemedDate) on {{ $redeemedDate }}@endif
+                        Redeemed @if($redeemedDate) • {{ $redeemedDate }}@endif
                     </span>
                 @endif
             </div>

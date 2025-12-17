@@ -8,13 +8,40 @@
     </x-slot>
 
     <div class="py-10 md:px-0 px-4">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8" x-data="{ tab: 'upcoming' }">
+        @php
+            $type = request()->query('type');
+            $initialTab = $type === 'my-events' ? 'mine' : 'upcoming';
+        @endphp
+
+        <div
+            class="max-w-7xl mx-auto sm:px-6 lg:px-8"
+            x-data="{
+                tab: '{{ $initialTab }}',
+                syncUrl() {
+                    const params = new URLSearchParams(window.location.search);
+                    params.set('type', this.tab === 'mine' ? 'my-events' : 'upcoming');
+                    const newUrl = `${window.location.pathname}?${params.toString()}`;
+                    window.history.replaceState({}, '', newUrl);
+                },
+                setTab(next) {
+                    this.tab = next;
+                    this.syncUrl();
+                },
+                init() {
+                    const type = new URLSearchParams(window.location.search).get('type');
+                    if (type === 'my-events') this.tab = 'mine';
+                    if (type === 'upcoming') this.tab = 'upcoming';
+                    this.syncUrl();
+                },
+            }"
+            x-init="init()"
+        >
             <!-- Tabs -->
             <div class="mb-6 flex items-center justify-center">
                 <div class="inline-flex rounded-xl bg-gray-100 p-1 border border-slate-400">
                     <button
                         type="button"
-                        @click="tab = 'upcoming'"
+                        @click="setTab('upcoming')"
                         :class="tab === 'upcoming' ? 'bg-orange-500 shadow text-white' : 'text-gray-600 hover:text-gray-900'"
                         class="px-4 py-2 text-sm font-semibold rounded-lg transition"
                     >
@@ -22,7 +49,7 @@
                     </button>
                     <button
                         type="button"
-                        @click="tab = 'mine'"
+                        @click="setTab('mine')"
                         :class="tab === 'mine' ? 'bg-orange-500 shadow text-white' : 'text-gray-600 hover:text-gray-900'"
                         class="px-4 py-2 text-sm font-semibold rounded-lg transition"
                     >
