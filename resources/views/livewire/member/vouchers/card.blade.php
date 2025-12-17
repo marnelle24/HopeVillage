@@ -62,10 +62,21 @@
             @keydown.escape.window="showQr = false"
         >
             <div class="bg-white w-full max-w-lg flex flex-col items-center justify-center rounded-2xl p-5" @click.stop>
+                @if($voucher && $voucher->name)
+                    <p class="text-sm text-gray-800">
+                        Redeem 
+                        <span class="font-bold">{{ $voucher->name }} </span>
+                        voucher
+                        @if($merchant && $merchant->name)
+                            from
+                            <span class="font-bold">{{ $merchant->name }}</span>
+                        @endif
+                    </p>
+                @endif
                 @if($qrImage)
                     <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64">
                 @endif
-                <p class="mt-4 text-xs text-gray-600 text-center">{{ $value }}</p>
+                <p class="mt-2 text-xs text-gray-600 text-center font-bold">{{ $value }}</p>
             </div>
         </div>
     </template>
