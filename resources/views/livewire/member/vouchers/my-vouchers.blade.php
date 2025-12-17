@@ -1,9 +1,12 @@
 <div class="space-y-10">
     <!-- Claimed -->
     <div>
-        <div class="mb-3">
-            <p class="text-xl font-bold text-gray-700 mb-1">Claimed Vouchers</p>
-            <p class="text-xs text-gray-600">Tap a voucher to flip, then click Redeem to show the QR code.</p>
+        <div class="mb-3 flex items-start justify-between">
+            <div>
+                <p class="text-xl font-bold text-gray-700 mb-1">Claimed Vouchers</p>
+                <p class="text-xs text-gray-600">Tap a voucher to flip, then click Redeem to show the QR code.</p>
+            </div>
+            <a href="{{ route('member.vouchers', ['status' => 'my-vouchers']) }}" class="border border-indigo-600/60 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">Reload</a>
         </div>
 
         <div class="flex flex-nowrap gap-2 min-h-[140px] items-center overflow-x-auto overflow-y-hidden">
@@ -26,14 +29,12 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @forelse($this->redeemed as $voucher)
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 opacity-70">
-                    <p class="text-sm font-bold text-gray-800">{{ $voucher->name }}</p>
-                    <p class="mt-0.5 text-xs text-gray-500">
-                        {{ $voucher->merchant?->business_name ?? 'Merchant' }}
-                    </p>
-                    <p class="mt-3 text-sm text-gray-700 line-clamp-3">{{ $voucher->description }}</p>
-                    <p class="mt-4 text-xs text-gray-500 font-mono">{{ $voucher->voucher_code }}</p>
-                </div>
+                <x-member.voucher-landscape
+                    :voucher="$voucher"
+                    :dimmed="true"
+                    :redeemed="true"
+                    :redeemed-at="$voucher->pivot->redeemed_at"
+                />
             @empty
                 <div class="col-span-full border border-dashed border-gray-300 rounded-2xl bg-gray-50/50 p-6 text-center text-sm text-gray-500">
                     No redeemed vouchers yet.

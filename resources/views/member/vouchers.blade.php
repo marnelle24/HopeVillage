@@ -41,9 +41,9 @@
             }"
             x-init="(() => {
                 const status = new URLSearchParams(window.location.search).get('status');
-                if (status === 'my-vouchers') this.tab = 'mine';
-                if (status === 'activeVouchers') this.tab = 'active';
-                this.syncUrl();
+                if (status === 'my-vouchers') tab = 'mine';
+                if (status === 'activeVouchers') tab = 'active';
+                syncUrl();
             })()"
             @touchstart.passive="onTouchStart($event)"
             @touchend.passive="onTouchEnd($event)"

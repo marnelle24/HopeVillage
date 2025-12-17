@@ -29,6 +29,35 @@
     <body class="font-sans antialiased bg-[#FAF7F4]">
         <x-banner />
 
+        <!-- Toast notifications (Livewire event: notify) -->
+        <div
+            x-data="{ open: false, message: '', type: 'success', t: null }"
+            x-on:hv-toast.window="
+                type = $event.detail?.type ?? 'success';
+                message = $event.detail?.message ?? '';
+                open = true;
+                clearTimeout(t);
+                t = setTimeout(() => open = false, 2500);
+            "
+            x-show="open"
+            x-transition.opacity
+            x-cloak
+            class="fixed bottom-[6rem] right-0 z-[120] max-w-[90vw] w-[360px]"
+            role="status"
+            aria-live="polite"
+        >
+            <div
+                class="rounded-l-xl border shadow-lg px-4 py-3 opacity-90 transition-opacity duration-300"
+                :class="type === 'success'
+                    ? 'bg-emerald-100 border-emerald-200 text-emerald-800'
+                    : (type === 'error'
+                        ? 'bg-red-50 border-red-200 text-red-800 opacity-0 transition-opacity duration-300'
+                        : 'bg-slate-50 border-slate-200 text-slate-800 opacity-0 transition-opacity duration-300')"
+            >
+                <p class="text-sm font-semibold" x-text="message"></p>
+            </div>
+        </div>
+
         <div class="min-h-screen bg-gray-100">
             @livewire('navigation-menu')
 
@@ -50,6 +79,15 @@
         @stack('modals')
 
         @livewireScripts
+        <script>
+            document.addEventListener('livewire:init', () => {
+                if (!window.Livewire) return;
+                Livewire.on('notify', (...args) => {
+                    const detail = args?.[0] ?? {};
+                    window.dispatchEvent(new CustomEvent('hv-toast', { detail }));
+                });
+            });
+        </script>
         @stack('scripts')
     </body>
 </html>

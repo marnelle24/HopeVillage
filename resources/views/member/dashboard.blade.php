@@ -78,20 +78,31 @@
 
             <!-- Anchor targets for bottom navigation -->
             <div id="my-vouchers">
-                <div>
-                    <p class="text-xl font-bold text-gray-700 mb-1">My Vouchers</p>
-                    <p class="text-xs text-gray-600">Your claimed vouchers will appear here.</p>
+                <div class="mb-4 flex items-end justify-between gap-3">
+                    <div>
+                        <p class="text-xl font-bold text-gray-700 mb-1">My Vouchers</p>
+                        <p class="text-xs text-gray-600">Your most recently claimed vouchers.</p>
+                    </div>
+                    <a
+                        href="{{ route('member.vouchers', ['status' => 'my-vouchers']) }}"
+                        class="border border-indigo-600/60 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                    >
+                        View all
+                    </a>
                 </div>
 
                 @php
-                    // If you later pass real claimed vouchers from backend, provide `$claimedVouchers`.
-                    // For now we keep sample items unless `$claimedVouchers` is explicitly set to an empty array/collection.
-                    $claimedVouchers = auth()->user()->claimedVouchers ?? ['10', '20', '30', '40', '50'];
+                    $recentClaimedVouchers = auth()->user()
+                        ->vouchers()
+                        ->wherePivot('status', 'claimed')
+                        ->latest('user_voucher.claimed_at')
+                        ->limit(6)
+                        ->get();
                 @endphp
 
                 <div class="flex flex-nowrap gap-2 min-h-[140px] items-center overflow-x-auto overflow-y-hidden">
-                    @forelse($claimedVouchers as $value)
-                        @livewire('member.vouchers.card', ['value' => (string) $value], key('member-voucher-card-' . $loop->index . '-' . $value))
+                    @forelse($recentClaimedVouchers as $voucher)
+                        @livewire('member.vouchers.card', ['value' => (string) $voucher->voucher_code], key('member-voucher-card-' . $voucher->id . '-' . $voucher->voucher_code))
                     @empty
                         <div class="border border-dashed border-gray-300 rounded-lg bg-gray-50/50 p-4 w-full text-center py-8 text-sm text-gray-400/60 font-semibold">
                             No Voucher found

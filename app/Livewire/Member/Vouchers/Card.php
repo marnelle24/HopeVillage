@@ -20,10 +20,14 @@ class Card extends Component
 
     public function redeem(): void
     {
-        $userId = (string) auth()->id();
+        $user = auth()->user();
+        $fin = (string) ($user?->fin ?? '');
 
-        // NOTE: This is a UI-only QR payload for now (no server-side redemption flow exists yet).
-        $this->qrPayload = "HV_VOUCHER:{$this->value}";
+        // QR payload format: <type>/<FIN>/<voucher_code>
+        // type = voucher
+        // FIN = fin of the member who claimed the voucher
+        // voucher_code = the voucher code as it was created
+        $this->qrPayload = 'voucher/' . $fin . '/' . $this->value;
         $this->qrImage = app(QrCodeService::class)->generateQrCodeImage($this->qrPayload, 420);
         $this->showQr = true;
     }
