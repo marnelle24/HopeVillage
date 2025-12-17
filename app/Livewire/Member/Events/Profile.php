@@ -4,6 +4,7 @@ namespace App\Livewire\Member\Events;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Services\PointsService;
 use Illuminate\Database\QueryException;
 use Livewire\Component;
 
@@ -36,7 +37,7 @@ class Profile extends Component
         }
 
         try {
-            EventRegistration::firstOrCreate(
+            $registration = EventRegistration::firstOrCreate(
                 [
                     'user_id' => $user->id,
                     'event_id' => $event->id,
@@ -47,6 +48,10 @@ class Profile extends Component
                     'registered_at' => now(),
                 ]
             );
+
+            if ($registration->wasRecentlyCreated) {
+                app(PointsService::class)->awardEventJoin($user, $event);
+            }
         } catch (QueryException) {
             // In case of a race condition on the unique(user_id,event_id) constraint.
         }

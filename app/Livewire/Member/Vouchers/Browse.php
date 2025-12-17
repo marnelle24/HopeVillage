@@ -3,6 +3,7 @@
 namespace App\Livewire\Member\Vouchers;
 
 use App\Models\Voucher;
+use App\Services\PointsService;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 
@@ -31,6 +32,8 @@ class Browse extends Component
             'status' => 'claimed',
             'claimed_at' => now(),
         ]);
+
+        app(PointsService::class)->awardVoucherClaim($user, $voucher);
 
         $this->dispatch('notify', type: 'success', message: 'Voucher claimed!');
     }

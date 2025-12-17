@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\ActivityType;
+use App\Models\Event;
+use App\Models\EventRegistration;
+use App\Models\Location;
+use App\Models\User;
+use App\Models\Voucher;
+use App\Services\PointsService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class PointsActionsController extends Controller
+{
+    /**
+     * Member entry to a location (+10 points)
+     * Expects: fin, location_id
+     */
+    public function locationEntry(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'fin' => ['required', 'string'],
+            'location_id' => ['required', 'integer', 'exists:locations,id'],
+        ]);
+
+        $user = User::query()->where('fin', $data['fin'])->firstOrFail();
+        $location = Location::query()->findOrFail($data['location_id']);
+
+        DB::transaction(function () use ($user, $location) {
+            $activityType = ActivityType::query()->firstOrCreate(
+                ['name' => PointsService::ACTIVITY_LOCATION_ENTRY],
+                ['description' => 'Member entry to location', 'is_active' => true]
+            );
+
+            $memberActivity = $user->memberActivities()->create([
+                'activity_type_id' => $activityType->id,
+                'location_id' => $location->id,
+                'amenity_id' => null,
+                'activity_time' => now(),
+                'description' => 'Member entry to location',
+                'metadata' => null,
+            ]);
+
+            app(PointsService::class)->award(
+                user: $user,
+                activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
+                points: PointsService::POINTS_LOCATION_ENTRY,
+                description: 'Member entry to location',
+                locationId: $location->id,
+                memberActivityId: $memberActivity->id,
+            );
+        });
+
+        return response()->json([
+            'ok' => true,
+            'fin' => $user->fin,
+            'total_points' => $user->fresh()->total_points,
+        ]);
+    }
+
+    /**
+     * Mark member attended an event (+20 points)
+     * Expects: fin, event_id OR event_code
+     */
+    public function attendEvent(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'fin' => ['required', 'string'],
+            'event_id' => ['nullable', 'integer', 'exists:events,id'],
+            'event_code' => ['nullable', 'string'],
+        ]);
+
+        $user = User::query()->where('fin', $data['fin'])->firstOrFail();
+
+        $event = Event::query()
+            ->when($data['event_id'] ?? null, fn ($q) => $q->whereKey($data['event_id']))
+            ->when($data['event_code'] ?? null, fn ($q) => $q->where('event_code', $data['event_code']))
+            ->firstOrFail();
+
+        $registration = EventRegistration::query()
+            ->where('user_id', $user->id)
+            ->where('event_id', $event->id)
+            ->firstOrFail();
+
+        if ($registration->status === 'attended') {
+            return response()->json([
+                'ok' => true,
+                'already_attended' => true,
+                'total_points' => $user->total_points,
+            ]);
+        }
+
+        DB::transaction(function () use ($registration, $user, $event) {
+            $registration->update([
+                'status' => 'attended',
+                'attended_at' => now(),
+            ]);
+
+            app(PointsService::class)->awardEventAttend($user, $event);
+        });
+
+        return response()->json([
+            'ok' => true,
+            'total_points' => $user->fresh()->total_points,
+        ]);
+    }
+
+    /**
+     * Redeem a claimed voucher (+5 points)
+     * Expects: fin, voucher_code
+     */
+    public function redeemVoucher(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'fin' => ['required', 'string'],
+            'voucher_code' => ['required', 'string', 'exists:vouchers,voucher_code'],
+        ]);
+
+        $user = User::query()->where('fin', $data['fin'])->firstOrFail();
+        $voucher = Voucher::query()->where('voucher_code', $data['voucher_code'])->firstOrFail();
+
+        $pivot = $user->vouchers()
+            ->where('vouchers.id', $voucher->id)
+            ->first();
+
+        if (!$pivot) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Voucher not claimed by this member.',
+            ], 422);
+        }
+
+        if ($pivot->pivot->status === 'redeemed') {
+            return response()->json([
+                'ok' => true,
+                'already_redeemed' => true,
+                'total_points' => $user->total_points,
+            ]);
+        }
+
+        DB::transaction(function () use ($user, $voucher) {
+            // Mark redeemed on pivot
+            $user->vouchers()->updateExistingPivot($voucher->id, [
+                'status' => 'redeemed',
+                'redeemed_at' => now(),
+            ]);
+
+            // Update voucher usage count (basic tracking)
+            $voucher->increment('usage_count');
+
+            app(PointsService::class)->awardVoucherRedeem($user, $voucher);
+        });
+
+        return response()->json([
+            'ok' => true,
+            'total_points' => $user->fresh()->total_points,
+        ]);
+    }
+}
+
+

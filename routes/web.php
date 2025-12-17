@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\PointsActionsController;
 use App\Http\Controllers\VerificationCodeController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,10 @@ Route::middleware([
 
     // Raffle / Roulette
     Route::get('/admin/raffle', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle');
+
+    // Points actions (admin-operated)
+    Route::post('/admin/points/location-entry', [PointsActionsController::class, 'locationEntry'])->name('admin.points.location-entry');
+    Route::post('/admin/points/event-attend', [PointsActionsController::class, 'attendEvent'])->name('admin.points.event-attend');
 });
 
 // Member Dashboard - Only accessible by member users
@@ -114,6 +119,9 @@ Route::middleware([
     Route::get('/merchant/vouchers', \App\Livewire\Merchant\Vouchers\Index::class)->name('merchant.vouchers.index');
     Route::get('/merchant/vouchers/create', \App\Livewire\Merchant\Vouchers\Form::class)->name('merchant.vouchers.create');
     Route::get('/merchant/vouchers/{voucher_code}/edit', \App\Livewire\Merchant\Vouchers\Form::class)->name('merchant.vouchers.edit');
+
+    // Points actions (merchant-operated)
+    Route::post('/merchant/points/voucher-redeem', [PointsActionsController::class, 'redeemVoucher'])->name('merchant.points.voucher-redeem');
 });
 
 // Legacy dashboard route - redirects based on user type
