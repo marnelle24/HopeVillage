@@ -82,6 +82,15 @@ Route::middleware([
         return view('member.events');
     })->name('member.events');
 
+    Route::get('/member/vouchers', function () {
+        return view('member.vouchers');
+    })->name('member.vouchers');
+
+    // Backward/alternate URL: /member/voucher?status=...
+    Route::get('/member/voucher', function () {
+        return redirect()->route('member.vouchers', request()->query());
+    })->name('member.voucher');
+
     Route::get('/member/event/{event_code}', \App\Livewire\Member\Events\Profile::class)
         ->name('member.events.profile');
     

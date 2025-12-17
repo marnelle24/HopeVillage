@@ -112,6 +112,13 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function vouchers(): BelongsToMany
+    {
+        return $this->belongsToMany(Voucher::class)
+            ->withPivot(['status', 'claimed_at', 'redeemed_at'])
+            ->withTimestamps();
+    }
+
     public function defaultMerchant()
     {
         return $this->merchants()->wherePivot('is_default', true)->first();

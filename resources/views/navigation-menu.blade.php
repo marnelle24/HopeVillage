@@ -78,9 +78,9 @@
                             </x-nav-link>
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            <a href="{{ route('member.dashboard') }}#my-vouchers" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                                {{ __('My Vouchers') }}
-                            </a>
+                            <x-nav-link href="{{ route('member.vouchers') }}" :active="request()->routeIs('member.vouchers')">
+                                {{ __('Vouchers') }}
+                            </x-nav-link>
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <a href="{{ route('member.events') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">
@@ -255,8 +255,8 @@
                     <x-responsive-nav-link href="{{ route('member.dashboard') }}" :active="request()->routeIs('member.dashboard')">
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('member.dashboard') }}#my-vouchers">
-                        {{ __('My Vouchers') }}
+                    <x-responsive-nav-link href="{{ route('member.vouchers') }}" :active="request()->routeIs('member.vouchers')">
+                        {{ __('Vouchers') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link href="{{ route('member.events') }}" :active="request()->routeIs('member.events')">
                         {{ __('Events') }}
@@ -461,7 +461,7 @@
                 </a>
 
 
-                <a href="{{ route('member.dashboard') }}#my-vouchers" class="flex flex-col items-center justify-center py-3 pl-5 gap-1 hover:bg-slate-700 {{ request()->routeIs('member.my-vouchers') ? 'text-white bg-slate-700' : 'text-slate-200' }}">
+                <a href="{{ route('member.vouchers') }}" class="flex flex-col items-center justify-center py-3 pl-5 gap-1 hover:bg-slate-700 {{ request()->routeIs('member.vouchers') ? 'text-white bg-slate-700' : 'text-slate-200' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75h6m-6 3h6m-6 3h6m-6 3h6M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Z" />
                     </svg>

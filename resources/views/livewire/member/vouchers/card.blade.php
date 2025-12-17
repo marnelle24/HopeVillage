@@ -40,26 +40,28 @@
         </div>
     </div>
 
-    @if($showQr)
-        <div class="fixed inset-0 z-[80] bg-white flex items-center justify-center p-4 overflow-hidden rounded-full" wire:click="closeQr">
-            <div class="bg-white rounded-full p-2 w-full max-w-sm flex flex-col items-center justify-center" @click.stop>
-                @if($qrImage)
-                    <div class="bg-white rounded-full border border-gray-200">
-                        <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64">
-                    </div>
-                @endif
-                <p
-                    class="text-[7px] text-gray-500 cursort-pointer font-mono break-all text-center cursor-pointer select-all"
-                    role="button"
-                    tabindex="0"
-                    title="Tap to view fullscreen"
-                    @click.stop="payloadFull = true"
-                    @keydown.enter.prevent.stop="payloadFull = true"
-                    @keydown.space.prevent.stop="payloadFull = true"
-                >See fullscreen</p>
+    <template x-teleport="body">
+        @if($showQr)
+            <div class="fixed inset-0 z-[80] bg-white flex items-center justify-center p-4 overflow-hidden rounded-full" wire:click="closeQr">
+                <div class="bg-white rounded-full p-2 w-full max-w-sm flex flex-col items-center justify-center" @click.stop>
+                    @if($qrImage)
+                        <div class="bg-white rounded-full border border-gray-200">
+                            <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64">
+                        </div>
+                    @endif
+                    <p
+                        class="mt-2 text-[8px] text-gray-500 cursort-pointer font-mono break-all text-center cursor-pointer select-all"
+                        role="button"
+                        tabindex="0"
+                        title="Tap to view fullscreen"
+                        @click.stop="payloadFull = true"
+                        @keydown.enter.prevent.stop="payloadFull = true"
+                        @keydown.space.prevent.stop="payloadFull = true"
+                    > Fullscreen</p>
+                </div>
             </div>
-        </div>
-    @endif
+        @endif
+    </template>
 
     <template x-teleport="body">
         <div
