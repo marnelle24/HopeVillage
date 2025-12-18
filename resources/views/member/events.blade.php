@@ -1,9 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Events') }}
-            </h2>
+            <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-16">
             <div>
                 <span class="font-semibold text-gray-900 text-xs">My Points</span>
                 <button type="button" title="My Points" class="flex items-center gap-1 text-xs text-gray-500 border border-gray-300 rounded-lg px-2 py-1">

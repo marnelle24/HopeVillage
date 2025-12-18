@@ -10,32 +10,44 @@
             @csrf
 
             <div class="mt-4">
-                <x-label for="fin" value="{{ __('FIN (Foreign Identification Number)') }}" />
+                <div class="flex items-center">
+                    <x-label for="fin" value="{{ __('FIN (Foreign Identification Number)') }}" />
+                    <span class="ml-1 text-red-500 text-xl">*</span>
+                </div>
                 <x-input id="fin" class="block mt-1 w-full" type="text" name="fin" :value="old('fin')" required autocomplete="off" placeholder="F1234567X" />
-                <p class="mt-1 text-xs text-gray-500">
+                {{-- <p class="mt-1 text-xs text-gray-500">
                     Format: F/G/M + 7 digits + checksum letter.
-                </p>
+                </p> --}}
             </div>
 
             <div class="mt-4">
-                <x-label for="name" value="{{ __('Name') }}" />
+                <div class="flex items-center">
+                    <x-label for="name" value="{{ __('Name') }}" />
+                    <span class="ml-1 text-red-500 text-xl">*</span>
+                </div>
                 <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
             <div class="mt-4">
-                <x-label for="email" value="{{ __('Email') }}" />
+                <div class="flex items-center">
+                    <x-label for="email" value="{{ __('Email') }}" />
+                    <span class="ml-1 text-red-500 text-xl">*</span>
+                </div>
                 <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             </div>
 
             <div class="mt-4">
-                <x-label for="whatsapp_number" value="{{ __('Contact Number (WhatsApp)') }}" />
+                <div class="flex items-center">
+                    <x-label for="whatsapp_number" value="{{ __('Contact Number (WhatsApp)') }}" />
+                    <span class="ml-1 text-red-500 text-xl">*</span>
+                </div>
                 <x-input id="whatsapp_number" class="block mt-1 w-full" type="text" name="whatsapp_number" :value="old('whatsapp_number')" autocomplete="tel" placeholder="+65XXXXXXXX" />
                 <p class="mt-1 text-xs text-gray-500">
-                    Optional. If the number is on WhatsApp, we’ll send your verification code there too.
+                    If the number is on WhatsApp, we’ll send your verification code there too.
                 </p>
             </div>
 
-            <div class="mt-4 grid grid-cols-2 gap-4">
+            {{-- <div class="mt-4 grid grid-cols-2 gap-4">
                 <div>
                     <x-label for="age" value="{{ __('Age') }}" />
                     <x-input id="age" class="block mt-1 w-full" type="number" name="age" :value="old('age')" placeholder="Optional" min="0" max="120" />
@@ -44,7 +56,7 @@
                     <x-label for="gender" value="{{ __('Gender') }}" />
                     <x-input id="gender" class="block mt-1 w-full" type="text" name="gender" :value="old('gender')" placeholder="Optional" />
                 </div>
-            </div>
+            </div> --}}
 
             <div class="mt-4">
                 <x-label for="password" value="{{ __('Password') }}" />

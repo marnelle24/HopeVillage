@@ -1,9 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Dashboard') }}
-            </h2>
+            <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-16">
             <div>
                 <span class="font-semibold text-gray-900 text-xs">My Points</span>
                 <button type="button" title="My Points" class="flex items-center gap-1 text-xs text-gray-500 border border-gray-300 rounded-lg px-2 py-1">
@@ -88,7 +86,7 @@
                     </div>
                     <a
                         href="{{ route('member.vouchers', ['status' => 'my-vouchers']) }}"
-                        class="border border-indigo-600/60 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                        class="border border-orange-500/60 rounded-lg px-2 py-1 text-xs font-semibold text-orange-500 hover:text-orange-600"
                     >
                         View all
                     </a>
@@ -120,7 +118,7 @@
                         <p class="text-xl font-bold text-gray-700 mb-1">My Recent Events</p>
                         <p class="text-xs text-gray-600">Your most recently registered events.</p>
                     </div>
-                    <a href="{{ route('member.events') }}" class="border border-indigo-600/60 rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                    <a href="{{ route('member.events') }}" class="border border-orange-500/60 rounded-lg px-2 py-1 text-xs font-semibold text-orange-500 hover:text-orange-600">
                         View all
                     </a>
                 </div>

@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'merchant_user' => \App\Http\Middleware\EnsureMerchantUser::class,
             'hv_verified' => \App\Http\Middleware\EnsureHvVerified::class,
         ]);
+        
+        // Trust ngrok proxies to detect HTTPS
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
