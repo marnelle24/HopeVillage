@@ -201,7 +201,7 @@
                         ->pointLogs()
                         ->with(['activityType', 'location', 'amenity'])
                         ->latest('awarded_at')
-                        ->limit(10)
+                        ->limit(5)
                         ->get();
 
                     // Helper function to get activity label and color classes
@@ -218,7 +218,7 @@
                     };
                 @endphp
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mt-4">
+                <div class="overflow-hidden mt-4">
                     @if($recentActivities->isEmpty())
                         <!-- Empty state -->
                         <div class="text-center py-8">
@@ -227,7 +227,7 @@
                         </div>
                     @else
                         <!-- Mobile-first list -->
-                        <div class="space-y-3 sm:hidden">
+                        <div class="space-y-3 sm:hidden overflow-auto max-h-[100px]">
                             @foreach($recentActivities as $activity)
                                 @php
                                     $activityInfo = $getActivityInfo($activity->activityType->name ?? '');
@@ -248,7 +248,7 @@
                                     
                                     $date = $activity->awarded_at ?? $activity->created_at;
                                 @endphp
-                                <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="border border-gray-200 bg-white rounded-lg shadow-sm p-4">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
                                             <span class="{{ $textClass }} {{ $bgClass }} px-2 py-1 border {{ $borderClass }} rounded-lg text-xs font-semibold">{{ $label }}</span>
