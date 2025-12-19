@@ -7,7 +7,7 @@
         {{ $slot }}
     </div>
     <p class="mt-10 text-center text-md text-gray-500">
-        @if (Route::has('register'))
+        @if (request()->routeIs('register'))
             Already have an account? <a href="{{ route('login') }}" class="text-orange-500 hover:text-orange-600">Login</a>
         @else
             Don't have an account? <a href="{{ route('register') }}" class="text-orange-500 hover:text-orange-600">Register</a>

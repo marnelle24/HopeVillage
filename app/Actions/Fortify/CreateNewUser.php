@@ -5,9 +5,12 @@ namespace App\Actions\Fortify;
 use App\Models\Team;
 use App\Models\User;
 use App\Rules\ValidFin;
+use App\Rules\ValidWhatsAppNumber;
+use App\Services\TwilioWhatsAppService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
 
@@ -23,15 +26,27 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): User
     {
         // Normalize FIN to uppercase early so unique/checksum behave consistently
-        if (isset($input['fin'])) {
-            $input['fin'] = strtoupper(trim((string) $input['fin']));
-        }
+        // if (isset($input['fin'])) {
+        //     $input['fin'] = strtoupper(trim((string) $input['fin']));
+        // }
 
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'whatsapp_number' => ['nullable', 'string', 'max:20', 'unique:users,whatsapp_number'],
-            'fin' => ['required', 'string', 'size:9', 'unique:users,fin', new ValidFin()],
+            'email' => [
+                'required', 
+                'string', 
+                'email', 
+                'max:255', 
+                'unique:users'
+            ],
+            'whatsapp_number' => [
+                'required',
+                'string',
+                'max:20',
+                // 'unique:users,whatsapp_number',
+                new ValidWhatsAppNumber(app(TwilioWhatsAppService::class))
+            ],
+            // 'fin' => ['required', 'string', 'size:9', 'unique:users,fin', new ValidFin()],
             'age' => ['nullable', 'integer', 'min:0', 'max:120'],
             'gender' => ['nullable', 'string', 'max:20'],
             'password' => $this->passwordRules(),
@@ -49,9 +64,14 @@ class CreateNewUser implements CreatesNewUsers
                 'gender' => $input['gender'] ?? null,
             ];
 
-            // Generate FIN and QR code for members
+            // Generate unique 9-character FIN and QR code for members
             if (($userData['user_type'] ?? 'member') === 'member') {
-                $userData['fin'] = $input['fin'];
+                // Generate a unique 9-character UID
+                do {
+                    $fin = strtoupper(Str::random(9));
+                } while (User::where('fin', $fin)->exists());
+                
+                $userData['fin'] = $fin;
                 
                 // Set QR code to FIN value
                 $userData['qr_code'] = $userData['fin'];

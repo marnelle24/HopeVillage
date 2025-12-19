@@ -125,6 +125,104 @@ class TwilioWhatsAppService
     }
 
     /**
+     * Validate if a phone number is valid and can potentially receive WhatsApp messages.
+     * Uses Twilio Lookup API to validate phone number format.
+     * 
+     * Note: Twilio doesn't have a direct API to check if a number is registered on WhatsApp
+     * without sending a message. This method validates the phone number format using
+     * Twilio Lookup API. Actual WhatsApp validation happens when sending messages.
+     *
+     * @return array{valid: bool, error?: string, formatted?: string}
+     */
+    public function validatePhoneNumber(string $phoneNumber): array
+    {
+        if (!$this->enabled()) {
+            return [
+                'valid' => false,
+                'error' => 'Twilio service is not enabled'
+            ];
+        }
+
+        // Normalize the phone number
+        $normalized = $this->normalizeWhatsAppAddress($phoneNumber);
+        if (!$normalized) {
+            return [
+                'valid' => false,
+                'error' => 'Invalid phone number format'
+            ];
+        }
+
+        // Extract E.164 format (remove whatsapp: prefix)
+        $e164Number = str_replace('whatsapp:', '', $normalized);
+
+        $sid = (string) config('services.twilio.account_sid');
+
+        // Auth: prefer API Key if present, otherwise Account SID + Auth Token
+        $username = null;
+        $password = null;
+
+        $apiKeySid = (string) config('services.twilio.api_key_sid');
+        $apiKeySecret = (string) config('services.twilio.api_key_secret');
+        if ($apiKeySid !== '' && $apiKeySecret !== '') {
+            $username = $apiKeySid;
+            $password = $apiKeySecret;
+        } else {
+            $token = (string) config('services.twilio.auth_token');
+            $username = $sid;
+            $password = $token;
+        }
+
+        // Use Twilio Lookup API to validate phone number
+        $response = Http::withBasicAuth($username, $password)
+            ->get("https://lookups.twilio.com/v1/PhoneNumbers/{$e164Number}", [
+                'Type' => 'carrier',
+            ]);
+
+        if (!$response->successful()) {
+            $payload = $response->json();
+            $errorMessage = is_array($payload) ? ($payload['message'] ?? 'Invalid phone number') : 'Invalid phone number';
+            
+            Log::warning('Twilio Lookup failed for phone number validation.', [
+                'phone' => $phoneNumber,
+                'normalized' => $e164Number,
+                'status' => $response->status(),
+                'error' => $errorMessage,
+            ]);
+
+            return [
+                'valid' => false,
+                'error' => $errorMessage
+            ];
+        }
+
+        $data = $response->json();
+        
+        Log::info('Twilio Lookup successful for phone number.', [
+            'phone' => $phoneNumber,
+            'normalized' => $e164Number,
+            'carrier' => $data['carrier']['name'] ?? 'Unknown',
+            'type' => $data['carrier']['type'] ?? 'Unknown',
+        ]);
+
+        return [
+            'valid' => true,
+            'formatted' => $e164Number,
+        ];
+    }
+
+    /**
+     * Check if a phone number is potentially a valid WhatsApp number.
+     * This validates the format but cannot confirm WhatsApp registration without sending a message.
+     * 
+     * @return bool True if the phone number format is valid
+     */
+    public function isValidWhatsAppNumber(string $phoneNumber): bool
+    {
+        $result = $this->validatePhoneNumber($phoneNumber);
+        return $result['valid'] ?? false;
+    }
+
+    /**
      * Normalize into Twilio WhatsApp address: whatsapp:+E164
      */
     private function normalizeWhatsAppAddress(string $phoneNumber): ?string
