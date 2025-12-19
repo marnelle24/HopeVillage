@@ -4,6 +4,32 @@
         <p class="text-xs text-gray-600">Events you have registered for will appear here.</p>
     </div>
 
+    @if (session()->has('message'))
+        @php
+            $type = session('message_type', 'success');
+            $classes = $type === 'error'
+                ? 'bg-red-100 border-red-400 text-red-700'
+                : 'bg-green-100 border-green-400 text-green-700';
+        @endphp
+        <div 
+            x-data="{ show: true }"
+            x-init="setTimeout(() => show = false, 4000)"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            x-cloak
+            class="mb-4 border px-4 py-3 rounded {{ $classes }}" 
+            role="alert"
+        >
+            <span class="block sm:inline">{{ session('message') }}</span>
+        </div>
+    @endif
+
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         @forelse($registeredEvents as $registration)
             @php
@@ -54,7 +80,7 @@
                                 loading="lazy"
                             >
                         @else
-                            <div class="h-48 w-full flex items-center justify-center text-xs text-gray-400">
+                            <div class="h-48 w-full flex items-center justify-center text-lg font-semibold text-slate-300 bg-orange-100">
                                 No image
                             </div>
                         @endif

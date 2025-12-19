@@ -29,6 +29,7 @@ class Browse extends Component
         $event = Event::query()
             ->where('status', 'published')
             ->where('end_date', '>=', now())
+            ->whereHas('location', fn ($q) => $q->whereNull('deleted_at'))
             ->findOrFail($eventId);
 
         if ($event->max_participants && $event->max_participants > 0) {
@@ -61,14 +62,14 @@ class Browse extends Component
             // In case of a race condition on the unique(user_id,event_id) constraint.
         }
 
+        // Set success flash message
         session()->flash('message', 'You have successfully joined the event.');
         session()->flash('message_type', 'success');
 
-        // UX: bring the user back to the alert, and notify other components (e.g. My Events) to refresh.
-        $this->dispatch('scroll-to-top');
-        $this->dispatch('event-joined', eventId: $event->id);
+        sleep(1); // Wait for 2 seconds to allow the flash message to be displayed
 
-        $this->resetPage();
+        // Redirect to member events page with type=my-events parameter
+        $this->redirect(route('member.events', ['type' => 'my-events']));
     }
 
     public function render()
@@ -78,12 +79,17 @@ class Browse extends Component
         $events = Event::query()
             ->where('status', 'published')
             ->where('end_date', '>=', now())
+            // Only show events from locations that are not soft deleted
+            ->whereHas('location', fn ($q) => $q->whereNull('deleted_at'))
             ->when($this->search !== '', function ($q) {
                 $q->where(function ($qq) {
                     $qq->where('title', 'like', '%' . $this->search . '%')
                         ->orWhere('description', 'like', '%' . $this->search . '%')
                         ->orWhere('venue', 'like', '%' . $this->search . '%')
-                        ->orWhereHas('location', fn ($lq) => $lq->where('name', 'like', '%' . $this->search . '%'));
+                        ->orWhereHas('location', function ($lq) {
+                            $lq->whereNull('deleted_at')
+                                ->where('name', 'like', '%' . $this->search . '%');
+                        });
                 });
             })
             ->with(['location', 'media'])

@@ -12,7 +12,7 @@
                             class="cursor-pointer hover:opacity-80 transition-opacity"
                             onclick="openQrCodeModal()"
                         >
-                            <div class="bg-white p-0.5 rounded-none shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+                            <div class="bg-white border-4 border-orange-600 p-0.5 rounded-none shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 animate-border-blink">
                                 <img 
                                     id="qr-code-thumbnail" 
                                     src="" 
@@ -307,6 +307,22 @@
 
     @if(auth()->user()->qr_code)
     @push('scripts')
+    <style>
+        @keyframes border-blink {
+            0%, 100% {
+                border-color: rgb(234 88 12); /* orange-600 */
+                box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.7);
+            }
+            50% {
+                border-color: rgb(251 146 60); /* orange-400 */
+                box-shadow: 0 0 8px 2px rgba(234, 88, 12, 0.5);
+            }
+        }
+        
+        .animate-border-blink {
+            animation: border-blink 1.5s ease-in-out infinite;
+        }
+    </style>
     <script>
         // Load QR code on page load
         document.addEventListener('DOMContentLoaded', function() {

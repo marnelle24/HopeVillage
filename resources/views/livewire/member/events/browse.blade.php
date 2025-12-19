@@ -14,18 +14,6 @@
         >
     </div>
 
-    @if (session()->has('message'))
-        @php
-            $type = session('message_type', 'success');
-            $classes = $type === 'error'
-                ? 'bg-red-100 border-red-400 text-red-700'
-                : 'bg-green-100 border-green-400 text-green-700';
-        @endphp
-        <div class="mb-4 border px-4 py-3 rounded {{ $classes }}" role="alert">
-            <span class="block sm:inline">{{ session('message') }}</span>
-        </div>
-    @endif
-
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($events as $event)
             @php

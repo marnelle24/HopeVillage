@@ -51,8 +51,8 @@
                 :class="type === 'success'
                     ? 'bg-emerald-100 border-emerald-200 text-emerald-800'
                     : (type === 'error'
-                        ? 'bg-red-50 border-red-200 text-red-800 opacity-0 transition-opacity duration-300'
-                        : 'bg-slate-50 border-slate-200 text-slate-800 opacity-0 transition-opacity duration-300')"
+                        ? 'bg-red-50 border-red-200 text-red-800'
+                        : 'bg-slate-50 border-slate-200 text-slate-800')"
             >
                 <p class="text-sm font-semibold" x-text="message"></p>
             </div>

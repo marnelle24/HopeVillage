@@ -140,6 +140,7 @@
                             @endif
                         </div>
                     </div>
+                    
                 </div>
 
                 <!-- Right Column - Quick Actions & Recent Events -->
@@ -184,6 +185,16 @@
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Quick Actions</h3>
                         
                         <div class="space-y-3">
+                            <button 
+                                type="button"
+                                onclick="openQrScanner()"
+                                class="flex items-center border border-green-500 hover:border-green-600 justify-center gap-2 w-full bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200"
+                            >
+                                <svg class="size-5" fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16.1666667,6 C16.0746192,6 16,6.07461921 16,6.16666667 L16,7.83333333 C16,7.92538079 16.0746192,8 16.1666667,8 L17.8333333,8 C17.9253808,8 18,7.92538079 18,7.83333333 L18,6.16666667 C18,6.07461921 17.9253808,6 17.8333333,6 L16.1666667,6 Z M16,18 L16,17.5 C16,17.2238576 16.2238576,17 16.5,17 C16.7761424,17 17,17.2238576 17,17.5 L17,18 L18,18 L18,17.5 C18,17.2238576 18.2238576,17 18.5,17 C18.7761424,17 19,17.2238576 19,17.5 L19,18.5 C19,18.7761424 18.7761424,19 18.5,19 L14.5,19 C14.2238576,19 14,18.7761424 14,18.5 L14,17.5 C14,17.2238576 14.2238576,17 14.5,17 C14.7761424,17 15,17.2238576 15,17.5 L15,18 L16,18 L16,18 Z M13,11 L13.5,11 C13.7761424,11 14,11.2238576 14,11.5 C14,11.7761424 13.7761424,12 13.5,12 L11.5,12 C11.2238576,12 11,11.7761424 11,11.5 C11,11.2238576 11.2238576,11 11.5,11 L12,11 L12,10 L10.5,10 C10.2238576,10 10,9.77614237 10,9.5 C10,9.22385763 10.2238576,9 10.5,9 L13.5,9 C13.7761424,9 14,9.22385763 14,9.5 C14,9.77614237 13.7761424,10 13.5,10 L13,10 L13,11 Z M18,12 L17.5,12 C17.2238576,12 17,11.7761424 17,11.5 C17,11.2238576 17.2238576,11 17.5,11 L18,11 L18,10.5 C18,10.2238576 18.2238576,10 18.5,10 C18.7761424,10 19,10.2238576 19,10.5 L19,12.5 C19,12.7761424 18.7761424,13 18.5,13 C18.2238576,13 18,12.7761424 18,12.5 L18,12 Z M13,14 L12.5,14 C12.2238576,14 12,13.7761424 12,13.5 C12,13.2238576 12.2238576,13 12.5,13 L13.5,13 C13.7761424,13 14,13.2238576 14,13.5 L14,15.5 C14,15.7761424 13.7761424,16 13.5,16 L10.5,16 C10.2238576,16 10,15.7761424 10,15.5 C10,15.2238576 10.2238576,15 10.5,15 L13,15 L13,14 L13,14 Z M16.1666667,5 L17.8333333,5 C18.4776655,5 19,5.52233446 19,6.16666667 L19,7.83333333 C19,8.47766554 18.4776655,9 17.8333333,9 L16.1666667,9 C15.5223345,9 15,8.47766554 15,7.83333333 L15,6.16666667 C15,5.52233446 15.5223345,5 16.1666667,5 Z M6.16666667,5 L7.83333333,5 C8.47766554,5 9,5.52233446 9,6.16666667 L9,7.83333333 C9,8.47766554 8.47766554,9 7.83333333,9 L6.16666667,9 C5.52233446,9 5,8.47766554 5,7.83333333 L5,6.16666667 C5,5.52233446 5.52233446,5 6.16666667,5 Z M6.16666667,6 C6.07461921,6 6,6.07461921 6,6.16666667 L6,7.83333333 C6,7.92538079 6.07461921,8 6.16666667,8 L7.83333333,8 C7.92538079,8 8,7.92538079 8,7.83333333 L8,6.16666667 C8,6.07461921 7.92538079,6 7.83333333,6 L6.16666667,6 Z M6.16666667,15 L7.83333333,15 C8.47766554,15 9,15.5223345 9,16.1666667 L9,17.8333333 C9,18.4776655 8.47766554,19 7.83333333,19 L6.16666667,19 C5.52233446,19 5,18.4776655 5,17.8333333 L5,16.1666667 C5,15.5223345 5.52233446,15 6.16666667,15 Z M6.16666667,16 C6.07461921,16 6,16.0746192 6,16.1666667 L6,17.8333333 C6,17.9253808 6.07461921,18 6.16666667,18 L7.83333333,18 C7.92538079,18 8,17.9253808 8,17.8333333 L8,16.1666667 C8,16.0746192 7.92538079,16 7.83333333,16 L6.16666667,16 Z M13,6 L10.5,6 C10.2238576,6 10,5.77614237 10,5.5 C10,5.22385763 10.2238576,5 10.5,5 L13.5,5 C13.7761424,5 14,5.22385763 14,5.5 L14,7.5 C14,7.77614237 13.7761424,8 13.5,8 C13.2238576,8 13,7.77614237 13,7.5 L13,6 Z M10.5,8 C10.2238576,8 10,7.77614237 10,7.5 C10,7.22385763 10.2238576,7 10.5,7 L11.5,7 C11.7761424,7 12,7.22385763 12,7.5 C12,7.77614237 11.7761424,8 11.5,8 L10.5,8 Z M5.5,14 C5.22385763,14 5,13.7761424 5,13.5 C5,13.2238576 5.22385763,13 5.5,13 L7.5,13 C7.77614237,13 8,13.2238576 8,13.5 C8,13.7761424 7.77614237,14 7.5,14 L5.5,14 Z M9.5,14 C9.22385763,14 9,13.7761424 9,13.5 C9,13.2238576 9.22385763,13 9.5,13 L10.5,13 C10.7761424,13 11,13.2238576 11,13.5 C11,13.7761424 10.7761424,14 10.5,14 L9.5,14 Z M11,18 L11,18.5 C11,18.7761424 10.7761424,19 10.5,19 C10.2238576,19 10,18.7761424 10,18.5 L10,17.5 C10,17.2238576 10.2238576,17 10.5,17 L12.5,17 C12.7761424,17 13,17.2238576 13,17.5 C13,17.7761424 12.7761424,18 12.5,18 L11,18 Z M9,11 L9.5,11 C9.77614237,11 10,11.2238576 10,11.5 C10,11.7761424 9.77614237,12 9.5,12 L8.5,12 C8.22385763,12 8,11.7761424 8,11.5 L8,11 L7.5,11 C7.22385763,11 7,10.7761424 7,10.5 C7,10.2238576 7.22385763,10 7.5,10 L8.5,10 C8.77614237,10 9,10.2238576 9,10.5 L9,11 Z M5,10.5 C5,10.2238576 5.22385763,10 5.5,10 C5.77614237,10 6,10.2238576 6,10.5 L6,11.5 C6,11.7761424 5.77614237,12 5.5,12 C5.22385763,12 5,11.7761424 5,11.5 L5,10.5 Z M15,10.5 C15,10.2238576 15.2238576,10 15.5,10 C15.7761424,10 16,10.2238576 16,10.5 L16,12.5 C16,12.7761424 15.7761424,13 15.5,13 C15.2238576,13 15,12.7761424 15,12.5 L15,10.5 Z M17,15 L17,14.5 C17,14.2238576 17.2238576,14 17.5,14 L18.5,14 C18.7761424,14 19,14.2238576 19,14.5 C19,14.7761424 18.7761424,15 18.5,15 L18,15 L18,15.5 C18,15.7761424 17.7761424,16 17.5,16 L15.5,16 C15.2238576,16 15,15.7761424 15,15.5 L15,14.5 C15,14.2238576 15.2238576,14 15.5,14 C15.7761424,14 16,14.2238576 16,14.5 L16,15 L17,15 Z M3,6.5 C3,6.77614237 2.77614237,7 2.5,7 C2.22385763,7 2,6.77614237 2,6.5 L2,4.5 C2,3.11928813 3.11928813,2 4.5,2 L6.5,2 C6.77614237,2 7,2.22385763 7,2.5 C7,2.77614237 6.77614237,3 6.5,3 L4.5,3 C3.67157288,3 3,3.67157288 3,4.5 L3,6.5 Z M17.5,3 C17.2238576,3 17,2.77614237 17,2.5 C17,2.22385763 17.2238576,2 17.5,2 L19.5,2 C20.8807119,2 22,3.11928813 22,4.5 L22,6.5 C22,6.77614237 21.7761424,7 21.5,7 C21.2238576,7 21,6.77614237 21,6.5 L21,4.5 C21,3.67157288 20.3284271,3 19.5,3 L17.5,3 Z M6.5,21 C6.77614237,21 7,21.2238576 7,21.5 C7,21.7761424 6.77614237,22 6.5,22 L4.5,22 C3.11928813,22 2,20.8807119 2,19.5 L2,17.5 C2,17.2238576 2.22385763,17 2.5,17 C2.77614237,17 3,17.2238576 3,17.5 L3,19.5 C3,20.3284271 3.67157288,21 4.5,21 L6.5,21 Z M21,17.5 C21,17.2238576 21.2238576,17 21.5,17 C21.7761424,17 22,17.2238576 22,17.5 L22,19.5 C22,20.8807119 20.8807119,22 19.5,22 L17.5,22 C17.2238576,22 17,21.7761424 17,21.5 C17,21.2238576 17.2238576,21 17.5,21 L19.5,21 C20.3284271,21 21,20.3284271 21,19.5 L21,17.5 Z"></path> </g>
+                                </svg>
+                                Scan QR Code
+                            </button>
                             <a href="{{ route('admin.locations.events.create', $location->location_code) }}" class="flex items-center justify-center gap-2 w-full bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200">
                                 <svg class="size-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 8V16M16 12H8M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                                 Create New Event
@@ -195,7 +206,70 @@
                         </div>
                     </div>
 
+                    <!-- QR Scanner Modal -->
+                    <div 
+                        id="qr-scanner-modal" 
+                        class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center"
+                        style="display: none;"
+                    >
+                        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Scan Member QR Code</h3>
+                                <button 
+                                    type="button"
+                                    onclick="closeQrScanner()"
+                                    class="text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="rounded-xl overflow-hidden border border-gray-200 bg-black">
+                                    <video id="qr-scanner-video" class="w-full h-64 object-cover" playsinline autoplay></video>
+                                </div>
+                                <div id="qr-scanner-error" class="mt-3 text-sm text-red-600 hidden"></div>
+                                <div id="qr-scanner-loading" class="mt-3 text-sm text-gray-600 hidden">Initializing camera...</div>
+                                
+                                <!-- Scan Response Alert -->
+                                <div id="qr-scan-response" class="mt-3 hidden">
+                                    <div id="qr-scan-response-content" class="rounded-lg p-3 text-sm font-semibold"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button 
+                                    type="button"
+                                    onclick="restartQrScanner()"
+                                    class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+                                >
+                                    Restart Scanner
+                                </button>
+                                <button 
+                                    type="button"
+                                    onclick="closeQrScanner()"
+                                    class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-all"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <script>
+                        // Location code for API calls
+                        const LOCATION_CODE = '{{ $location->location_code }}';
+                        
+                        // QR Scanner state
+                        let qrScannerState = {
+                            stream: null,
+                            detector: null,
+                            scanTimer: null,
+                            isScanning: false
+                        };
+
                         async function shareLocationQrCode() {
                             const img = document.getElementById('location-qr-image');
                             const downloadLink = document.getElementById('location-qr-download');
@@ -222,6 +296,360 @@
                                 downloadLink.click();
                             }
                         }
+
+                        function openQrScanner() {
+                            const modal = document.getElementById('qr-scanner-modal');
+                            if (!modal) return;
+                            
+                            // Hide any previous response
+                            const responseDiv = document.getElementById('qr-scan-response');
+                            if (responseDiv) {
+                                responseDiv.classList.add('hidden');
+                            }
+                            
+                            modal.classList.remove('hidden');
+                            modal.classList.add('flex');
+                            modal.style.display = 'flex';
+                            logQrScan('QR Scanner opened', { location_code: LOCATION_CODE });
+                            startQrScanner();
+                        }
+
+                        function closeQrScanner() {
+                            stopQrScanner();
+                            const modal = document.getElementById('qr-scanner-modal');
+                            if (modal) {
+                                modal.classList.add('hidden');
+                                modal.classList.remove('flex');
+                                modal.style.display = 'none';
+                            }
+                            logQrScan('QR Scanner closed');
+                        }
+
+                        async function startQrScanner() {
+                            const video = document.getElementById('qr-scanner-video');
+                            const errorDiv = document.getElementById('qr-scanner-error');
+                            const loadingDiv = document.getElementById('qr-scanner-loading');
+                            
+                            if (!video) return;
+
+                            // Reset UI
+                            if (errorDiv) {
+                                errorDiv.classList.add('hidden');
+                                errorDiv.textContent = '';
+                            }
+                            if (loadingDiv) {
+                                loadingDiv.classList.remove('hidden');
+                            }
+
+                            // Check camera support
+                            if (!navigator.mediaDevices?.getUserMedia) {
+                                showError('Camera is not supported on this device/browser.');
+                                logQrScan('Camera not supported', { error: 'getUserMedia not available' });
+                                if (loadingDiv) loadingDiv.classList.add('hidden');
+                                return;
+                            }
+
+                            try {
+                                // Request camera access
+                                qrScannerState.stream = await navigator.mediaDevices.getUserMedia({
+                                    video: { facingMode: { ideal: 'environment' } },
+                                    audio: false
+                                });
+                                
+                                video.srcObject = qrScannerState.stream;
+                                await video.play();
+                                
+                                logQrScan('Camera access granted');
+                            } catch (e) {
+                                showError('Camera permission denied or camera not available.');
+                                logQrScan('Camera access denied', { error: e.message });
+                                if (loadingDiv) loadingDiv.classList.add('hidden');
+                                return;
+                            }
+
+                            // Check BarcodeDetector support
+                            if (!('BarcodeDetector' in window)) {
+                                showError('QR scan is not supported on this browser. Please use Chrome on Android, or update your browser.');
+                                logQrScan('BarcodeDetector not supported');
+                                if (loadingDiv) loadingDiv.classList.add('hidden');
+                                stopQrScanner();
+                                return;
+                            }
+
+                            try {
+                                qrScannerState.detector = new BarcodeDetector({ formats: ['qr_code'] });
+                                logQrScan('BarcodeDetector initialized');
+                            } catch (e) {
+                                showError('Failed to initialize QR scanner.');
+                                logQrScan('BarcodeDetector initialization failed', { error: e.message });
+                                if (loadingDiv) loadingDiv.classList.add('hidden');
+                                stopQrScanner();
+                                return;
+                            }
+
+                            if (loadingDiv) loadingDiv.classList.add('hidden');
+                            qrScannerState.isScanning = true;
+
+                            // Start polling for QR codes
+                            qrScannerState.scanTimer = setInterval(async () => {
+                                if (!qrScannerState.detector || !video || !qrScannerState.isScanning) return;
+                                
+                                try {
+                                    const codes = await qrScannerState.detector.detect(video);
+                                    if (codes && codes.length > 0) {
+                                        const scannedValue = codes[0].rawValue;
+                                        logQrScan('QR Code detected', { member_fin: scannedValue });
+                                        await handleQrScan(scannedValue);
+                                    }
+                                } catch (e) {
+                                    // Ignore transient detection errors
+                                }
+                            }, 300);
+                        }
+
+                        function stopQrScanner() {
+                            qrScannerState.isScanning = false;
+                            
+                            if (qrScannerState.scanTimer) {
+                                clearInterval(qrScannerState.scanTimer);
+                                qrScannerState.scanTimer = null;
+                            }
+
+                            if (qrScannerState.stream) {
+                                qrScannerState.stream.getTracks().forEach(track => track.stop());
+                                qrScannerState.stream = null;
+                            }
+
+                            const video = document.getElementById('qr-scanner-video');
+                            if (video) {
+                                video.srcObject = null;
+                            }
+
+                            qrScannerState.detector = null;
+                        }
+
+                        function resumeQrScanning() {
+                            const video = document.getElementById('qr-scanner-video');
+                            if (!video || !qrScannerState.stream) {
+                                // If stream is lost, restart completely
+                                logQrScan('Stream lost, restarting scanner');
+                                stopQrScanner();
+                                setTimeout(() => startQrScanner(), 100);
+                                return;
+                            }
+                            
+                            // Stream is still active, just restart detection
+                            logQrScan('Resuming QR scanning');
+                            
+                            // Clear any existing timer
+                            if (qrScannerState.scanTimer) {
+                                clearInterval(qrScannerState.scanTimer);
+                                qrScannerState.scanTimer = null;
+                            }
+                            
+                            // Reinitialize detector if needed
+                            if (!qrScannerState.detector && 'BarcodeDetector' in window) {
+                                try {
+                                    qrScannerState.detector = new BarcodeDetector({ formats: ['qr_code'] });
+                                } catch (e) {
+                                    logQrScan('Failed to reinitialize detector', { error: e.message });
+                                    return;
+                                }
+                            }
+                            
+                            qrScannerState.isScanning = true;
+                            
+                            // Start polling for QR codes
+                            qrScannerState.scanTimer = setInterval(async () => {
+                                if (!qrScannerState.detector || !video || !qrScannerState.isScanning) return;
+                                
+                                try {
+                                    const codes = await qrScannerState.detector.detect(video);
+                                    if (codes && codes.length > 0) {
+                                        const scannedValue = codes[0].rawValue;
+                                        logQrScan('QR Code detected', { member_fin: scannedValue });
+                                        await handleQrScan(scannedValue);
+                                    }
+                                } catch (e) {
+                                    // Ignore transient detection errors
+                                }
+                            }, 300);
+                        }
+
+                        function restartQrScanner() {
+                            logQrScan('Restarting QR scanner');
+                            stopQrScanner();
+                            setTimeout(() => startQrScanner(), 100);
+                        }
+
+                        function showError(message) {
+                            const errorDiv = document.getElementById('qr-scanner-error');
+                            if (errorDiv) {
+                                errorDiv.textContent = message;
+                                errorDiv.classList.remove('hidden');
+                            }
+                        }
+
+                        async function handleQrScan(memberFin) {
+                            if (!memberFin || !memberFin.trim()) {
+                                logQrScan('Invalid QR code scanned', { member_fin: memberFin });
+                                showToast('error', 'Invalid QR code. Please try again.');
+                                return;
+                            }
+
+                            // Stop scanning to prevent multiple scans
+                            stopQrScanner();
+
+                            const loadingDiv = document.getElementById('qr-scanner-loading');
+                            if (loadingDiv) {
+                                loadingDiv.textContent = 'Processing scan...';
+                                loadingDiv.classList.remove('hidden');
+                            }
+
+                            try {
+                                logQrScan('Sending scan request to API', {
+                                    member_fin: memberFin,
+                                    location_code: LOCATION_CODE,
+                                    type_of_activity: 'ENTRY'
+                                });
+
+                                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                                const apiUrl = '{{ route("api.member-activity.scan") }}';
+                                
+                                logQrScan('API URL', { url: apiUrl });
+                                
+                                const response = await fetch(apiUrl, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        ...(csrfToken && { 'X-CSRF-TOKEN': csrfToken })
+                                    },
+                                    body: JSON.stringify({
+                                        member_fin: memberFin.trim(),
+                                        location_code: LOCATION_CODE,
+                                        type_of_activity: 'ENTRY'
+                                    })
+                                });
+
+                                const data = await response.json();
+
+                                if (loadingDiv) loadingDiv.classList.add('hidden');
+
+                                if (response.ok && data.success) {
+                                    logQrScan('Scan successful', {
+                                        member_fin: memberFin,
+                                        location_code: LOCATION_CODE,
+                                        response: data
+                                    });
+                                    
+                                    const message = data.data?.points_awarded 
+                                        ? `Member ${data.data.member.name} scanned successfully! ${data.data.points_awarded} points awarded.`
+                                        : `Member ${data.data.member.name} scanned successfully!`;
+                                    
+                                    showToast('success', message);
+                                    showScanResponse('success', message);
+                                    
+                                    // Resume scanning after showing response (only restart detection, keep camera)
+                                    setTimeout(() => {
+                                        resumeQrScanning();
+                                    }, 2000);
+                                } else {
+                                    const errorMessage = data.message || 'Failed to record activity';
+                                    logQrScan('Scan failed', {
+                                        member_fin: memberFin,
+                                        location_code: LOCATION_CODE,
+                                        error: errorMessage,
+                                        response: data
+                                    });
+                                    showToast('error', errorMessage);
+                                    showScanResponse('error', errorMessage);
+                                    
+                                    // Resume scanning after showing response (only restart detection, keep camera)
+                                    setTimeout(() => {
+                                        resumeQrScanning();
+                                    }, 2000);
+                                }
+                            } catch (error) {
+                                if (loadingDiv) loadingDiv.classList.add('hidden');
+                                
+                                logQrScan('Scan error', {
+                                    member_fin: memberFin,
+                                    location_code: LOCATION_CODE,
+                                    error: error.message,
+                                    stack: error.stack
+                                });
+                                
+                                const errorMessage = 'Network error. Please check your connection and try again.';
+                                showToast('error', errorMessage);
+                                showScanResponse('error', errorMessage);
+                                
+                                // Resume scanning after showing response (only restart detection, keep camera)
+                                setTimeout(() => {
+                                    resumeQrScanning();
+                                }, 2000);
+                            }
+                        }
+
+                        function showScanResponse(type, message) {
+                            const responseDiv = document.getElementById('qr-scan-response');
+                            const responseContent = document.getElementById('qr-scan-response-content');
+                            
+                            if (!responseDiv || !responseContent) return;
+                            
+                            // Clear previous classes
+                            responseContent.className = 'rounded-lg p-3 text-sm font-semibold';
+                            
+                            // Add appropriate styling based on type
+                            if (type === 'success') {
+                                responseContent.classList.add('bg-green-100', 'border', 'border-green-400', 'text-green-800');
+                            } else {
+                                responseContent.classList.add('bg-red-100', 'border', 'border-red-400', 'text-red-800');
+                            }
+                            
+                            responseContent.textContent = message;
+                            responseDiv.classList.remove('hidden');
+                            
+                            // Auto-hide after 5 seconds
+                            setTimeout(() => {
+                                responseDiv.classList.add('hidden');
+                            }, 5000);
+                        }
+
+                        function showToast(type, message) {
+                            console.log('[QR Scanner] Dispatching toast:', { type, message });
+                            
+                            // Use requestAnimationFrame to ensure DOM is ready
+                            requestAnimationFrame(() => {
+                                // Dispatch the custom event for Alpine.js to catch
+                                const event = new CustomEvent('hv-toast', {
+                                    detail: { type, message },
+                                    bubbles: true,
+                                    cancelable: true
+                                });
+                                
+                                // Dispatch on window (Alpine listens here)
+                                window.dispatchEvent(event);
+                                
+                                console.log('[QR Scanner] Toast event dispatched to window');
+                            });
+                        }
+
+                        function logQrScan(action, data = {}) {
+                            const logData = {
+                                action,
+                                timestamp: new Date().toISOString(),
+                                location_code: LOCATION_CODE,
+                                ...data
+                            };
+                            console.log('[QR Scanner]', logData);
+                        }
+
+                        // Cleanup on page unload
+                        window.addEventListener('beforeunload', () => {
+                            stopQrScanner();
+                        });
                     </script>
 
                     <!-- Recent Events Card -->

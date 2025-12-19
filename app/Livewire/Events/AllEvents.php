@@ -50,7 +50,11 @@ class AllEvents extends Component
 
     public function render()
     {
-        $query = Event::with(['location', 'creator', 'registrations', 'media']);
+        $query = Event::with(['location', 'creator', 'registrations', 'media'])
+            // Only show events from locations that are not soft deleted
+            ->whereHas('location', function ($locationQuery) {
+                $locationQuery->whereNull('deleted_at');
+            });
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -59,7 +63,8 @@ class AllEvents extends Component
                   ->orWhere('event_code', 'like', '%' . $this->search . '%')
                   ->orWhere('venue', 'like', '%' . $this->search . '%')
                   ->orWhereHas('location', function ($locationQuery) {
-                      $locationQuery->where('name', 'like', '%' . $this->search . '%');
+                      $locationQuery->whereNull('deleted_at')
+                          ->where('name', 'like', '%' . $this->search . '%');
                   });
             });
         }
@@ -75,7 +80,10 @@ class AllEvents extends Component
         $events = $query->orderBy('start_date', 'desc')
             ->paginate(12);
 
-        $locations = Location::orderBy('name')->get();
+        // Only show non-deleted locations in the filter dropdown
+        $locations = Location::whereNull('deleted_at')
+            ->orderBy('name')
+            ->get();
 
         return view('livewire.events.all-events', [
             'events' => $events,
