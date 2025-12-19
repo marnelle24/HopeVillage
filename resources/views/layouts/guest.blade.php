@@ -5,7 +5,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        {{-- <title>{{ config('app.name', 'Laravel') }}</title> --}}
+        <title>Hope Village | Guest Workers & Migrants Online Support Community</title>
+
+        <meta name="description" content="{{ 'Hope Village is the online community for Migrants & Guest Workers. It is a platform for the community to connect with each other and to share their stories and experiences.' }}">
+        <link rel="icon" type="image/png" href="{{ asset('hv-logo.png') }}">
+        <link rel="shortcut icon" type="image/png" href="{{ asset('hv-logo.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('hv-logo.png') }}">
+        <link rel="apple-touch-icon-precomposed" href="{{ asset('hv-logo.png') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('hv-logo.png') }}">
+        <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('hv-logo.png') }}">
+        <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('hv-logo.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
