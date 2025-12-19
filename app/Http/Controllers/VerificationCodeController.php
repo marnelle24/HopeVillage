@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\VerificationCodeMail;
 use App\Models\VerificationCode;
+use App\Services\PointsService;
 use App\Services\TwilioWhatsAppService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -80,7 +81,24 @@ class VerificationCodeController extends Controller
                 'used_at' => now(),
             ]);
 
+        // Check if user was already verified before this update
+        $wasAlreadyVerified = $user->is_verified;
+        
         $user->forceFill(['is_verified' => true])->save();
+
+        // Award 10 points for creating and verifying account (only on first verification)
+        if (!$wasAlreadyVerified) {
+            // Check if user already has points from account verification (safety check)
+            $hasVerificationPoints = $user->pointLogs()
+                ->whereHas('activityType', function ($query) {
+                    $query->where('name', PointsService::ACTIVITY_ACCOUNT_VERIFICATION);
+                })
+                ->exists();
+
+            if (!$hasVerificationPoints) {
+                app(PointsService::class)->awardAccountVerification($user);
+            }
+        }
 
         return redirect()->route('dashboard');
     }

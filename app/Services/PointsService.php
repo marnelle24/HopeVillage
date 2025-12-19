@@ -12,17 +12,30 @@ use Illuminate\Support\Facades\DB;
 
 class PointsService
 {
+    public const ACTIVITY_ACCOUNT_VERIFICATION = 'account_verification';
     public const ACTIVITY_LOCATION_ENTRY = 'member_entry_location';
     public const ACTIVITY_EVENT_JOIN = 'member_join_event';
     public const ACTIVITY_EVENT_ATTEND = 'member_attend_event';
     public const ACTIVITY_VOUCHER_CLAIM = 'member_claim_voucher';
     public const ACTIVITY_VOUCHER_REDEEM = 'member_redeem_voucher';
 
+    public const POINTS_ACCOUNT_VERIFICATION = 10;
     public const POINTS_LOCATION_ENTRY = 10;
     public const POINTS_EVENT_JOIN = 10;
     public const POINTS_EVENT_ATTEND = 20;
     public const POINTS_VOUCHER_CLAIM = 10;
     public const POINTS_VOUCHER_REDEEM = 5;
+
+    public function awardAccountVerification(User $user): void
+    {
+        $this->award(
+            user: $user,
+            activityName: self::ACTIVITY_ACCOUNT_VERIFICATION,
+            points: self::POINTS_ACCOUNT_VERIFICATION,
+            description: 'Account created and verified',
+            locationId: null,
+        );
+    }
 
     public function awardLocationEntry(User $user, int $locationId): void
     {

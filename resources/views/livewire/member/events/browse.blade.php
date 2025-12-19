@@ -49,11 +49,6 @@
             @endphp
 
             <div class="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative">
-                <a
-                    href="{{ route('member.events.profile', $event->event_code) }}"
-                    class="absolute inset-0 z-0"
-                    aria-label="View {{ $event->title }}"
-                ></a>
                 @php
                     $eventImageUrl = $event->thumbnail_url ?? null;
                     if (!$eventImageUrl) {
@@ -82,34 +77,36 @@
                     @endif
                 </div>
 
-                <a href="{{ route('member.events.profile', $event->event_code) }}" class="group" aria-label="View {{ $event->title }}">
-                    <div class="p-4 relative z-10 group-hover:bg-orange-50">
-                        <p class="text-lg font-bold text-gray-900 leading-snug">
-                            {{ \Illuminate\Support\Str::words($event->title, 8, '...') }}
-                        </p>
-                        <p class="mt-1 text-xs text-gray-500">{{ $schedule }}</p>
-                        <p class="mt-1 text-xs text-gray-500">
-                            {{ $event->location?->name ?? 'Unknown location' }}
-                            @if($event->venue)
-                                • {{ $event->venue }}
+                <div class="p-4 relative z-10 group-hover:bg-orange-50 group">
+                    <p class="text-lg font-bold text-gray-900 leading-snug">
+                        {{ \Illuminate\Support\Str::words($event->title, 8, '...') }}
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500">{{ $schedule }}</p>
+                    <p class="mt-1 text-xs text-gray-500">
+                        {{ $event->location?->name ?? 'Unknown location' }}
+                        @if($event->venue)
+                            • {{ $event->venue }}
+                        @endif
+                    </p>
+
+                    <div class="mt-3 flex items-center justify-between gap-2">
+                        <p class="text-xs text-gray-500 border border-gray-200 rounded-lg px-2 py-1">
+                            @if($event->max_participants && $event->max_participants > 0)
+                                {{ $event->registrations_count }} / {{ $event->max_participants }}
+                            @else
+                                Open to all
                             @endif
                         </p>
-    
-                        <div class="mt-3 flex items-center justify-between gap-2">
-                            <p class="text-xs text-gray-500">
-                                @if($event->max_participants && $event->max_participants > 0)
-                                    {{ $event->registrations_count }} / {{ $event->max_participants }}
-                                @else
-                                    Open to all
-                                @endif
-                            </p>
-    
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('member.events.profile', $event->event_code) }}" class="flex gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition disabled:opacity-50 relative z-20">
+                                View
+                            </a>
                             @if($event->is_registered)
-                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 text-gray-500 border border-gray-200">
+                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-100 text-orange-500 border border-orange-200">
                                     Joined
                                 </button>
                             @elseif($isFull)
-                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 text-gray-500 border border-gray-200">
+                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-100 text-orange-500 border border-orange-200">
                                     Full
                                 </button>
                             @else
@@ -117,7 +114,7 @@
                                     type="button"
                                     wire:click="join({{ $event->id }})"
                                     wire:loading.attr="disabled"
-                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition disabled:opacity-50 relative z-20"
+                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition disabled:opacity-50 relative z-20"
                                 >
                                     <span wire:loading.remove wire:target="join({{ $event->id }})">Join</span>
                                     <span wire:loading wire:target="join({{ $event->id }})">Joining...</span>
@@ -125,7 +122,7 @@
                             @endif
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
         @empty
             <div class="col-span-full border border-dashed border-gray-300 rounded-lg bg-gray-50/50 p-4 w-full text-center py-8 text-sm text-gray-400/60 font-semibold">
