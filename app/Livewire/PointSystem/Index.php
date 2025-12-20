@@ -5,6 +5,7 @@ namespace App\Livewire\PointSystem;
 use App\Models\ActivityType;
 use App\Models\Location;
 use App\Models\PointSystemConfig;
+use App\Models\Setting;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -17,12 +18,22 @@ class Index extends Component
     public $activityTypeFilter = '';
     public $locationFilter = '';
     public $showMessage = false;
+    public $pointSystemEnabled = true;
 
     protected $paginationTheme = 'tailwind';
+    
+    protected $listeners = ['point-system-toggled' => 'updatePointSystemState'];
 
     public function mount()
     {
         $this->showMessage = session()->has('message');
+        $this->pointSystemEnabled = (bool) Setting::get('point_system_enabled', true);
+    }
+
+    public function updatePointSystemState($enabled)
+    {
+        // Ensure we're getting a boolean value
+        $this->pointSystemEnabled = (bool) $enabled;
     }
 
     public function updatingSearch()

@@ -6,6 +6,7 @@ use App\Models\ActivityType;
 use App\Models\Event;
 use App\Models\PointLog;
 use App\Models\PointSystemConfig;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Voucher;
 use Illuminate\Support\Facades\DB;
@@ -160,6 +161,14 @@ class PointsService
         ?int $memberActivityId = null,
         ?int $amenityId = null,
     ): void {
+        // Check if point system is globally enabled
+        $pointSystemEnabled = (bool) Setting::get('point_system_enabled', true);
+        
+        if (!$pointSystemEnabled) {
+            // Point system is disabled, don't award points
+            return;
+        }
+
         DB::transaction(function () use ($user, $activityName, $description, $locationId, $memberActivityId, $amenityId) {
             $activityType = ActivityType::query()->firstOrCreate(
                 ['name' => $activityName],

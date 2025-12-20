@@ -2,11 +2,12 @@
 
 namespace App\Livewire\PointSystem;
 
-use App\Models\ActivityType;
 use App\Models\Amenity;
-use App\Models\Location;
-use App\Models\PointSystemConfig;
+use App\Models\Setting;
 use Livewire\Component;
+use App\Models\Location;
+use App\Models\ActivityType;
+use App\Models\PointSystemConfig;
 
 class Form extends Component
 {
@@ -36,6 +37,12 @@ class Form extends Component
 
     public function mount($id = null)
     {
+        $this->pointSystemEnabled = (bool) Setting::get('point_system_enabled', true);
+
+        if (!$this->pointSystemEnabled) {
+            return redirect()->route('admin.point-system.index')->with('message', 'Point system is disabled.');
+        }
+        
         $this->showMessage = session()->has('message');
         
         if ($id) {

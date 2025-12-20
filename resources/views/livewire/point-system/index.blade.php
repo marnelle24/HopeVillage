@@ -1,25 +1,30 @@
 <div>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center flex-wrap gap-4">
             <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
                 {{ __('Point System Management') }}
             </h2>
-            <a href="{{ route('admin.point-system.create') }}" class="md:flex hidden items-center gap-1 bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-full text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-                Add New Configuration
-            </a>
-            <a href="{{ route('admin.point-system.create') }}" class="md:hidden block bg-orange-600 hover:bg-orange-500 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-            </a>
+            <div class="flex items-center gap-4">
+                <!-- Point System Toggle Component -->
+                <livewire:point-system.toggle />
+            </div>
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 @if(!$pointSystemEnabled) opacity-90 pointer-events-none relative @endif" wire:key="point-system-content-{{ $pointSystemEnabled }}">
+            @if(!$pointSystemEnabled)
+                <div class="absolute inset-0 z-50 flex items-center justify-center bg-gray-100/70 rounded-lg">
+                    <div class="bg-white border-2 border-gray-300 rounded-lg px-6 py-4 shadow-lg">
+                        <p class="text-lg font-semibold text-gray-700 text-center">
+                            Point System is Disabled
+                        </p>
+                        <p class="text-sm text-gray-500 text-center mt-2">
+                            Enable the point system to manage configurations
+                        </p>
+                    </div>
+                </div>
+            @endif
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -61,19 +66,21 @@
 
             <!-- Search and Filter -->
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div>
                         <input 
-                            type="text" 
+                            type="text"
                             wire:model.live.debounce.300ms="search" 
                             placeholder="Search configurations..." 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            @if(!$pointSystemEnabled) disabled @endif
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                     </div>
                     <div>
                         <select 
                             wire:model.live="statusFilter" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            @if(!$pointSystemEnabled) disabled @endif
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                             <option value="all">All Status</option>
                             <option value="active">Active</option>
@@ -83,7 +90,8 @@
                     <div>
                         <select 
                             wire:model.live="activityTypeFilter" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            @if(!$pointSystemEnabled) disabled @endif
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                             <option value="">All Activity Types</option>
                             @foreach($activityTypes as $activityType)
@@ -91,17 +99,29 @@
                             @endforeach
                         </select>
                     </div>
-                    <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <select 
                             wire:model.live="locationFilter" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            @if(!$pointSystemEnabled) disabled @endif
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                             <option value="">All Locations</option>
                             @foreach($locations as $location)
                                 <option value="{{ $location->id }}">{{ $location->name }}</option>
                             @endforeach
                         </select>
+                        <div>
+                            <a href="{{ route('admin.point-system.create') }}" class="flex items-center justify-center gap-1 bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg text-center text-sm transition-colors">
+                                <span class="flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </span>
+                                New Config
+                            </a>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -164,8 +184,9 @@
                             <div class="p-4 flex items-start justify-end gap-2">
                                 <button 
                                     wire:click="edit({{ $config->id }})"
+                                    @if(!$pointSystemEnabled) disabled @endif
                                     title="Edit Configuration"
-                                    class="rounded-full p-3 flex items-center hover:scale-110 justify-center bg-blue-500 hover:bg-sky-600 text-white transition-all duration-300">
+                                    class="rounded-full p-3 flex items-center justify-center bg-blue-500 text-white transition-all duration-300 @if($pointSystemEnabled) hover:scale-110 hover:bg-sky-600 @else cursor-not-allowed opacity-50 @endif">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                     </svg>
@@ -174,7 +195,8 @@
                                     wire:confirm="Are you sure you want to delete this configuration?" 
                                     title="Delete Configuration"
                                     wire:click="delete({{ $config->id }})"
-                                    class="rounded-full p-3 flex items-center hover:scale-110 justify-center bg-red-400 hover:bg-red-500 text-white transition-all duration-300">
+                                    @if(!$pointSystemEnabled) disabled @endif
+                                    class="rounded-full p-3 flex items-center justify-center bg-red-400 text-white transition-all duration-300 @if($pointSystemEnabled) hover:scale-110 hover:bg-red-500 @else cursor-not-allowed opacity-50 @endif">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                     </svg>
