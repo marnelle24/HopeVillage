@@ -23,10 +23,21 @@
                             </div>
                         </div>
                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Welcome, {{ auth()->user()->name }}!</h1>
-                            <p class="text-sm text-gray-500 mt-1">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Welcome, {{ auth()->user()->name }}!</h1>
+                                @php
+                                    $isVerified = auth()->user()->is_verified;
+                                    $bgClass = $isVerified ? 'bg-green-50' : 'bg-yellow-50';
+                                    $textClass = $isVerified ? 'text-green-600' : 'text-yellow-600';
+                                    $borderClass = $isVerified ? 'border-green-400' : 'border-yellow-400';
+                                @endphp
+                                <span class="inline-block {{ $bgClass }} {{ $textClass }} px-2 py-0.5 border {{ $borderClass }} rounded-lg text-xs font-semibold mt-0.5">
+                                    {{ $isVerified ? 'Verified' : 'Unverified' }}
+                                </span>
+                            </div>
+                            {{-- <p class="text-sm text-gray-500 mt-1">
                                 Your member overview and quick access.
-                            </p>
+                            </p> --}}
                         </div>
                     </div>
                 </div>
