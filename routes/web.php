@@ -3,11 +3,16 @@
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\PointsActionsController;
 use App\Http\Controllers\VerificationCodeController;
+use App\Http\Controllers\WhatsAppValidationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+// WhatsApp Validation Check (needs CSRF protection, so in web routes)
+Route::post('/api/check-whatsapp', [WhatsAppValidationController::class, 'check'])
+    ->name('api.check-whatsapp');
 
 // Public Merchant Application Route
 Route::get('/merchant/apply', \App\Livewire\Merchant\Apply::class)->name('merchant.apply');

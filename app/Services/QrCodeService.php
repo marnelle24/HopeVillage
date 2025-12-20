@@ -24,22 +24,31 @@ class QrCodeService
      */
     public function generateQrCodeImage(string $data, int $size = 300): string
     {
-        $builder = new Builder(
-            writer: new PngWriter(),
-            writerOptions: [],
-            validateResult: false,
-            data: $data,
-            encoding: new Encoding('UTF-8'),
-            errorCorrectionLevel: ErrorCorrectionLevel::High,
-            size: $size,
-            margin: 10,
-            roundBlockSizeMode: RoundBlockSizeMode::Margin
-        );
+        try {
+            $builder = new Builder(
+                writer: new PngWriter(),
+                writerOptions: [],
+                validateResult: false,
+                data: $data,
+                encoding: new Encoding('UTF-8'),
+                errorCorrectionLevel: ErrorCorrectionLevel::High,
+                size: $size,
+                margin: 10,
+                roundBlockSizeMode: RoundBlockSizeMode::Margin
+            );
 
-        $result = $builder->build();
+            $result = $builder->build();
 
-        // Convert to data URI
-        return $result->getDataUri();
+            // Convert to data URI
+            return $result->getDataUri();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('QR code generation exception', [
+                'error' => $e->getMessage(),
+                'data' => $data,
+                'size' => $size,
+            ]);
+            throw $e;
+        }
     }
 
     /**
@@ -47,21 +56,30 @@ class QrCodeService
      */
     public function generateQrCodeBase64(string $data, int $size = 300): string
     {
-        $builder = new Builder(
-            writer: new PngWriter(),
-            writerOptions: [],
-            validateResult: false,
-            data: $data,
-            encoding: new Encoding('UTF-8'),
-            errorCorrectionLevel: ErrorCorrectionLevel::High,
-            size: $size,
-            margin: 10,
-            roundBlockSizeMode: RoundBlockSizeMode::Margin
-        );
+        try {
+            $builder = new Builder(
+                writer: new PngWriter(),
+                writerOptions: [],
+                validateResult: false,
+                data: $data,
+                encoding: new Encoding('UTF-8'),
+                errorCorrectionLevel: ErrorCorrectionLevel::High,
+                size: $size,
+                margin: 10,
+                roundBlockSizeMode: RoundBlockSizeMode::Margin
+            );
 
-        $result = $builder->build();
+            $result = $builder->build();
 
-        return base64_encode($result->getString());
+            return base64_encode($result->getString());
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('QR code base64 generation exception', [
+                'error' => $e->getMessage(),
+                'data' => $data,
+                'size' => $size,
+            ]);
+            throw $e;
+        }
     }
 }
 

@@ -172,42 +172,70 @@ class TwilioWhatsAppService
             $password = $token;
         }
 
-        // Use Twilio Lookup API to validate phone number
-        $response = Http::withBasicAuth($username, $password)
-            ->get("https://lookups.twilio.com/v1/PhoneNumbers/{$e164Number}", [
-                'Type' => 'carrier',
-            ]);
-
-        if (!$response->successful()) {
-            $payload = $response->json();
-            $errorMessage = is_array($payload) ? ($payload['message'] ?? 'Invalid phone number') : 'Invalid phone number';
-            
-            Log::warning('Twilio Lookup failed for phone number validation.', [
+        // Ensure we have credentials before making the request
+        if (empty($username) || empty($password)) {
+            Log::warning('Twilio Lookup skipped - missing credentials.', [
                 'phone' => $phoneNumber,
                 'normalized' => $e164Number,
-                'status' => $response->status(),
-                'error' => $errorMessage,
             ]);
 
             return [
                 'valid' => false,
-                'error' => $errorMessage
+                'error' => 'Twilio credentials are not properly configured'
             ];
         }
 
-        $data = $response->json();
-        
-        Log::info('Twilio Lookup successful for phone number.', [
-            'phone' => $phoneNumber,
-            'normalized' => $e164Number,
-            'carrier' => $data['carrier']['name'] ?? 'Unknown',
-            'type' => $data['carrier']['type'] ?? 'Unknown',
-        ]);
+        // Use Twilio Lookup API to validate phone number
+        try {
+            $response = Http::timeout(10)
+                ->withBasicAuth($username, $password)
+                ->get("https://lookups.twilio.com/v1/PhoneNumbers/{$e164Number}", [
+                    'Type' => 'carrier',
+                ]);
 
-        return [
-            'valid' => true,
-            'formatted' => $e164Number,
-        ];
+            if (!$response->successful()) {
+                $payload = $response->json();
+                $errorMessage = is_array($payload) ? ($payload['message'] ?? 'Invalid phone number') : 'Invalid phone number';
+                
+                Log::warning('Twilio Lookup failed for phone number validation.', [
+                    'phone' => $phoneNumber,
+                    'normalized' => $e164Number,
+                    'status' => $response->status(),
+                    'error' => $errorMessage,
+                ]);
+
+                return [
+                    'valid' => false,
+                    'error' => $errorMessage
+                ];
+            }
+
+            $data = $response->json();
+            
+            Log::info('Twilio Lookup successful for phone number.', [
+                'phone' => $phoneNumber,
+                'normalized' => $e164Number,
+                'carrier' => $data['carrier']['name'] ?? 'Unknown',
+                'type' => $data['carrier']['type'] ?? 'Unknown',
+            ]);
+
+            return [
+                'valid' => true,
+                'formatted' => $e164Number,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Twilio Lookup exception during phone number validation.', [
+                'phone' => $phoneNumber,
+                'normalized' => $e164Number,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'valid' => false,
+                'error' => 'Unable to validate phone number at this time. Please try again later.'
+            ];
+        }
     }
 
     /**
