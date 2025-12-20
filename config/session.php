@@ -32,7 +32,8 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    // Set to a very long time (30 days) - sessions will persist
+    'lifetime' => (int) env('SESSION_LIFETIME', 432000), // 43200 minutes = 30 days
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 

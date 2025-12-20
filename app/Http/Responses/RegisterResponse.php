@@ -11,8 +11,16 @@ class RegisterResponse implements RegisterResponseContract
     {
         $user = $request->user();
 
-        if ($user && method_exists($user, 'isMember') && $user->isMember() && !$user->is_verified) {
-            return redirect()->route('verification.code.show');
+        // Auto-login after registration - skip verification for now
+        // Verification will be handled later in the dashboard
+        
+        // Redirect based on user type
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->isMember()) {
+            return redirect()->route('member.dashboard');
+        } elseif ($user->isMerchantUser()) {
+            return redirect()->route('merchant.dashboard');
         }
 
         return redirect()->route('dashboard');

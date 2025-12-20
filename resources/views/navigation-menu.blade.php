@@ -379,7 +379,7 @@
                 @click="settingsOpen = false; openQrCodeModal()"
                 aria-haspopup="dialog"
                 aria-label="Open QR Code"
-                class="absolute left-1/2 -top-7 -translate-x-1/2 z-50 w-16 h-16 rounded-full bg-[#3A5770]/60 text-white shadow-lg ring-4 ring-[#4a7396] flex items-center justify-center hover:bg-[#3A5770] active:scale-95 transition"
+                class="absolute left-1/2 -top-7 -translate-x-1/2 z-50 w-16 h-16 rounded-full bg-[#3A5770]/60 text-white shadow-lg ring-4 ring-orange-500 flex items-center justify-center hover:bg-[#3A5770] active:scale-95 transition"
             >
                 {{-- Temporarily commented out the menu approach --}}
                 {{-- @click="settingsOpen = false; qrOpen = true; qrStep = 'menu'" --}}

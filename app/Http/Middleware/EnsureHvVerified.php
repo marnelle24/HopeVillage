@@ -13,14 +13,17 @@ class EnsureHvVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
+        // Disabled: Allow unverified users to access the dashboard
+        // Verification will be handled later in the dashboard
+        
+        // $user = $request->user();
 
-        // Only enforce for members.
-        if ($user && method_exists($user, 'isMember') && $user->isMember()) {
-            if (!$user->is_verified) {
-                return redirect()->route('verification.code.show');
-            }
-        }
+        // // Only enforce for members.
+        // if ($user && method_exists($user, 'isMember') && $user->isMember()) {
+        //     if (!$user->is_verified) {
+        //         return redirect()->route('verification.code.show');
+        //     }
+        // }
 
         return $next($request);
     }
