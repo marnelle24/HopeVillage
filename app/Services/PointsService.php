@@ -19,19 +19,19 @@ class PointsService
     public const ACTIVITY_VOUCHER_CLAIM = 'member_claim_voucher';
     public const ACTIVITY_VOUCHER_REDEEM = 'member_redeem_voucher';
 
-    public const POINTS_ACCOUNT_VERIFICATION = 10;
-    public const POINTS_LOCATION_ENTRY = 10;
-    public const POINTS_EVENT_JOIN = 10;
-    public const POINTS_EVENT_ATTEND = 20;
-    public const POINTS_VOUCHER_CLAIM = 10;
-    public const POINTS_VOUCHER_REDEEM = 5;
+    // Fallback points (used only if no admin configuration exists)
+    private const FALLBACK_POINTS_ACCOUNT_VERIFICATION = 10;
+    private const FALLBACK_POINTS_LOCATION_ENTRY = 10;
+    private const FALLBACK_POINTS_EVENT_JOIN = 10;
+    private const FALLBACK_POINTS_EVENT_ATTEND = 20;
+    private const FALLBACK_POINTS_VOUCHER_CLAIM = 10;
+    private const FALLBACK_POINTS_VOUCHER_REDEEM = 5;
 
     public function awardAccountVerification(User $user): void
     {
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_ACCOUNT_VERIFICATION,
-            points: self::POINTS_ACCOUNT_VERIFICATION,
             description: 'Account created and verified',
             locationId: null,
         );
@@ -42,7 +42,6 @@ class PointsService
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_LOCATION_ENTRY,
-            points: self::POINTS_LOCATION_ENTRY,
             description: 'Member entry to location',
             locationId: $locationId,
         );
@@ -53,7 +52,6 @@ class PointsService
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_EVENT_JOIN,
-            points: self::POINTS_EVENT_JOIN,
             description: 'Member joined event',
             locationId: $event->location_id,
         );
@@ -64,7 +62,6 @@ class PointsService
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_EVENT_ATTEND,
-            points: self::POINTS_EVENT_ATTEND,
             description: 'Member attended event',
             locationId: $event->location_id,
         );
@@ -75,7 +72,6 @@ class PointsService
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_VOUCHER_CLAIM,
-            points: self::POINTS_VOUCHER_CLAIM,
             description: 'Member claimed voucher ' . $voucher->voucher_code,
             locationId: null,
         );
@@ -86,39 +82,101 @@ class PointsService
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_VOUCHER_REDEEM,
-            points: self::POINTS_VOUCHER_REDEEM,
             description: 'Member redeemed voucher ' . $voucher->voucher_code,
             locationId: null,
+        );
+    }
+
+    /**
+     * Get fallback points based on activity name
+     */
+    private function getFallbackPoints(string $activityName): int
+    {
+        return match ($activityName) {
+            self::ACTIVITY_ACCOUNT_VERIFICATION => self::FALLBACK_POINTS_ACCOUNT_VERIFICATION,
+            self::ACTIVITY_LOCATION_ENTRY => self::FALLBACK_POINTS_LOCATION_ENTRY,
+            self::ACTIVITY_EVENT_JOIN => self::FALLBACK_POINTS_EVENT_JOIN,
+            self::ACTIVITY_EVENT_ATTEND => self::FALLBACK_POINTS_EVENT_ATTEND,
+            self::ACTIVITY_VOUCHER_CLAIM => self::FALLBACK_POINTS_VOUCHER_CLAIM,
+            self::ACTIVITY_VOUCHER_REDEEM => self::FALLBACK_POINTS_VOUCHER_REDEEM,
+            default => 0,
+        };
+    }
+
+    /**
+     * Get or create point system configuration
+     */
+    private function getOrCreateConfig(
+        int $activityTypeId,
+        ?int $locationId = null,
+        ?int $amenityId = null,
+        string $activityName = '',
+        ?string $description = null
+    ): PointSystemConfig {
+        // First, try to find a specific config (with location and/or amenity)
+        $config = PointSystemConfig::where('activity_type_id', $activityTypeId)
+            ->where('location_id', $locationId)
+            ->where('amenity_id', $amenityId)
+            ->where('is_active', true)
+            ->first();
+
+        if ($config) {
+            return $config;
+        }
+
+        // If no specific config, try global config (no location, no amenity)
+        $globalConfig = PointSystemConfig::where('activity_type_id', $activityTypeId)
+            ->whereNull('location_id')
+            ->whereNull('amenity_id')
+            ->where('is_active', true)
+            ->first();
+
+        if ($globalConfig) {
+            return $globalConfig;
+        }
+
+        // No admin config found, use fallback and create a default config
+        $points = $this->getFallbackPoints($activityName);
+        
+        return PointSystemConfig::query()->firstOrCreate(
+            [
+                'activity_type_id' => $activityTypeId,
+                'location_id' => $locationId,
+                'amenity_id' => $amenityId,
+            ],
+            [
+                'points' => $points,
+                'description' => $description ?? $activityName,
+                'is_active' => true,
+            ]
         );
     }
 
     public function award(
         User $user,
         string $activityName,
-        int $points,
         ?string $description = null,
         ?int $locationId = null,
         ?int $memberActivityId = null,
         ?int $amenityId = null,
     ): void {
-        DB::transaction(function () use ($user, $activityName, $points, $description, $locationId, $memberActivityId, $amenityId) {
+        DB::transaction(function () use ($user, $activityName, $description, $locationId, $memberActivityId, $amenityId) {
             $activityType = ActivityType::query()->firstOrCreate(
                 ['name' => $activityName],
                 ['description' => $activityName, 'is_active' => true]
             );
 
-            $config = PointSystemConfig::query()->firstOrCreate(
-                [
-                    'activity_type_id' => $activityType->id,
-                    'location_id' => $locationId,
-                    'amenity_id' => $amenityId,
-                ],
-                [
-                    'points' => $points,
-                    'description' => $description,
-                    'is_active' => true,
-                ]
+            // Get or create the point system configuration
+            $config = $this->getOrCreateConfig(
+                $activityType->id,
+                $locationId,
+                $amenityId,
+                $activityName,
+                $description
             );
+
+            // Use points from the configuration
+            $points = $config->points;
 
             PointLog::query()->create([
                 'user_id' => $user->id,
@@ -128,7 +186,7 @@ class PointsService
                 'location_id' => $locationId,
                 'amenity_id' => $amenityId,
                 'points' => $points,
-                'description' => $description,
+                'description' => $description ?? $activityName,
                 'awarded_at' => now(),
             ]);
 

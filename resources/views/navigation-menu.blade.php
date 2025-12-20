@@ -23,7 +23,8 @@
                     <div class="shrink-0 flex items-center">
                         <a href="{{ route('dashboard') }}">
                             {{-- <x-application-mark class="block h-9 w-auto" /> --}}
-                            <span class="text-xl font-bold text-gray-800">Hope Village</span>
+                            {{-- <span class="text-xl font-bold text-gray-800">Hope Village</span> --}}
+                            <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-12">
                         </a>
                     </div>
 
@@ -47,6 +48,9 @@
                             </x-nav-link>
                             <x-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants*')">
                                 {{ __('Merchants') }}
+                            </x-nav-link>
+                            <x-nav-link href="{{ route('admin.point-system.index') }}" :active="request()->routeIs('admin.point-system*')">
+                                {{ __('Point System') }}
                             </x-nav-link>
                         @elseif(auth()->user()->isMerchantUser())
                             <x-nav-link href="{{ route('merchant.dashboard') }}" :active="request()->routeIs('merchant.dashboard')">
@@ -122,6 +126,9 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants*')">
                         {{ __('Merchants') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.point-system.index') }}" :active="request()->routeIs('admin.point-system*')">
+                        {{ __('Point System') }}
                     </x-responsive-nav-link>
                 @elseif(auth()->user()->isMerchantUser())
                     <x-responsive-nav-link href="{{ route('merchant.dashboard') }}" :active="request()->routeIs('merchant.dashboard')">

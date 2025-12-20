@@ -47,7 +47,6 @@ class PointsActionsController extends Controller
             app(PointsService::class)->award(
                 user: $user,
                 activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
-                points: PointsService::POINTS_LOCATION_ENTRY,
                 description: 'Member entry to location',
                 locationId: $location->id,
                 memberActivityId: $memberActivity->id,

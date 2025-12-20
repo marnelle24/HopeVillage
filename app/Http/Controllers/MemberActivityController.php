@@ -105,18 +105,18 @@ class MemberActivityController extends Controller
                 ]);
 
                 // Award points if this is an ENTRY activity
+                $pointsBefore = $member->total_points;
                 $pointsAwarded = 0;
                 if (strtoupper($validated['type_of_activity']) === 'ENTRY') {
                     app(PointsService::class)->award(
                         user: $member,
                         activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
-                        points: PointsService::POINTS_LOCATION_ENTRY,
                         description: 'Member entry to location',
                         locationId: $location->id,
                         memberActivityId: $memberActivity->id,
                     );
-                    $pointsAwarded = PointsService::POINTS_LOCATION_ENTRY;
                     $member->refresh();
+                    $pointsAwarded = $member->total_points - $pointsBefore;
                 }
 
                 Log::info('Member activity scanned', [
