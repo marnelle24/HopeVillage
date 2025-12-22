@@ -77,6 +77,9 @@
 
         @stack('modals')
 
+        <!-- QR Scanner Component - Available throughout the system -->
+        <livewire:qr-scanner />
+
         @livewireScripts
         <script>
             document.addEventListener('livewire:init', () => {

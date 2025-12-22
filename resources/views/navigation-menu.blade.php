@@ -419,8 +419,7 @@
             style="display: none;"
         >
             <div class="w-full max-w-md bg-white rounded-2xl p-6 shadow-xl" @click.stop>
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">My QR Code</h3>
+                <div class="flex items-center justify-end mb-4">
                     <button type="button" class="text-gray-500 hover:text-gray-700 transition-colors" @click="closeQrCodeModal()">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -451,16 +450,15 @@
                 <!-- QR Code Display -->
                 <template x-if="qrCodeModalImage && !qrCodeModalLoading">
                     <div class="flex flex-col items-center gap-4">
-                        <div class="bg-white p-4 rounded-xl border-2 border-gray-200 shadow-sm">
-                            <img :src="qrCodeModalImage" alt="My QR code" class="w-64 h-64 object-contain">
-                        </div>
-                        <div class="text-center">
-                            <p class="text-xs text-gray-500 mb-1">Your Member Code</p>
-                            <p class="text-sm text-gray-800 font-mono font-semibold" x-text="qrCodeModalValue ?? ''"></p>
-                        </div>
+                        <h3 class="text-lg font-bold text-gray-800 text-center" x-text="qrCodeModalValue ?? ''"></h3>
                         <p class="text-xs text-gray-500 text-center px-4">
                             Show this QR code to be scanned at locations or events
                         </p>
+                        <div class="bg-white p-4 rounded-xl border-2 border-gray-200 shadow-sm">
+                            <img :src="qrCodeModalImage" alt="My QR code" class="w-64 h-64 object-contain">
+                        </div>
+
+                        <button class="bg-blue-500 hover:bg-blue-600 border border-blue-700 transition-all duration-300 hover:scale-105 text-white px-4 py-3 rounded-md w-1/2 mx-auto" @click="$dispatch('openQrScanner')">Scan QR a Code</button>
                     </div>
                 </template>
             </div>

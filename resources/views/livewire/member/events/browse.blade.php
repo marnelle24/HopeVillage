@@ -55,7 +55,7 @@
                     }
                 @endphp
 
-                <div class="h-48 w-full bg-gray-100 relative z-10">
+                <div class="h-48 w-full bg-gray-100 relative">
                     @if(!empty($eventImageUrl ?? null))
                         <img src="{{ $eventImageUrl ?? '' }}" alt="{{ $event->title }}" class="h-48 w-full object-cover" loading="lazy">
                     @else
