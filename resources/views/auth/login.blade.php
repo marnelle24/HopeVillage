@@ -16,9 +16,21 @@
             @csrf
 
             <div>
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" placeholder="Email Address" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-                {{-- <x-input id="email" class="block mt-1 w-full" type="email" name="email" value="marnelle24@gmail.com" required autofocus autocomplete="username" /> --}}
+                <x-label for="email" value="{{ __('WhatsApp Number or Email Address') }}" />
+                <x-input 
+                    id="email" 
+                    placeholder="+65XXXXXX or email@example.com" 
+                    class="block mt-1 w-full" 
+                    type="text" 
+                    name="email" 
+                    :value="old('email')" 
+                    required 
+                    autofocus 
+                    autocomplete="username" 
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                    You can login using your email address.
+                </p>
             </div>
 
             <div class="mt-4">

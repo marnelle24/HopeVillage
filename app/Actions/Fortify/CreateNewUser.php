@@ -19,25 +19,53 @@ class CreateNewUser implements CreatesNewUsers
     use PasswordValidationRules;
 
     /**
+     * Generate a dummy email from WhatsApp number
+     */
+    protected function generateEmailFromWhatsApp(string $whatsappNumber): string
+    {
+        // Remove all non-numeric characters except +
+        $cleaned = preg_replace('/[^+\d]/', '', $whatsappNumber);
+        
+        // If starts with +, keep it, otherwise add + if it doesn't start with it
+        if (!str_starts_with($cleaned, '+')) {
+            $cleaned = '+' . $cleaned;
+        }
+        
+        // Generate email: +65321123@hopevillage-user.sg
+        $email = $cleaned . '@hopevillage-user.sg';
+        
+        // Ensure uniqueness by appending a suffix if needed
+        $baseEmail = $email;
+        $counter = 1;
+        
+        while (User::where('email', $email)->exists()) {
+            $email = $baseEmail . '.' . $counter;
+            $counter++;
+        }
+        
+        return $email;
+    }
+
+    /**
      * Create a newly registered user.
      *
      * @param  array<string, string>  $input
      */
     public function create(array $input): User
     {
-        // Normalize FIN to uppercase early so unique/checksum behave consistently
-        // if (isset($input['fin'])) {
-        //     $input['fin'] = strtoupper(trim((string) $input['fin']));
-        // }
+        // Make email optional - if not provided, generate from WhatsApp
+        $email = !empty(trim($input['email'] ?? '')) 
+            ? trim($input['email']) 
+            : null;
 
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
-                'required', 
+                'nullable',  // Changed from 'required'
                 'string', 
                 'email', 
                 'max:255', 
-                'unique:users'
+                'unique:users'  // Only validate if email is provided
             ],
             'whatsapp_number' => [
                 'required',
@@ -53,10 +81,15 @@ class CreateNewUser implements CreatesNewUsers
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
-        return DB::transaction(function () use ($input) {
+        return DB::transaction(function () use ($input, $email) {
+            // Generate email from WhatsApp if not provided
+            if (empty($email)) {
+                $email = $this->generateEmailFromWhatsApp($input['whatsapp_number']);
+            }
+
             $userData = [
                 'name' => $input['name'],
-                'email' => $input['email'],
+                'email' => $email,
                 'password' => Hash::make($input['password']),
                 'user_type' => $input['user_type'] ?? 'member', // Default to member
                 'whatsapp_number' => $input['whatsapp_number'] ?? null,

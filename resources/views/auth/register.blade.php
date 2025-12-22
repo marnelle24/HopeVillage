@@ -30,14 +30,6 @@
 
             <div class="mt-4">
                 <div class="flex items-center">
-                    <x-label for="email" value="{{ __('Email') }}" />
-                    <span class="ml-1 text-red-500 text-xl">*</span>
-                </div>
-                <x-input id="email" placeholder="Email Address" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            </div>
-
-            <div class="mt-4">
-                <div class="flex items-center">
                     <x-label for="whatsapp_number" value="{{ __('Contact Number (WhatsApp)') }}" />
                     <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
@@ -59,6 +51,17 @@
                 @error('whatsapp_number')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <div class="mt-4">
+                <div class="flex items-center">
+                    <x-label for="email" value="{{ __('Email') }}" />
+                    <span class="ml-1 text-xs text-gray-500">(Optional)</span>
+                </div>
+                <x-input id="email" placeholder="Email Address (Optional)" class="block mt-1 w-full" type="email" name="email" :value="old('email')" autocomplete="username" />
+                {{-- <p class="mt-1 text-xs text-gray-500">
+                    If not provided, an email will be generated based on your WhatsApp number.
+                </p> --}}
             </div>
 
             {{-- <div class="mt-4 grid grid-cols-2 gap-4">

@@ -8,9 +8,9 @@
     </div>
     <p class="mt-10 text-center text-md text-gray-500">
         @if (request()->routeIs('register'))
-            Already have an account? <a href="{{ route('login') }}" class="text-orange-500 hover:text-orange-600">Sign Up</a>
+            Already have an account? <a href="{{ route('login') }}" class="text-orange-500 hover:text-orange-600">Sign In</a>
         @else
-            Don't have an account? <a href="{{ route('register') }}" class="text-orange-500 hover:text-orange-600">Register</a>
+            Don't have an account? <a href="{{ route('register') }}" class="text-orange-500 hover:text-orange-600">Sign Up</a>
         @endif
     </p>
 </div>
