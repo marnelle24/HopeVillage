@@ -11,6 +11,82 @@ use Laravel\Fortify\Fortify;
 class AuthenticateUser
 {
     /**
+     * Find user by WhatsApp number with flexible matching (supports numbers with/without country code)
+     */
+    protected function findUserByWhatsAppNumber(string $input): ?User
+    {
+        // Normalize input: remove spaces, dashes, etc., but keep + and digits
+        $normalized = preg_replace('/[^\d+]/', '', $input);
+        $digitsOnly = preg_replace('/\D+/', '', $input);
+        
+        // Get default country code from config (default to +65 for Singapore)
+        $defaultCountryCode = config('services.twilio.default_country_code', '65');
+        
+        // Build search variations
+        $variations = [
+            // Exact matches first
+            $input,                    // Original input
+            $normalized,               // Normalized (keeps +)
+            $digitsOnly,               // Digits only
+        ];
+        
+        // Add + prefix variation if not already present
+        if (!str_starts_with($normalized, '+')) {
+            $variations[] = '+' . $digitsOnly;
+        }
+        
+        // Without + prefix variation
+        $withoutPlus = str_replace('+', '', $normalized);
+        if ($withoutPlus !== $normalized) {
+            $variations[] = $withoutPlus;
+        }
+        
+        // If input doesn't start with +, try adding default country code
+        if (!str_starts_with($normalized, '+') && $defaultCountryCode) {
+            $variations[] = '+' . $defaultCountryCode . $digitsOnly;  // +65 + digits
+            $variations[] = $defaultCountryCode . $digitsOnly;        // 65 + digits
+        }
+        
+        // If input appears to start with country code (without +), extract local number
+        if ($defaultCountryCode && strlen($digitsOnly) > strlen($defaultCountryCode)) {
+            if (str_starts_with($digitsOnly, $defaultCountryCode)) {
+                $localNumber = substr($digitsOnly, strlen($defaultCountryCode));
+                $variations[] = '+' . $defaultCountryCode . $localNumber;  // +65 + local
+                $variations[] = $localNumber;  // Just local number
+            }
+        }
+        
+        // Remove duplicates and empty values
+        $variations = array_unique(array_filter($variations));
+        
+        // Try each variation
+        foreach ($variations as $variation) {
+            $user = User::where('whatsapp_number', $variation)->first();
+            if ($user) {
+                return $user;
+            }
+        }
+        
+        // Last attempt: try matching by last 8 digits (Singapore local number length)
+        // This handles cases where user enters just the local number part
+        if (strlen($digitsOnly) >= 8) {
+            $lastDigits = substr($digitsOnly, -8);
+            $users = User::whereNotNull('whatsapp_number')
+                ->get()
+                ->filter(function ($u) use ($lastDigits) {
+                    $storedDigits = preg_replace('/\D+/', '', $u->whatsapp_number);
+                    return str_ends_with($storedDigits, $lastDigits);
+                });
+            
+            if ($users->count() === 1) {
+                return $users->first();
+            }
+        }
+        
+        return null;
+    }
+
+    /**
      * Handle the incoming request.
      * Fortify expects this to return a User or throw ValidationException.
      *
@@ -38,25 +114,8 @@ class AuthenticateUser
             // Try to find by email
             $user = User::where('email', $username)->first();
         } else {
-            // Try to find by WhatsApp number
-            // Normalize the WhatsApp number (remove spaces, dashes, etc., but keep +)
-            $normalizedWhatsApp = preg_replace('/[^\d+]/', '', $username);
-            
-            // Try exact match first
-            $user = User::where('whatsapp_number', $normalizedWhatsApp)->first();
-            
-            // If not found, try with the original input
-            if (!$user) {
-                $user = User::where('whatsapp_number', $username)->first();
-            }
-            
-            // If still not found, try without + prefix
-            if (!$user && str_starts_with($normalizedWhatsApp, '+')) {
-                $withoutPlus = substr($normalizedWhatsApp, 1);
-                $user = User::where('whatsapp_number', $withoutPlus)
-                    ->orWhere('whatsapp_number', '+' . $withoutPlus)
-                    ->first();
-            }
+            // Try to find by WhatsApp number with flexible matching
+            $user = $this->findUserByWhatsAppNumber($username);
         }
 
         // If user not found or password doesn't match

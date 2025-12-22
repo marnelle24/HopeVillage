@@ -143,6 +143,15 @@
         .iti__flag-container + .iti__selected-dial-code {
             display: inline-block !important;
         }
+        /* Disable dropdown when only one country is available */
+        .iti--single-country .iti__selected-flag {
+            pointer-events: none;
+            cursor: default;
+        }
+        .iti--single-country .iti__flag-container {
+            pointer-events: none;
+            cursor: default;
+        }
     </style>
     @endpush
 
@@ -155,11 +164,36 @@
 
             const iti = window.intlTelInput(input, {
                 initialCountry: "sg", // Singapore as default
-                preferredCountries: ["sg", "my", "ph", "id", "th", "vn", "mm"],
+                onlyCountries: ["sg"], // Only allow Singapore country code
                 separateDialCode: true,
                 showSelectedDialCode: true,
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/js/utils.js",
             });
+
+            // Disable dropdown since only Singapore is available
+            const itiContainer = input.closest('.iti');
+            const flagContainer = itiContainer.querySelector('.iti__selected-flag');
+            
+            // Add class to indicate single country mode
+            itiContainer.classList.add('iti--single-country');
+            
+            // Prevent dropdown from opening by blocking click events
+            if (flagContainer) {
+                flagContainer.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
+                }, true);
+                
+                // Also prevent mousedown which might trigger the dropdown
+                flagContainer.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
+                }, true);
+            }
 
             // Set initial value if there's an old input
             @if(old('whatsapp_number'))
