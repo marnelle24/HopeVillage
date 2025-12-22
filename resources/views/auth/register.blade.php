@@ -95,7 +95,7 @@
 
                             <div class="ms-2">
                                 {!! __('By selecting ths option, your data can be stored for future forms. You can learn more about how we handle your personal information and your rights by reviewing our :privacy_policy', [
-                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
+                                        'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
                                 ]) !!}
                             </div>
                         </div>

@@ -15,6 +15,17 @@ class QrCodeController extends Controller
     {
         $this->qrCodeService = $qrCodeService;
     }
+    
+    /**
+     * Handle cases where dependency injection fails
+     */
+    protected function getQrCodeService(): QrCodeService
+    {
+        if (!$this->qrCodeService) {
+            $this->qrCodeService = app(QrCodeService::class);
+        }
+        return $this->qrCodeService;
+    }
 
     /**
      * Get QR code image for the authenticated member
@@ -30,7 +41,7 @@ class QrCodeController extends Controller
                 ], 404);
             }
 
-            $qrCodeDataUri = $this->qrCodeService->generateQrCodeImage($user->qr_code, 300);
+            $qrCodeDataUri = $this->getQrCodeService()->generateQrCodeImage($user->qr_code, 300);
             
             return response()->json([
                 'qr_code' => $user->qr_code,
@@ -43,10 +54,16 @@ class QrCodeController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
                 'user_id' => Auth::id(),
+                'qr_code' => Auth::user()?->qr_code,
             ]);
 
+            // In development, include more details
+            $errorMessage = config('app.debug') 
+                ? 'Failed to generate QR code: ' . $e->getMessage()
+                : 'Failed to generate QR code. Please try again later.';
+
             return response()->json([
-                'error' => 'Failed to generate QR code. Please try again later.'
+                'error' => $errorMessage
             ], 500);
         }
     }
@@ -65,7 +82,7 @@ class QrCodeController extends Controller
                 ], 404);
             }
 
-            $qrCodeDataUri = $this->qrCodeService->generateQrCodeImage($user->qr_code, 600);
+            $qrCodeDataUri = $this->getQrCodeService()->generateQrCodeImage($user->qr_code, 600);
             
             return response()->json([
                 'qr_code' => $user->qr_code,
@@ -78,10 +95,16 @@ class QrCodeController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
                 'user_id' => Auth::id(),
+                'qr_code' => Auth::user()?->qr_code,
             ]);
 
+            // In development, include more details
+            $errorMessage = config('app.debug') 
+                ? 'Failed to generate QR code: ' . $e->getMessage()
+                : 'Failed to generate QR code. Please try again later.';
+
             return response()->json([
-                'error' => 'Failed to generate QR code. Please try again later.'
+                'error' => $errorMessage
             ], 500);
         }
     }

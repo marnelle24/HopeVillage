@@ -31,7 +31,7 @@ Route::middleware([
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
+    // 'verified',
     'admin',
 ])->group(function () {
     Route::get('/admin/dashboard', function () {
@@ -89,9 +89,9 @@ Route::middleware([
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
+    // 'verified',
     'member',
-    'hv_verified',
+    // 'hv_verified',
 ])->group(function () {
     Route::get('/member/dashboard', function () {
         return view('member.dashboard');
@@ -122,7 +122,7 @@ Route::middleware([
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
+    // 'verified',
     'merchant_user',
 ])->group(function () {
     Route::get('/merchant/dashboard', function () {
@@ -142,7 +142,7 @@ Route::middleware([
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
+    // 'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();

@@ -7,10 +7,20 @@ use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class QrCodeService
 {
+    /**
+     * Check if GD extension is available
+     */
+    protected function isGdAvailable(): bool
+    {
+        return extension_loaded('gd') && function_exists('imagecreatetruecolor');
+    }
+
     /**
      * Generate a unique QR code string for a user
      */
@@ -25,8 +35,16 @@ class QrCodeService
     public function generateQrCodeImage(string $data, int $size = 300): string
     {
         try {
+            // Use PNG writer if GD is available, otherwise fall back to SVG
+            if ($this->isGdAvailable()) {
+                $writer = new PngWriter();
+            } else {
+                Log::warning('GD extension not available, using SVG writer for QR codes');
+                $writer = new SvgWriter();
+            }
+
             $builder = new Builder(
-                writer: new PngWriter(),
+                writer: $writer,
                 writerOptions: [],
                 validateResult: false,
                 data: $data,
@@ -42,10 +60,11 @@ class QrCodeService
             // Convert to data URI
             return $result->getDataUri();
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('QR code generation exception', [
+            Log::error('QR code generation exception', [
                 'error' => $e->getMessage(),
                 'data' => $data,
                 'size' => $size,
+                'gd_available' => $this->isGdAvailable(),
             ]);
             throw $e;
         }
@@ -57,8 +76,16 @@ class QrCodeService
     public function generateQrCodeBase64(string $data, int $size = 300): string
     {
         try {
+            // Use PNG writer if GD is available, otherwise fall back to SVG
+            if ($this->isGdAvailable()) {
+                $writer = new PngWriter();
+            } else {
+                Log::warning('GD extension not available, using SVG writer for QR codes');
+                $writer = new SvgWriter();
+            }
+
             $builder = new Builder(
-                writer: new PngWriter(),
+                writer: $writer,
                 writerOptions: [],
                 validateResult: false,
                 data: $data,
@@ -73,13 +100,13 @@ class QrCodeService
 
             return base64_encode($result->getString());
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('QR code base64 generation exception', [
+            Log::error('QR code base64 generation exception', [
                 'error' => $e->getMessage(),
                 'data' => $data,
                 'size' => $size,
+                'gd_available' => $this->isGdAvailable(),
             ]);
             throw $e;
         }
     }
 }
-
