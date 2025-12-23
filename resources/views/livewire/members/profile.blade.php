@@ -16,6 +16,45 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if (session()->has('message') || session()->has('error'))
+                <div 
+                    x-data="{ 
+                        show: @entangle('showMessage').live,
+                        timeoutId: null
+                    }"
+                    x-init="
+                        $watch('show', value => {
+                            if (value && !timeoutId) {
+                                timeoutId = setTimeout(() => {
+                                    show = false;
+                                    timeoutId = null;
+                                }, 3000);
+                            } else if (!value && timeoutId) {
+                                clearTimeout(timeoutId);
+                                timeoutId = null;
+                            }
+                        });
+                        if (show) {
+                            timeoutId = setTimeout(() => {
+                                show = false;
+                                timeoutId = null;
+                            }, 3000);
+                        }
+                    "
+                    x-show="show"
+                    x-transition:enter="transition ease-out duration-500"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-out duration-500"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="mb-4 {{ session()->has('error') ? 'bg-red-100 border-red-400 text-red-700' : 'bg-green-100 border-green-400 text-green-700' }} border px-4 py-3 rounded relative md:mx-0 mx-4" 
+                    role="alert"
+                >
+                    <span class="block sm:inline">{{ session('message') ?? session('error') }}</span>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:mx-0 mx-4">
                 <!-- Left: Member info -->
                 <div class="lg:col-span-1 space-y-6">
@@ -57,6 +96,37 @@
                                     </span>
                                 </p>
                             </div>
+                            @if(auth()->user()->isAdmin())
+                                <div>
+                                    <label class="text-sm font-medium text-gray-500">User Type</label>
+                                    <div class="mt-1 flex gap-2">
+                                        <select
+                                            wire:model="selectedUserType"
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                                        >
+                                            <option value="member">Member</option>
+                                            <option value="admin">Administrator</option>
+                                            <option value="merchant_user">Merchant User</option>
+                                        </select>
+                                        <button
+                                            wire:click="updateUserType"
+                                            wire:confirm="Are you sure you want to change this user's type? This action will be logged."
+                                            class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md"
+                                            title="Update User Type"
+                                        >
+                                            <svg class="size-5" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#ffffff" stroke="#ffffff">
+                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>disk</title> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="work-case" fill="#ffffff" transform="translate(85.333333, 85.333333)"> <path d="M243.498667,1.42108547e-14 L341.333333,97.8346667 L341.333333,341.333333 L1.42108547e-14,341.333333 L1.42108547e-14,1.42108547e-14 L243.498667,1.42108547e-14 Z M213.333333,234.666667 L128,234.666667 L128,298.688 L213.333333,298.688 L213.333333,234.666667 Z M85.3333333,42.6666667 L42.6666667,42.6666667 L42.6666667,298.666667 L85.3333333,298.666667 L85.3333333,192 L256,192 L256,298.666667 L298.666667,298.666667 L298.666667,115.498667 L256,72.8533333 L256,149.333333 L85.3333333,149.333333 L85.3333333,42.6666667 Z M213.333333,42.6666667 L128,42.6666667 L128,106.688 L213.333333,106.688 L213.333333,42.6666667 Z" id="Mask"> </path> </g> </g> </g>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs mt-1 text-gray-500">Only administrators can change user type</p>
+                                </div>
+                            @else
+                                <div>
+                                    <label class="text-sm font-medium text-gray-500">User Type</label>
+                                    <p class="text-gray-900 capitalize">{{ $member->user_type }}</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
