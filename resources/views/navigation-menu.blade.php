@@ -40,8 +40,11 @@
                             <x-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events*')">
                                 {{ __('Events') }}
                             </x-nav-link>
-                            <x-nav-link href="{{ route('admin.members.index') }}" :active="request()->routeIs('admin.members*')">
+                            <x-nav-link href="{{ route('admin.members.index') }}" :active="request()->routeIs('admin.members.index') || request()->routeIs('admin.members.profile')">
                                 {{ __('Members') }}
+                            </x-nav-link>
+                            <x-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
+                                {{ __('Member Activities') }}
                             </x-nav-link>
                             <x-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
                                 {{ __('Vouchers') }}
@@ -118,8 +121,11 @@
                     <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events*')">
                         {{ __('Events') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.members.index') }}" :active="request()->routeIs('admin.members*')">
+                    <x-responsive-nav-link href="{{ route('admin.members.index') }}" :active="request()->routeIs('admin.members.index') || request()->routeIs('admin.members.profile')">
                         {{ __('Members') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
+                        {{ __('Member Activities') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
                         {{ __('Vouchers') }}

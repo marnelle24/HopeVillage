@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ActivityTypeController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MemberActivityController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -12,3 +14,12 @@ Route::get('/user', function (Request $request) {
 // QR Code Scan - Member Activity Tracking (Public endpoint for scanner devices)
 Route::post('/member-activity/scan', [MemberActivityController::class, 'scan'])
     ->name('api.member-activity.scan');
+
+
+// Create the API to GET all the activity_type
+Route::get('/activity-types', [ActivityTypeController::class, 'index'])
+    ->name('api.activity-types.index');
+
+// create am api to get all the Locations
+Route::get('/locations', [LocationController::class, 'index'])
+    ->name('api.locations.index');

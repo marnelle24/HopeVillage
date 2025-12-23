@@ -4,6 +4,11 @@
             <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
                 {{ __('Members') }}
             </h2>
+            <div class="flex gap-2">
+                <a href="{{ route('admin.members.activities') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-normal py-2 px-4 rounded-lg text-sm">
+                    View Activities
+                </a>
+            </div>
         </div>
     </x-slot>
 
