@@ -12,8 +12,14 @@ class Index extends Component
 
     public string $search = '';
     public string $verifiedFilter = 'all'; // all | verified | unverified
+    public bool $showMessage = false;
 
     protected $paginationTheme = 'tailwind';
+
+    public function mount(): void
+    {
+        $this->showMessage = session()->has('message') || session()->has('error');
+    }
 
     public function updatingSearch(): void
     {
@@ -23,6 +29,25 @@ class Index extends Component
     public function updatingVerifiedFilter(): void
     {
         $this->resetPage();
+    }
+
+    public function delete($userId): void
+    {
+        // Only allow admin users to delete members
+        if (!auth()->user()->isAdmin()) {
+            session()->flash('error', 'You do not have permission to delete members.');
+            $this->showMessage = true;
+            return;
+        }
+
+        $member = User::where('id', $userId)
+            ->where('user_type', 'member')
+            ->firstOrFail();
+
+        $member->delete();
+
+        session()->flash('message', 'Member deleted successfully.');
+        $this->showMessage = true;
     }
 
     public function render()
