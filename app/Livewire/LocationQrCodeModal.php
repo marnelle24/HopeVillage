@@ -2,7 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Models\ActivityType;
 use App\Models\Location;
+use App\Models\MemberActivity;
+use App\Services\PointsService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class LocationQrCodeModal extends Component
@@ -14,6 +19,7 @@ class LocationQrCodeModal extends Component
     public $processing = false;
     public $error = null;
     public $success = false;
+    public $successMessage = null;
 
     protected $listeners = [
         'openLocationQrModal' => 'open',
@@ -33,13 +39,15 @@ class LocationQrCodeModal extends Component
         if ($locationCode) {
             $this->locationCode = $locationCode;
         }
-        if ($this->locationCode) {
-            $this->loadLocation();
-        }
         $this->open = true;
         $this->error = null;
         $this->success = false;
+        $this->processing = false;
         $this->memberFin = auth()->user()?->fin;
+        
+        if ($this->locationCode) {
+            $this->loadLocation();
+        }
     }
 
     public function close()
@@ -54,10 +62,15 @@ class LocationQrCodeModal extends Component
     {
         if ($this->locationCode) {
             $this->location = Location::where('location_code', $this->locationCode)->first();
+            
+            // Automatically call member-activity API for location entry
+            if ($this->location) {
+                $this->processLocationEntry();
+            }
         }
     }
-
-    public function processScan()
+    
+    public function processLocationEntry()
     {
         $user = auth()->user();
         
@@ -74,34 +87,100 @@ class LocationQrCodeModal extends Component
         $this->processing = true;
         $this->error = null;
         $this->success = false;
+        $this->successMessage = null;
 
         try {
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Accept' => 'application/json',
-                'X-Requested-With' => 'XMLHttpRequest',
-            ])->post(route('api.member-activity.scan'), [
-                'member_fin' => $user->fin,
-                'location_code' => $this->locationCode,
-                'type_of_activity' => 'ENTRY'
-            ]);
-            
-            $data = $response->json();
-            
-            if ($response->successful() && ($data['success'] ?? false)) {
+            DB::transaction(function () use ($user) {
+                // Check if user is a member
+                if ($user->user_type !== 'member') {
+                    $this->error = 'User is not a member.';
+                    $this->processing = false;
+                    return;
+                }
+
+                // Check if location is active
+                if (!$this->location->is_active) {
+                    $this->error = 'Location is not active.';
+                    $this->processing = false;
+                    return;
+                }
+
+                // Find or create activity type
+                $activityType = ActivityType::firstOrCreate(
+                    ['name' => 'ENTRY'],
+                    [
+                        'description' => 'Entry activity',
+                        'is_active' => true,
+                    ]
+                );
+
+                // Create member activity record
+                $memberActivity = MemberActivity::create([
+                    'user_id' => $user->id,
+                    'activity_type_id' => $activityType->id,
+                    'location_id' => $this->location->id,
+                    'amenity_id' => null,
+                    'activity_time' => now(),
+                    'description' => "Member ENTRY at {$this->location->name}",
+                    'metadata' => [
+                        'scanned_at' => now()->toIso8601String(),
+                        'location_code' => $this->location->location_code,
+                        'member_fin' => $user->fin,
+                        'device_info' => request()->header('User-Agent'),
+                        'ip_address' => request()->ip(),
+                    ],
+                ]);
+
+                // Award points for ENTRY activity
+                $pointsBefore = $user->total_points;
+                $pointsAwarded = 0;
+                
+                app(PointsService::class)->award(
+                    user: $user,
+                    activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
+                    description: 'Member entry to location',
+                    locationId: $this->location->id,
+                    memberActivityId: $memberActivity->id,
+                );
+                
+                $user->refresh();
+                $pointsAwarded = $user->total_points - $pointsBefore;
+
+                Log::info('Member activity recorded', [
+                    'member_fin' => $user->fin,
+                    'location_code' => $this->location->location_code,
+                    'activity_type' => 'ENTRY',
+                    'points_awarded' => $pointsAwarded,
+                ]);
+
+                // Set success message
                 $this->success = true;
+                $this->successMessage = "SUCCESS";
+                
                 $this->dispatch('location-qr-processed', [
                     'code' => $this->locationCode,
-                    'data' => $data
+                    'location_name' => $this->location->name,
+                    'points_awarded' => $pointsAwarded,
                 ]);
-                session()->flash('qr-scan-success', 'Location scan processed successfully!');
-            } else {
-                $this->error = $data['message'] ?? $data['error'] ?? 'Failed to process location scan.';
-            }
+                
+                session()->flash('qr-scan-success', 'SUCCESS');
+                $this->processing = false;
+            });
         } catch (\Exception $e) {
-            $this->error = 'Network error: Failed to process scan.';
-        } finally {
+            Log::error('Failed to record member activity', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            
+            $this->error = 'Failed to process location entry: ' . ($e->getMessage() ?? 'Unknown error');
             $this->processing = false;
         }
+    }
+
+    public function processScan()
+    {
+        // This method is kept for backward compatibility but now calls processLocationEntry
+        $this->processLocationEntry();
     }
 
     public function render()

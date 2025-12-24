@@ -18,7 +18,7 @@ class RegisterResponse implements RegisterResponseContract
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->isMember()) {
-            return redirect()->route('member.dashboard');
+            return redirect()->route('member.events');
         } elseif ($user->isMerchantUser()) {
             return redirect()->route('merchant.dashboard');
         }
