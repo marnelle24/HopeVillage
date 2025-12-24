@@ -1,6 +1,19 @@
 <div>
     <div
-        x-data="{ open: @entangle('open').live }"
+        x-data="{ 
+            open: @entangle('open').live,
+            success: @entangle('success').live,
+            init() {
+                // Auto-close modal after 2 seconds on success
+                this.$watch('success', (value) => {
+                    if (value) {
+                        setTimeout(() => {
+                            $wire.close();
+                        }, 2000);
+                    }
+                });
+            }
+        }"
         x-show="open"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0"
@@ -36,108 +49,61 @@
             </button>
 
             <!-- Modal Content -->
-            <div class="pr-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                    Event QR Code
-                </h2>
-                
-                <div class="space-y-4 mt-6">
-                    <!-- QR Code Type -->
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</label>
-                        <div class="mt-1">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                Event
-                            </span>
-                        </div>
+            <div class="pr-8 min-h-[200px] flex items-center justify-center">
+                <!-- Processing Message -->
+                @if($processing)
+                <div class="text-center py-8 w-full">
+                    <div class="flex items-center justify-center mb-4">
+                        <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                     </div>
-
-                    <!-- Event Code -->
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Event Code</label>
-                        <div class="mt-1 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="text-sm font-mono text-gray-900 break-all">{{ $eventCode }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Event Details -->
-                    @if($event)
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Event Title</label>
-                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ $event->title }}</p>
-                    </div>
-                    @if($event->description)
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</label>
-                        <p class="mt-1 text-sm text-gray-700">{{ $event->description }}</p>
-                    </div>
-                    @endif
-                    @if($event->start_date)
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Start Date</label>
-                        <p class="mt-1 text-sm text-gray-700">{{ $event->start_date->format('M d, Y h:i A') }}</p>
-                    </div>
-                    @endif
-                    @else
-                    <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                        <p class="text-sm text-yellow-800">Event not found in database.</p>
-                    </div>
-                    @endif
-
-                    <!-- Member FIN -->
-                    @if($memberFin)
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Member FIN</label>
-                        <div class="mt-1 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                            <p class="text-sm font-mono font-semibold text-blue-900">{{ $memberFin }}</p>
-                        </div>
-                    </div>
-                    @else
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Member FIN</label>
-                        <div class="mt-1 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <p class="text-sm text-yellow-800">Not logged in</p>
-                        </div>
-                    </div>
-                    @endif
-
-                    <!-- Error Message -->
-                    @if($error)
-                    <div class="p-3 bg-red-50 rounded-lg border border-red-200">
-                        <p class="text-sm text-red-800">{{ $error }}</p>
-                    </div>
-                    @endif
-
-                    <!-- Success Message -->
-                    @if($success)
-                    <div class="p-3 bg-green-50 rounded-lg border border-green-200">
-                        <p class="text-sm text-green-800 font-semibold">✓ Event scan processed successfully!</p>
-                    </div>
-                    @endif
+                    <p class="text-sm text-gray-600">Processing event attendance...</p>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="mt-6 flex gap-3">
-                    <button
-                        @click="$wire.close()"
-                        class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium"
-                    >
-                        Close
-                    </button>
-                    @if($event && $memberFin && !$success)
-                    <button
-                        @click="$wire.processScan()"
-                        :disabled="$wire.processing"
-                        class="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <span x-show="!$wire.processing">Process Scan</span>
-                        <span x-show="$wire.processing">Processing...</span>
-                    </button>
-                    @endif
+                @elseif($success)
+                <!-- Success Message -->
+                <div class="text-center py-8 w-full">
+                    <div class="flex items-center justify-center mb-4">
+                        <svg class="w-16 h-16 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <p class="text-2xl text-green-800 font-bold mb-4">SUCCESS</p>
                 </div>
+                @elseif($error)
+                <!-- Error Message -->
+                <div class="text-center py-8 w-full">
+                    <div class="flex items-center justify-center mb-4">
+                        <svg class="w-16 h-16 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <p class="text-2xl text-red-800 font-bold mb-4">FAIL</p>
+                    <p class="text-sm text-red-700 px-4">{{ $error }}</p>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-6">
+                        <button
+                            @click="$wire.close()"
+                            class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+                @else
+                <!-- Default/Loading state -->
+                <div class="text-center py-8 w-full">
+                    <div class="flex items-center justify-center mb-4">
+                        <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-600">Loading...</p>
+                </div>
+                @endif
             </div>
         </div>
     </div>
