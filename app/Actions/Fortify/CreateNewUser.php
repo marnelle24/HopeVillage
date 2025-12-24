@@ -74,7 +74,7 @@ class CreateNewUser implements CreatesNewUsers
                 // 'unique:users,whatsapp_number',
                 new ValidWhatsAppNumber(app(TwilioWhatsAppService::class))
             ],
-            // 'fin' => ['required', 'string', 'size:9', 'unique:users,fin', new ValidFin()],
+            'fin' => ['required', 'string', 'max:20', 'unique:users,fin'],
             'age' => ['nullable', 'integer', 'min:0', 'max:120'],
             'gender' => ['nullable', 'string', 'max:20'],
             'password' => $this->passwordRules(),
@@ -97,18 +97,34 @@ class CreateNewUser implements CreatesNewUsers
                 'gender' => $input['gender'] ?? null,
             ];
 
-            // Generate unique 9-character FIN and QR code for members
-            if (($userData['user_type'] ?? 'member') === 'member') {
-                // Generate a unique 9-character UID
-                do {
-                    $fin = strtoupper(Str::random(9));
-                } while (User::where('fin', $fin)->exists());
-                
-                $userData['fin'] = $fin;
-                
-                // Set QR code to FIN value
-                $userData['qr_code'] = $userData['fin'];
+            // Get FIN from request instead of auto-generating
+            // Use FIN from request
+            if (!empty($input['fin'])) {
+                $userData['fin'] = strtoupper(trim($input['fin']));
             }
+
+            // Generate unique 9-character QR code for members
+            if (($userData['user_type'] ?? 'member') === 'member') {
+                // Generate a unique 9-character QR code
+                do {
+                    $qrCode = strtoupper(Str::random(9));
+                } while (User::where('qr_code', $qrCode)->exists());
+                
+                $userData['qr_code'] = $qrCode;
+            }
+
+            // OLD CODE - Auto-generation of FIN (commented out)
+            // if (($userData['user_type'] ?? 'member') === 'member') {
+            //     // Generate a unique 9-character UID
+            //     do {
+            //         $fin = strtoupper(Str::random(9));
+            //     } while (User::where('fin', $fin)->exists());
+            //     
+            //     $userData['fin'] = $fin;
+            //     
+            //     // Set QR code to FIN value
+            //     $userData['qr_code'] = $userData['fin'];
+            // }
 
             return tap(User::create($userData), function (User $user) {
                 if (Jetstream::userHasTeamFeatures($user)) {

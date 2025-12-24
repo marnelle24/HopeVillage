@@ -9,23 +9,23 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
-            {{-- <div class="mt-4">
-                <div class="flex items-center">
-                    <x-label for="fin" value="{{ __('FIN (Foreign Identification Number)') }}" />
-                    <span class="ml-1 text-red-500 text-xl">*</span>
-                </div>
-                <x-input id="fin" class="block mt-1 w-full" type="text" name="fin" :value="old('fin')" required autocomplete="off" placeholder="F1234567X" />
-                <p class="mt-1 text-xs text-gray-500">
-                    Format: F/G/M + 7 digits + checksum letter.
-                </p>
-            </div> --}}
-
             <div class="mt-4">
                 <div class="flex items-center">
                     <x-label for="name" value="{{ __('Name') }}" />
                     <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
                 <x-input id="name" placeholder="Full Name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+            </div>
+
+            <div class="mt-4">
+                <div class="flex items-center">
+                    <x-label for="fin" value="{{ __('Last 4-digit FIN/NIRC') }}" />
+                    <span class="ml-1 text-red-500 text-xl">*</span>
+                </div>
+                <x-input id="fin" class="block mt-1 w-full" type="text" name="fin" maxlength="4" :value="old('fin')" required autocomplete="off" placeholder="123X" />
+                {{-- <p class="mt-1 text-xs text-gray-500">
+                    Format: F/G/M + 7 digits + checksum letter.
+                </p> --}}
             </div>
 
             <div class="mt-4">
