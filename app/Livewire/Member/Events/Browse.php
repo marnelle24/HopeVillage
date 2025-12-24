@@ -63,7 +63,7 @@ class Browse extends Component
         }
 
         // Set success flash message
-        session()->flash('message', 'You have successfully joined the event.');
+        session()->flash('message', 'You have successfully liked the event.');
         session()->flash('message_type', 'success');
 
         sleep(1); // Wait for 2 seconds to allow the flash message to be displayed

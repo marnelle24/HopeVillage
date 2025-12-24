@@ -15,14 +15,27 @@ class MyEvents extends Component
 
     public function render()
     {
-        $registeredEvents = auth()->user()
+        $allRegistrations = auth()->user()
             ->eventRegistrations()
             ->whereNotNull('event_id')
             ->with('event.location', 'event.media')
-            ->latest('registered_at')
             ->get();
 
+        // Separate attended events from registered/joined events
+        $attendedEvents = $allRegistrations
+            ->filter(function ($registration) {
+                return $registration->status === 'attended' && $registration->event !== null;
+            })
+            ->sortByDesc('attended_at');
+
+        $registeredEvents = $allRegistrations
+            ->filter(function ($registration) {
+                return $registration->status !== 'attended' && $registration->event !== null;
+            })
+            ->sortByDesc('registered_at');
+
         return view('livewire.member.events.my-events', [
+            'attendedEvents' => $attendedEvents,
             'registeredEvents' => $registeredEvents,
         ]);
     }

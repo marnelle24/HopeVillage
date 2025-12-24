@@ -128,7 +128,7 @@
                         <div class="mt-4">
                             @if($event->is_registered)
                                 <button type="button" disabled class="w-full px-4 py-2 text-sm font-semibold rounded-lg bg-gray-100 text-gray-500 border border-gray-200">
-                                    Joined
+                                    Added to interested list
                                 </button>
                             @elseif($isFull)
                                 <button type="button" disabled class="w-full px-4 py-2 text-sm font-semibold rounded-lg bg-gray-100 text-gray-500 border border-gray-200">
@@ -141,8 +141,8 @@
                                     wire:loading.attr="disabled"
                                     class="w-full px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition disabled:opacity-50"
                                 >
-                                    <span wire:loading.remove wire:target="join">Join</span>
-                                    <span wire:loading wire:target="join">Joining...</span>
+                                    <span wire:loading.remove wire:target="join">Add to interested list</span>
+                                    <span wire:loading wire:target="join">Adding to interested list...</span>
                                 </button>
                             @endif
                         </div>

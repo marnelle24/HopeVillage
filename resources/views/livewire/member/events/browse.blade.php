@@ -86,15 +86,15 @@
                             @endif
                         </p>
                         <div class="flex items-center gap-2">
-                            <a href="{{ route('member.events.profile', $event->event_code) }}" class="flex gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition disabled:opacity-50 relative z-20">
+                            <a href="{{ route('member.events.profile', $event->event_code) }}" class="flex gap-1 px-3 py-1.5 text-sm font-semibold rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition disabled:opacity-50 relative z-20">
                                 View
                             </a>
                             @if($event->is_registered)
-                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-100 text-orange-500 border border-orange-200">
-                                    Joined
+                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 text-orange-500 border border-orange-200">
+                                    Liked
                                 </button>
                             @elseif($isFull)
-                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-100 text-orange-500 border border-orange-200">
+                                <button type="button" disabled class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 text-orange-500 border border-orange-200">
                                     Full
                                 </button>
                             @else
@@ -102,10 +102,10 @@
                                     type="button"
                                     wire:click="join({{ $event->id }})"
                                     wire:loading.attr="disabled"
-                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition disabled:opacity-50 relative z-20"
+                                    class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition disabled:opacity-50 relative z-20"
                                 >
-                                    <span wire:loading.remove wire:target="join({{ $event->id }})">Join</span>
-                                    <span wire:loading wire:target="join({{ $event->id }})">Joining...</span>
+                                    <span wire:loading.remove wire:target="join({{ $event->id }})">Like</span>
+                                    <span wire:loading wire:target="join({{ $event->id }})">liking...</span>
                                 </button>
                             @endif
                         </div>
