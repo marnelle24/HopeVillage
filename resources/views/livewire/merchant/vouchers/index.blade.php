@@ -105,7 +105,25 @@
                         <div class="flex-1 flex items-start h-full p-4">
                             <div class="flex-1">
                                 <div class="flex md:flex-row flex-col md:items-center items-start gap-2">
-                                    <h3 class="md:text-lg text-xl font-bold text-gray-500">{{ $voucher->name }}</h3>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="md:text-lg text-xl font-bold text-gray-500">{{ $voucher->name }}</h3>
+                                        @php
+                                            $qrCodeService = app(\App\Services\QrCodeService::class);
+                                            $qrCodeImage = $qrCodeService->generateQrCodeImage($voucher->voucher_code, 80);
+                                            $qrCodeImageFull = $qrCodeService->generateQrCodeImage($voucher->voucher_code, 400);
+                                        @endphp
+                                        <img 
+                                            src="{{ $qrCodeImage }}" 
+                                            alt="QR Code for {{ $voucher->voucher_code }}"
+                                            class="w-16 h-16 border border-gray-300 rounded-lg bg-white p-1 cursor-pointer hover:border-indigo-500 hover:shadow-md transition-all duration-200"
+                                            title="Click to view QR Code: {{ $voucher->voucher_code }}"
+                                            @click="$dispatch('open-qr-modal', { 
+                                                qrCode: '{{ $voucher->voucher_code }}',
+                                                qrImage: '{{ $qrCodeImageFull }}',
+                                                title: '{{ $voucher->name }}'
+                                            })"
+                                        >
+                                    </div>
                                     <span class="flex items-center gap-1 text-gray-600 bg-transparent border border-gray-500 rounded-lg py-1 px-2 text-xs">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
@@ -207,6 +225,94 @@
             <!-- Pagination -->
             <div class="mt-6 md:px-0 px-4">
                 {{ $vouchers->links() }}
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Full Screen Modal -->
+    <div
+        x-data="{ 
+            open: false,
+            qrCode: '',
+            qrImage: '',
+            title: '',
+            init() {
+                this.$watch('open', (value) => {
+                    if (value) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+                
+                window.addEventListener('open-qr-modal', (e) => {
+                    this.qrCode = e.detail.qrCode;
+                    this.qrImage = e.detail.qrImage;
+                    this.title = e.detail.title;
+                    this.open = true;
+                });
+            }
+        }"
+        x-show="open"
+        x-transition:enter="ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        x-cloak
+        class="fixed inset-0 z-[9999] bg-gray-300/50 flex items-center justify-center p-4"
+        @keydown.escape.window="open = false"
+        @click.self="open = false"
+        style="display: none;"
+    >
+        <div
+            @click.stop
+            class="bg-white rounded-lg shadow-2xl max-w-md w-full p-8 relative"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+        >
+            <!-- Close button -->
+            <button
+                @click="open = false"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
+                aria-label="Close"
+            >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Modal Content -->
+            <div class="text-center">
+                <h3 class="text-xl font-bold text-gray-900 mb-2" x-text="title"></h3>
+                <p class="text-sm text-gray-600 mb-6" x-text="'Code: ' + qrCode"></p>
+                
+                <div class="flex justify-center mb-6">
+                    <img 
+                        :src="qrImage" 
+                        :alt="'QR Code for ' + qrCode"
+                        class="w-80 h-80 border-4 border-gray-200 rounded-lg bg-white p-4 shadow-lg"
+                    >
+                </div>
+                
+                <div class="flex items-center justify-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                    </svg>
+                    <span class="font-mono font-semibold" x-text="qrCode"></span>
+                </div>
+                
+                <button
+                    @click="open = false"
+                    class="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition font-medium"
+                >
+                    Close
+                </button>
             </div>
         </div>
     </div>

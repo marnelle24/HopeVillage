@@ -27,7 +27,7 @@
     </div>
 
     <!-- Active -->
-    <div>
+    {{-- <div>
         <div class="mb-3">
             <p class="text-xl font-bold text-gray-700 mb-1">All Active Vouchers</p>
             <p class="text-xs text-gray-600">Currently published by merchants (may include not-yet-valid vouchers).</p>
@@ -42,7 +42,7 @@
                 </div>
             @endforelse
         </div>
-    </div>
+    </div> --}}
 </div>
 
 
