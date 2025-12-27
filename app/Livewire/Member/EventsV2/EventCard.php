@@ -72,7 +72,7 @@ class EventCard extends Component
         // Refresh the event data for this card
         $this->refreshEventData();
 
-        $this->dispatch('event-updated');
+        $this->dispatch('event-updated', status: $this->event['registration_status'] ?? null);
         
         // Refresh parent component if in my-events
         if ($this->isMyEvents) {
@@ -90,48 +90,46 @@ class EventCard extends Component
             ->findOrFail($this->event['id']);
 
         try {
-            $registration = EventRegistration::firstOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'event_id' => $event->id,
-                ],
-                [
-                    'type' => 'app',
-                    'status' => 'interested',
-                    'registered_at' => now(),
-                ]
-            );
+            $registration = EventRegistration::where('user_id', $user->id)
+                ->where('event_id', $event->id)
+                ->first();
 
-            // If registration already exists, update the status to interested
-            if (!$registration->wasRecentlyCreated) {
-                if ($registration->status !== 'interested') {
+            // Toggle: if already interested, remove it (delete registration)
+            if ($registration && $registration->status === 'interested') {
+                $registration->delete();
+                session()->flash('message', 'Removed from liked events.');
+                session()->flash('message_type', 'success');
+                $this->dispatch('notify', type: 'success', message: 'Removed from liked events.');
+            } else {
+                // Create or update to interested status
+                if ($registration) {
                     $registration->update([
                         'status' => 'interested',
                         'registered_at' => now(),
                     ]);
-                    session()->flash('message', 'Marked as interested.');
-                    session()->flash('message_type', 'success');
-                    $this->dispatch('notify', type: 'success', message: 'Marked as interested.');
                 } else {
-                    session()->flash('message', 'You are already marked as interested.');
-                    session()->flash('message_type', 'info');
-                    $this->dispatch('notify', type: 'info', message: 'You are already marked as interested.');
+                    EventRegistration::create([
+                        'user_id' => $user->id,
+                        'event_id' => $event->id,
+                        'type' => 'app',
+                        'status' => 'interested',
+                        'registered_at' => now(),
+                    ]);
                 }
-            } else {
-                session()->flash('message', 'Marked as interested.');
+                session()->flash('message', 'Event liked.');
                 session()->flash('message_type', 'success');
-                $this->dispatch('notify', type: 'success', message: 'Marked as interested.');
+                $this->dispatch('notify', type: 'success', message: 'Event liked.');
             }
         } catch (QueryException) {
-            session()->flash('message', 'Unable to mark event as interested.');
+            session()->flash('message', 'Unable to update like status.');
             session()->flash('message_type', 'error');
-            $this->dispatch('notify', type: 'error', message: 'Unable to mark event as interested.');
+            $this->dispatch('notify', type: 'error', message: 'Unable to update like status.');
         }
 
         // Refresh the event data for this card
         $this->refreshEventData();
 
-        $this->dispatch('event-updated');
+        $this->dispatch('event-updated', status: $this->event['registration_status'] ?? null);
         
         // Refresh parent component if in my-events
         if ($this->isMyEvents) {
@@ -148,76 +146,69 @@ class EventCard extends Component
             ->whereHas('location', fn ($q) => $q->whereNull('deleted_at'))
             ->findOrFail($this->event['id']);
 
-        if ($event->max_participants && $event->max_participants > 0) {
-            $current = $event->registrations()->where('status', 'registered')->count();
-            if ($current >= $event->max_participants) {
-                session()->flash('message', 'This event is already full.');
-                session()->flash('message_type', 'error');
-                $this->dispatch('notify', type: 'error', message: 'This event is already full.');
-                return;
-            }
-        }
-
         try {
-            $registration = EventRegistration::firstOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'event_id' => $event->id,
-                ],
-                [
-                    'type' => 'app',
-                    'status' => 'registered',
-                    'registered_at' => now(),
-                ]
-            );
+            $registration = EventRegistration::where('user_id', $user->id)
+                ->where('event_id', $event->id)
+                ->first();
 
-            // If registration already exists, update the status to registered
-            if (!$registration->wasRecentlyCreated) {
-                $oldStatus = $registration->status;
-                if ($oldStatus !== 'registered') {
+            // Toggle: if already registered, unregister (delete registration)
+            if ($registration && $registration->status === 'registered') {
+                $registration->delete();
+                session()->flash('message', 'Registration cancelled.');
+                session()->flash('message_type', 'success');
+                $this->dispatch('notify', type: 'success', message: 'Registration cancelled.');
+            } else {
+                // Check if event is full before registering
+                if ($event->max_participants && $event->max_participants > 0) {
+                    $current = $event->registrations()->where('status', 'registered')->count();
+                    if ($current >= $event->max_participants) {
+                        session()->flash('message', 'This event is already full.');
+                        session()->flash('message_type', 'error');
+                        $this->dispatch('notify', type: 'error', message: 'This event is already full.');
+                        return;
+                    }
+                }
+
+                // Create or update to registered status
+                $oldStatus = $registration?->status;
+                if ($registration) {
                     $registration->update([
                         'status' => 'registered',
                         'registered_at' => now(),
                     ]);
-                    // Award points only when changing to registered status (not if already attended)
-                    if ($oldStatus !== 'attended') {
-                        app(PointsService::class)->awardEventJoin($user, $event);
-                    }
-                    session()->flash('message', 'You have successfully joined the event.');
-                    session()->flash('message_type', 'success');
-                    $this->dispatch('notify', type: 'success', message: 'You have successfully joined the event.');
                 } else {
-                    session()->flash('message', 'You are already registered for this event.');
-                    session()->flash('message_type', 'info');
-                    $this->dispatch('notify', type: 'info', message: 'You are already registered for this event.');
+                    EventRegistration::create([
+                        'user_id' => $user->id,
+                        'event_id' => $event->id,
+                        'type' => 'app',
+                        'status' => 'registered',
+                        'registered_at' => now(),
+                    ]);
                 }
-            } else {
-                // Award points for new registration
-                app(PointsService::class)->awardEventJoin($user, $event);
-                session()->flash('message', 'You have successfully joined the event.');
+
+                // Award points only when changing to registered status (not if already attended)
+                if ($oldStatus !== 'attended') {
+                    app(PointsService::class)->awardEventJoin($user, $event);
+                }
+
+                session()->flash('message', 'Successfully registered for the event.');
                 session()->flash('message_type', 'success');
-                $this->dispatch('notify', type: 'success', message: 'You have successfully joined the event.');
+                $this->dispatch('notify', type: 'success', message: 'Successfully registered for the event.');
             }
         } catch (QueryException) {
-            session()->flash('message', 'Unable to join event.');
+            session()->flash('message', 'Unable to update registration.');
             session()->flash('message_type', 'error');
-            $this->dispatch('notify', type: 'error', message: 'Unable to join event.');
+            $this->dispatch('notify', type: 'error', message: 'Unable to update registration.');
         }
 
         // Refresh the event data for this card
         $this->refreshEventData();
 
-        $this->dispatch('event-updated');
+        $this->dispatch('event-updated', status: $this->event['registration_status'] ?? null);
         
         // Refresh parent component if in my-events
         if ($this->isMyEvents) {
             $this->dispatch('refresh-my-events');
-        }
-
-        // For Browse component, redirect after join
-        if (request()->routeIs('member.events') && !$this->isMyEvents) {
-            sleep(1);
-            $this->redirect(route('member.events', ['type' => 'my-events']));
         }
     }
 

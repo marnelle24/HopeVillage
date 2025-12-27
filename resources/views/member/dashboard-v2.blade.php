@@ -18,25 +18,29 @@
             <!-- Header Section with Avatar and Greeting -->
             <div class="bg-gradient-to-br from-orange-300 to-orange-400 p-6 pb-8 rounded-b-4xl shadow-lg">
                 <div class="flex items-center justify-between animate-fade-in">
-                    <div class="flex items-center gap-4">
-                        {{-- <div class="avatar placeholder">
-                            <div class="bg-neutral text-neutral-content rounded-full w-16 ring ring-primary ring-offset-base-100 ring-offset-2 animate-pulse-slow">
-                                <span class="text-2xl">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                            </div>
-                        </div> --}}
+                    <div class="flex items-start gap-3">
                         <div>
-                            <p class="text-orange-100 text-lg font-bold">Hello!</p>
-                            <h2 class="text-orange-900 text-3xl font-bold flex items-center gap-2">
-                                {{ auth()->user()->name }}
-                            </h2>
-                            <div class="flex items-center gap-2">
-                                <p class="text-white font-mono tracking-wider text-md font-medium">{{ auth()->user()->qr_code }}</p>
-                                {{-- verified badge --}}
-                                @if(auth()->user()->is_verified)
-                                    <span class="text-white text-[11px] font-medium bg-green-400 text-green-300 px-1.5 py-0.5 rounded-full">Verified</span>
-                                @else
-                                    <span class="text-white text-[11px] font-medium bg-red-400 text-red-400 px-1.5 py-0.5 rounded-full">Unverified</span>
-                                @endif
+                            <p class="text-orange-100 text-lg font-bold mb-4 drop-shadow">Welcome back!</p>
+                            <div class="flex items-start gap-2">
+                                <div class="mt-9 border-2 border-white bg-white/70 shadow-lg rounded-xl p-2">
+                                    <svg class="size-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 13H16C17.7107 13 19.1506 14.2804 19.3505 15.9795L20 21.5M8 13C5.2421 12.3871 3.06717 10.2687 2.38197 7.52787L2 6M8 13V18C8 19.8856 8 20.8284 8.58579 21.4142C9.17157 22 10.1144 22 12 22C13.8856 22 14.8284 22 15.4142 21.4142C16 20.8284 16 19.8856 16 18V17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"></path> <circle cx="12" cy="6" r="4" stroke="#ffffff" stroke-width="1.5"></circle> </g>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-orange-900 text-3xl font-bold flex items-center gap-2">
+                                        {{ auth()->user()->name }}
+                                    </h2>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-white font-mono tracking-wider text-sm font-medium">{{ auth()->user()->qr_code }}</p>
+                                        {{-- verified badge --}}
+                                        @if(auth()->user()->is_verified)
+                                            <span class="text-white text-[11px] font-medium bg-green-400 text-green-300 px-1.5 py-0.5 rounded-full">Verified</span>
+                                        @else
+                                            <span class="text-white text-[11px] font-medium bg-red-400 text-red-400 px-1.5 py-0.5 rounded-full">Unverified</span>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                             <br />
                             <div class="flex flex-col">

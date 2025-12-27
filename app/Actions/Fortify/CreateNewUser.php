@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Rules\ValidFin;
 use App\Rules\ValidWhatsAppNumber;
+use App\Services\PointsService;
 use App\Services\TwilioWhatsAppService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -129,6 +130,11 @@ class CreateNewUser implements CreatesNewUsers
             return tap(User::create($userData), function (User $user) {
                 if (Jetstream::userHasTeamFeatures($user)) {
                     $this->createTeam($user);
+                }
+                
+                // Award 10 points for registration (only for members)
+                if ($user->isMember()) {
+                    app(PointsService::class)->awardRegistration($user);
                 }
             });
         });

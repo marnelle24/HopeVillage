@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 class PointsService
 {
     public const ACTIVITY_ACCOUNT_VERIFICATION = 'account_verification';
+    public const ACTIVITY_REGISTRATION = 'member_registration';
     public const ACTIVITY_LOCATION_ENTRY = 'member_entry_location';
     public const ACTIVITY_EVENT_JOIN = 'member_join_event';
     public const ACTIVITY_EVENT_ATTEND = 'member_attend_event';
@@ -22,6 +23,7 @@ class PointsService
 
     // Fallback points (used only if no admin configuration exists)
     private const FALLBACK_POINTS_ACCOUNT_VERIFICATION = 10;
+    private const FALLBACK_POINTS_REGISTRATION = 10;
     private const FALLBACK_POINTS_LOCATION_ENTRY = 10;
     private const FALLBACK_POINTS_EVENT_JOIN = 10;
     private const FALLBACK_POINTS_EVENT_ATTEND = 20;
@@ -34,6 +36,16 @@ class PointsService
             user: $user,
             activityName: self::ACTIVITY_ACCOUNT_VERIFICATION,
             description: 'Account created and verified',
+            locationId: null,
+        );
+    }
+
+    public function awardRegistration(User $user): void
+    {
+        $this->award(
+            user: $user,
+            activityName: self::ACTIVITY_REGISTRATION,
+            description: 'New member registration',
             locationId: null,
         );
     }
@@ -95,6 +107,7 @@ class PointsService
     {
         return match ($activityName) {
             self::ACTIVITY_ACCOUNT_VERIFICATION => self::FALLBACK_POINTS_ACCOUNT_VERIFICATION,
+            self::ACTIVITY_REGISTRATION => self::FALLBACK_POINTS_REGISTRATION,
             self::ACTIVITY_LOCATION_ENTRY => self::FALLBACK_POINTS_LOCATION_ENTRY,
             self::ACTIVITY_EVENT_JOIN => self::FALLBACK_POINTS_EVENT_JOIN,
             self::ACTIVITY_EVENT_ATTEND => self::FALLBACK_POINTS_EVENT_ATTEND,

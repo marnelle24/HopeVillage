@@ -34,7 +34,7 @@
 
         <!-- Toast notifications (DaisyUI) -->
         <div 
-            class="toast {{ auth()->check() && auth()->user()->isMember() ? 'toast-bottom' : 'toast-top' }} toast-end z-[120]"
+            class="toast toast-top toast-end z-[120]"
             x-data="{ 
                 toasts: [],
                 addToast(type, message) {
