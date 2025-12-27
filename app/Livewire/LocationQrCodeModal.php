@@ -43,6 +43,7 @@ class LocationQrCodeModal extends Component
         $this->error = null;
         $this->success = false;
         $this->processing = false;
+        $this->location = null; // Reset location
         $this->memberFin = auth()->user()?->fin;
         
         if ($this->locationCode) {
@@ -61,12 +62,18 @@ class LocationQrCodeModal extends Component
     public function loadLocation()
     {
         if ($this->locationCode) {
-            $this->location = Location::where('location_code', $this->locationCode)->first();
+            // Normalize the location code (trim and uppercase)
+            $normalizedCode = strtoupper(trim($this->locationCode));
+            
+            $this->location = Location::where('location_code', $normalizedCode)->first();
+            
+            if (!$this->location) {
+                $this->error = 'Location not found.';
+                return;
+            }
             
             // Automatically call member-activity API for location entry
-            if ($this->location) {
-                $this->processLocationEntry();
-            }
+            $this->processLocationEntry();
         }
     }
     

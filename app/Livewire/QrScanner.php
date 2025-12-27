@@ -63,54 +63,83 @@ class QrScanner extends Component
         // Get the authenticated user's FIN
         $user = auth()->user();
         $memberFin = $user?->fin ?? null;
-        
-        // Process the QR code to determine type and prepare data for display
-        $qrUpper = strtoupper(trim($result));
+        $isMerchant = $user && $user->isMerchantUser();
+        $isMember = $user && $user->isMember();
+
+        $qrUpper = strtoupper(trim($result)); // uppercase the result
         $qrType = null;
-        $displayData = [
-            'raw_value' => $result,
-            'type' => null,
-            'code' => null,
-            'member_fin' => $memberFin,
-        ];
-        
-        if (str_starts_with($qrUpper, 'LOC-')) {
-            $qrType = 'LOC';
-            $displayData['type'] = 'Location';
-            $displayData['code'] = $result;
-            $displayData['description'] = 'Location QR Code';
-        } elseif (str_starts_with($qrUpper, 'EVT-')) {
-            $qrType = 'EVT';
-            $displayData['type'] = 'Event';
-            $displayData['code'] = $result;
-            $displayData['description'] = 'Event QR Code';
-        } elseif (str_starts_with($qrUpper, 'VOU-')) {
+
+        if($isMerchant && str_starts_with($qrUpper, 'VOU-')) 
+        {
+            $scannedVoucher = explode('_', $qrUpper);
+            $voucherCode = $scannedVoucher[0]; // voucher qr code
+            $redeemerQrCode = $scannedVoucher[1]; // member qr code who redeem the voucher
+
+        // Process the QR code to determine type and prepare data for display
+            $displayData = [
+                'raw_value' => $scannedVoucher,
+                'type' => 'voucher',
+                'code' => $redeemerQrCode,
+                'member_fin' => $redeemerQrCode,
+            ];
+
             $qrType = 'VOU';
-            $displayData['type'] = 'Voucher';
-            $displayData['code'] = $result;
+            $displayData['type'] = 'voucher';
+            $displayData['code'] = $voucherCode;
             $displayData['description'] = 'Voucher QR Code';
-        } else {
-            $displayData['type'] = 'Unknown';
-            $displayData['code'] = $result;
-            $displayData['description'] = 'Unknown QR Code Type';
+
+        }
+        else
+        {
+            // Process the QR code to determine type and prepare data for display
+            $displayData = [
+                'raw_value' => $result,
+                'type' => null,
+                'code' => null,
+                'member_fin' => $memberFin,
+            ];
+            
+            if (str_starts_with($qrUpper, 'LOC-')) 
+            {
+                $qrType = 'LOC';
+                $displayData['type'] = 'Location';
+                $displayData['code'] = $result;
+                $displayData['description'] = 'Location QR Code';
+            } 
+            elseif (str_starts_with($qrUpper, 'EVT-'))
+            {
+                $qrType = 'EVT';
+                $displayData['type'] = 'Event';
+                $displayData['code'] = $result;
+                $displayData['description'] = 'Event QR Code';
+            } 
+            else 
+            {
+                $displayData['type'] = 'Unknown';
+                $displayData['code'] = $result;
+                $displayData['description'] = 'Unknown QR Code Type';
+            }
+
         }
 
         $this->resultData = $displayData;
         $this->showResultModal = true;
         
         // Set the selected QR type and code for component rendering
-        if ($qrType === 'LOC') {
+        if ($isMember && $qrType === 'LOC') {
             $this->selectedQrType = 'location';
             $this->selectedQrCode = $result;
             $this->dispatch('openLocationQrModal', $result);
-        } elseif ($qrType === 'EVT') {
+        } elseif ($isMember && $qrType === 'EVT') {
             $this->selectedQrType = 'event';
             $this->selectedQrCode = $result;
             $this->dispatch('openEventQrModal', $result);
-        } elseif ($qrType === 'VOU') {
+        }
+        elseif ($isMerchant && $qrType === 'VOU') {
             $this->selectedQrType = 'voucher';
-            $this->selectedQrCode = $result;
-            $this->dispatch('openVoucherQrModal', $result);
+            $this->selectedQrCode = $voucherCode;
+            // Pass both voucher code and redeemer QR code
+            $this->dispatch('openVoucherQrModal', $voucherCode, $redeemerQrCode);
         }
         
         $this->dispatch('qr-code-scanned', $result);

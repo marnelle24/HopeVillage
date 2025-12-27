@@ -78,12 +78,6 @@
                             <span class="font-semibold">Entries:</span> {{ count($entries) }}
                         </div>
 
-                        @if($winner)
-                            <div class="mt-2 p-3 rounded-lg bg-green-50 border border-green-200">
-                                <p class="text-xs text-green-700 font-semibold">Winner</p>
-                                <p class="text-lg font-bold text-green-900 break-all">{{ $winner }}</p>
-                            </div>
-                        @endif
                     </div>
                 </div>
 
@@ -96,7 +90,11 @@
                             spinTo(d) {
                                 this.spinning = true;
                                 this.degrees = d;
-                                setTimeout(() => { this.spinning = false; }, 4200);
+                                setTimeout(() => { 
+                                    this.spinning = false;
+                                    // Dispatch event to open winner modal after spin completes
+                                    window.dispatchEvent(new CustomEvent('roulette-spin-complete'));
+                                }, 4200);
                             }
                         }"
                         @roulette-spun.window="spinTo($event.detail.degrees)"
@@ -202,4 +200,58 @@
             </div>
         </div>
     </div>
+
+    <!-- Winner Modal -->
+    <dialog 
+        x-data="{ 
+            openModal() { 
+                this.$el.showModal(); 
+            },
+            closeModal() { 
+                this.$el.close(); 
+            }
+        }"
+        x-init="
+            window.addEventListener('roulette-spin-complete', () => {
+                openModal();
+            });
+        "
+        class="modal"
+        @click.away="closeModal()"
+    >
+        <div class="modal-box text-center">
+            <h3 class="font-bold text-2xl mb-4 text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-3 text-yellow-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                </svg>
+                🎉 Winner! 🎉
+            </h3>
+            @if($winner)
+                <div class="py-6">
+                    <p class="text-sm text-gray-600 mb-3">The winner is:</p>
+                    <p class="text-4xl font-bold text-primary break-all px-4">
+                        {{ $winner }}
+                    </p>
+                    @if($source === 'event_attendees' || $source === 'members_fin')
+                        <p class="text-sm text-gray-500 mt-4">FIN Number</p>
+                    @else
+                        <p class="text-sm text-gray-500 mt-4">Selected Number</p>
+                    @endif
+                </div>
+            @else
+                <p class="text-gray-600 py-4">No winner selected.</p>
+            @endif
+            <div class="modal-action justify-center">
+                <button 
+                    @click="$el.close()"
+                    class="btn btn-primary"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 </div>

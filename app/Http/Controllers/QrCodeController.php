@@ -70,13 +70,14 @@ class QrCodeController extends Controller
 
     /**
      * Get QR code image as full size for display
+     * Available to all authenticated users (admin, merchant_user, member)
      */
     public function fullSize()
     {
         try {
             $user = Auth::user();
 
-            if (!$user || !$user->isMember() || !$user->qr_code) {
+            if (!$user || !$user->qr_code) {
                 return response()->json([
                     'error' => 'QR code not found'
                 ], 404);

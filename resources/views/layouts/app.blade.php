@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="bumblebee">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,8 +16,12 @@
         <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('hv-logo.png') }}">
         <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('hv-logo.png') }}">
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        {{-- <link rel="preconnect" href="https://fonts.bunny.net"> --}}
+        {{-- <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" /> --}}
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -28,33 +32,96 @@
     <body class="font-sans antialiased bg-[#FAF7F4]">
         <x-banner />
 
-        <!-- Toast notifications (Livewire event: notify) -->
-        <div
-            x-data="{ open: false, message: '', type: 'success', t: null }"
-            x-on:hv-toast.window="
-                type = $event.detail?.type ?? 'success';
-                message = $event.detail?.message ?? '';
-                open = true;
-                clearTimeout(t);
-                t = setTimeout(() => open = false, 2500);
-            "
-            x-show="open"
-            x-transition.opacity
-            x-cloak
-            class="fixed bottom-[6rem] right-0 z-[120] max-w-[90vw] w-[360px]"
-            role="status"
-            aria-live="polite"
+        <!-- Toast notifications (DaisyUI) -->
+        <div 
+            class="toast {{ auth()->check() && auth()->user()->isMember() ? 'toast-bottom' : 'toast-top' }} toast-end z-[120]"
+            x-data="{ 
+                toasts: [],
+                addToast(type, message) {
+                    if (!message || message === '') {
+                        return;
+                    }
+                    const id = Date.now();
+                    this.toasts.push({ id, type, message });
+                    setTimeout(() => {
+                        this.removeToast(id);
+                    }, 3000);
+                },
+                removeToast(id) {
+                    this.toasts = this.toasts.filter(t => t.id !== id);
+                }
+            }"
+            x-on:hv-toast.window="addToast($event.detail?.type ?? 'success', $event.detail?.message ?? '')"
         >
-            <div
-                class="rounded-l-xl border shadow-lg px-4 py-3 opacity-90 transition-opacity duration-300"
-                :class="type === 'success'
-                    ? 'bg-emerald-100 border-emerald-200 text-emerald-800'
-                    : (type === 'error'
-                        ? 'bg-red-50 border-red-200 text-red-800'
-                        : 'bg-slate-50 border-slate-200 text-slate-800')"
-            >
-                <p class="text-sm font-semibold" x-text="message"></p>
-            </div>
+            <template x-for="toast in toasts" :key="toast.id">
+                <div 
+                    class="bg-orange-500 p-2 rounded-lg shadow-lg mb-2 min-w-[300px] max-w-[90vw] flex items-center justify-between"
+                    :class="{
+                        '': toast.type === 'success',
+                        '': toast.type === 'error',
+                        '': toast.type === 'info',
+                        '': toast.type === 'warning'
+                    }"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 transform translate-x-full"
+                    x-transition:enter-end="opacity-100 transform translate-x-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 transform translate-x-0"
+                    x-transition:leave-end="opacity-0 transform translate-x-full"
+                >
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg 
+                            x-show="toast.type === 'success'"
+                            x-cloak
+                            xmlns="http://www.w3.org/2000/svg" 
+                            class="stroke-current shrink-0 h-5 w-5" 
+                            fill="none" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <svg 
+                            x-show="toast.type === 'error'"
+                            x-cloak
+                            xmlns="http://www.w3.org/2000/svg" 
+                            class="stroke-current shrink-0 h-5 w-5" 
+                            fill="none" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <svg 
+                            x-show="toast.type === 'info'"
+                            x-cloak
+                            xmlns="http://www.w3.org/2000/svg" 
+                            class="stroke-current shrink-0 h-5 w-5" 
+                            fill="none" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <svg 
+                            x-show="toast.type === 'warning'"
+                            x-cloak
+                            xmlns="http://www.w3.org/2000/svg" 
+                            class="stroke-current shrink-0 h-5 w-5" 
+                            fill="none" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <span x-text="toast.message" class="font-medium text-sm break-words text-white"></span>
+                    </div>
+                    <button 
+                        @click="removeToast(toast.id)"
+                        class="btn btn-sm btn-ghost btn-circle shrink-0 text-white"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </template>
         </div>
 
         <div class="min-h-screen bg-gray-100">
@@ -84,9 +151,16 @@
         <script>
             document.addEventListener('livewire:init', () => {
                 if (!window.Livewire) return;
-                Livewire.on('notify', (...args) => {
-                    const detail = args?.[0] ?? {};
-                    window.dispatchEvent(new CustomEvent('hv-toast', { detail }));
+                Livewire.on('notify', (data) => {
+                    // In Livewire v3, when using named parameters like dispatch('notify', type: 'success', message: '...')
+                    // the data comes as an object with the parameter names as keys
+                    const detail = data || {};
+                    window.dispatchEvent(new CustomEvent('hv-toast', { 
+                        detail: {
+                            type: detail.type || 'success',
+                            message: detail.message || ''
+                        }
+                    }));
                 });
             });
         </script>

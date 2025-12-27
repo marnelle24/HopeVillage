@@ -163,6 +163,7 @@
                 });
             }
         }"
+        @openQrScanner.window="$wire.open()"
         x-show="open"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0"

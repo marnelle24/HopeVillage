@@ -47,6 +47,38 @@ class Roulette extends Component
         $this->loadEntries();
     }
 
+    public function updatedRangeStart(): void
+    {
+        if ($this->source === 'range' && $this->rangeStart !== null && $this->rangeEnd !== null) {
+            // Only load if both values are set and valid
+            if ($this->rangeStart >= 1 && $this->rangeEnd >= 1) {
+                $this->loadEntries();
+            }
+        }
+    }
+
+    public function updatedRangeEnd(): void
+    {
+        if ($this->source === 'range' && $this->rangeStart !== null && $this->rangeEnd !== null) {
+            // Only load if both values are set and valid
+            if ($this->rangeStart >= 1 && $this->rangeEnd >= 1) {
+                $this->loadEntries();
+            }
+        }
+    }
+
+    public function updatedSelectedEventId(): void
+    {
+        if ($this->source === 'event_attendees' && $this->selectedEventId) {
+            $this->loadEntries();
+        } elseif ($this->source === 'event_attendees' && !$this->selectedEventId) {
+            // Clear entries if event is deselected
+            $this->entries = [];
+            $this->winner = null;
+            $this->winnerIndex = null;
+        }
+    }
+
     public function loadEntries(): void
     {
         $this->resetValidation();

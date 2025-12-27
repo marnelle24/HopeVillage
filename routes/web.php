@@ -25,6 +25,9 @@ Route::middleware([
     Route::get('/verify-account', [VerificationCodeController::class, 'show'])->name('verification.code.show');
     Route::post('/verify-account', [VerificationCodeController::class, 'verify'])->name('verification.code.verify');
     Route::post('/verify-account/resend', [VerificationCodeController::class, 'resend'])->name('verification.code.resend');
+    
+    // QR Code route - Available to all authenticated users (admin, merchant_user, member)
+    Route::get('/qr-code/full', [QrCodeController::class, 'fullSize'])->name('qr-code.full');
 });
 
 // Admin Dashboard - Only accessible by admin users
@@ -94,13 +97,21 @@ Route::middleware([
     'member',
     // 'hv_verified',
 ])->group(function () {
-    Route::get('/member/dashboard', function () {
+    Route::get('/member/dashboard-v1', function () {
         return view('member.dashboard');
-    })->name('member.dashboard');
+    })->name('member.dashboard.v1');
+
+    Route::get('/member/events-v1', function () {
+        return view('member.events');
+    })->name('member.events.v1');
 
     Route::get('/member/events', function () {
-        return view('member.events');
+        return view('member.events-v2');
     })->name('member.events');
+
+    Route::get('/member/dashboard', function () {
+        return view('member.dashboard-v2');
+    })->name('member.dashboard');
 
     Route::get('/member/vouchers', function () {
         return view('member.vouchers');
@@ -116,7 +127,6 @@ Route::middleware([
     
     // QR Code routes
     Route::get('/member/qr-code', [QrCodeController::class, 'show'])->name('member.qr-code');
-    Route::get('/member/qr-code/full', [QrCodeController::class, 'fullSize'])->name('member.qr-code.full');
 });
 
 // Merchant Dashboard - Only accessible by merchant users

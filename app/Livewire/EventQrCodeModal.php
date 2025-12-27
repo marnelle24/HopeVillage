@@ -44,6 +44,7 @@ class EventQrCodeModal extends Component
         $this->error = null;
         $this->success = false;
         $this->processing = false;
+        $this->event = null; // Reset event
         $this->memberFin = auth()->user()?->fin;
         
         if ($this->eventCode) {
@@ -62,13 +63,19 @@ class EventQrCodeModal extends Component
     public function loadEvent()
     {
         if ($this->eventCode) {
+            // Normalize the event code (trim and uppercase)
+            $normalizedCode = strtoupper(trim($this->eventCode));
+            
             // Event code already includes EVT- prefix in database
-            $this->event = Event::where('event_code', $this->eventCode)->first();
+            $this->event = Event::where('event_code', $normalizedCode)->first();
+            
+            if (!$this->event) {
+                $this->error = 'Event not found.';
+                return;
+            }
             
             // Automatically process event attendance
-            if ($this->event) {
-                $this->processEventAttendance();
-            }
+            $this->processEventAttendance();
         }
     }
     

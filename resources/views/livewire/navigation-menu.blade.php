@@ -13,7 +13,7 @@
     }
 @endphp
 
-@if(auth()->check() && !auth()->user()->isMember())
+@if(auth()->check() && (!auth()->user()->isMember() || !auth()->user()->isMerchantUser()))
     <nav x-data="{ open: false }" x-cloak class="{{ $navBgClass }} border-b border-gray-100">
         <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,13 +190,22 @@
             stream: null,
             detector: null,
             scanTimer: null,
+            isMerchant: @js(auth()->check() && auth()->user()->isMerchantUser()),
+            handleQrButtonClick() {
+                this.settingsOpen = false;
+                if (this.isMerchant) {
+                    window.dispatchEvent(new CustomEvent('openQrScanner'));
+                } else {
+                    this.openQrCodeModal();
+                }
+            },
             async loadMyQrCode() {
                 this.qrLoading = true;
                 this.qrError = null;
                 this.qrImage = null;
                 this.qrValue = null;
                 try {
-                    const res = await fetch('{{ route('member.qr-code.full') }}', {
+                    const res = await fetch('{{ route('qr-code.full') }}', {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
                             'Accept': 'application/json',
@@ -287,7 +296,7 @@
                 this.qrCodeModalImage = null;
                 this.qrCodeModalValue = null;
                 try {
-                    const res = await fetch('{{ route('member.qr-code.full') }}', {
+                    const res = await fetch('{{ route('qr-code.full') }}', {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
                             'Accept': 'application/json',
@@ -345,23 +354,24 @@
         </div>
 
         <div class="relative">
-            <div class="grid grid-cols-4">
-                <a href="{{ route('member.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500 {{ request()->routeIs('member.dashboard') ? 'text-white bg-orange-500' : 'text-slate-200' }}">
+            <div class="grid {{ auth()->check() && auth()->user()->isMerchantUser() ? 'grid-cols-3' : 'grid-cols-4' }}">
+                <a href="{{ auth()->check() && auth()->user()->isMerchantUser() ? route('merchant.dashboard') : route('member.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500 {{ (auth()->check() && auth()->user()->isMerchantUser() && request()->routeIs('merchant.dashboard')) || (auth()->check() && auth()->user()->isMember() && (request()->routeIs('member.dashboard') || request()->routeIs('member.dashboard'))) ? 'text-white bg-orange-500' : 'text-slate-200' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.5A2.25 2.25 0 0 0 6.75 21.75h3.75v-4.5A2.25 2.25 0 0 1 12.75 15h-1.5A2.25 2.25 0 0 1 13.5 17.25v4.5h3.75A2.25 2.25 0 0 0 19.5 19.5V9.75" />
                     </svg>
                     <span class="text-[11px] font-semibold">Home</span>
                 </a>
 
+                @if(auth()->check() && auth()->user()->isMember())
                 <a href="{{ route('member.events') }}" class="flex flex-col items-center justify-center py-3 pr-1 gap-1 hover:bg-orange-500 {{ request()->routeIs('member.events') || request()->routeIs('member.events*') ? 'text-white bg-orange-500' : 'text-slate-200' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5A2.25 2.25 0 0 1 5.25 5.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75Zm3-9h.008v.008H6v-.008Zm3 0h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Z" />
                     </svg>
                     <span class="text-[11px] font-semibold">Events</span>
                 </a>
+                @endif
 
-
-                <a href="{{ route('member.vouchers') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500 {{ request()->routeIs('member.vouchers') ? 'text-white bg-orange-500' : 'text-slate-200' }}">
+                <a href="{{ auth()->check() && auth()->user()->isMerchantUser() ? route('merchant.vouchers.index') : route('member.vouchers') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500 {{ (auth()->check() && auth()->user()->isMerchantUser() && request()->routeIs('merchant.vouchers*')) || (auth()->check() && auth()->user()->isMember() && request()->routeIs('member.vouchers')) ? 'text-white bg-orange-500' : 'text-slate-200' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75h6m-6 3h6m-6 3h6m-6 3h6M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Z" />
                     </svg>
@@ -388,7 +398,7 @@
             <!-- Floating center QR button -->
             <button
                 type="button"
-                @click="settingsOpen = false; openQrCodeModal()"
+                @click="handleQrButtonClick()"
                 aria-haspopup="dialog"
                 aria-label="Open QR Code"
                 class="absolute left-1/2 -top-7 -translate-x-1/2 z-50 w-16 h-16 rounded-full bg-[#3A5770]/60 text-white shadow-lg ring-4 ring-[#4a7396] flex items-center justify-center hover:bg-[#3A5770] active:scale-95 transition"

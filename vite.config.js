@@ -15,6 +15,17 @@ export default defineConfig({
             detectTls: isNgrok ? ngrokDomain : undefined,
         }),
     ],
+    build: {
+        rollupOptions: {
+            onwarn(warning, warn) {
+                // Suppress @property warnings from DaisyUI
+                if (warning.message?.includes('@property') || warning.message?.includes('Unknown at rule')) {
+                    return;
+                }
+                warn(warning);
+            },
+        },
+    },
     server: {
         host: '0.0.0.0', // Allow external connections
         port: 5173,

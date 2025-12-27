@@ -363,7 +363,7 @@
         function openQrCodeModal() {
             const modal = document.getElementById('qr-code-modal');
             // Load full size QR code
-            fetch('{{ route("member.qr-code.full") }}', {
+            fetch('{{ route("qr-code.full") }}', {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',

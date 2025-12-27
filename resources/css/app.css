@@ -1,7 +1,48 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+/* @plugin "daisyui"; */
+
+@theme {
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+}
+
+@plugin "daisyui" {
+  themes: business --default, bumblebee --prefersdark;
+  logs: true;
+}
 
 [x-cloak] {
     display: none;
+}
+
+@layer utilities {
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    @keyframes slide-in-right {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-slide-in-right {
+        animation: slide-in-right 0.3s ease-out;
+    }
 }

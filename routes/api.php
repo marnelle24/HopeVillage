@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityTypeController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MemberActivityController;
 use App\Http\Resources\UserResource;
@@ -23,3 +24,7 @@ Route::get('/activity-types', [ActivityTypeController::class, 'index'])
 // create am api to get all the Locations
 Route::get('/locations', [LocationController::class, 'index'])
     ->name('api.locations.index');
+
+// create a api to get all the active events
+Route::get('/events', [EventController::class, 'getEvents'])
+    ->name('api.events.index');
