@@ -11,15 +11,24 @@
 
             <div class="mt-4">
                 <div class="flex items-center">
-                    <x-label class="tracking-wider" for="name" value="{{ __('Name') }}" />
+                    <x-label class="tracking-wider" for="name" value="{{ 
+                        request()->get('lang') === 'bang' ? 'নাম' : 
+                        (request()->get('lang') === 'zh' ? '姓名' : 'Name')
+                    }}" />
                     <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
-                <input id="name" placeholder="Complete Name" class="mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                <input id="name" placeholder="{{ 
+                    request()->get('lang') === 'bang' ? 'নাম' : 
+                    (request()->get('lang') === 'zh' ? '姓名' : 'Name')
+                }}" class="mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
             <div class="mt-4">
                 <div class="flex items-center">
-                    <x-label for="whatsapp_number" value="{{ __('Mobile Number') }}" />
+                    <x-label for="whatsapp_number" value="{{ 
+                        request()->get('lang') === 'bang' ? 'যোগাযোগ নম্বর' : 
+                        (request()->get('lang') === 'zh' ? '联系电话' : 'Mobile Number')
+                    }}" />
                 </div>
                 <div class="relative">
                     <input id="whatsapp_number" 
@@ -29,12 +38,12 @@
                            value="{{ old('whatsapp_number') }}" 
                            required
                            autocomplete="tel"
-                           placeholder="Enter phone number" />
+                           placeholder="{{ 
+                               request()->get('lang') === 'bang' ? 'যোগাযোগ নম্বর' : 
+                               (request()->get('lang') === 'zh' ? '联系电话' : 'Mobile Number')
+                           }}" />
                     <input type="hidden" name="country_code" id="country_code" value="{{ old('country_code', '+65') }}" />
                 </div>
-                {{-- <p class="mt-1 text-xs text-gray-500">
-                    If the number is on WhatsApp, we'll send your verification code there too.
-                </p> --}}
                 <p id="whatsapp-validation-message" class="mt-1 text-xs hidden"></p>
                 @error('whatsapp_number')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -43,13 +52,15 @@
 
             <div class="mt-4">
                 <div class="flex items-center">
-                    <x-label for="email" value="{{ __('Email') }}" />
-                    <span class="ml-1 text-xs text-gray-500">(Optional)</span>
+                    <x-label for="email" value="{{ 
+                        request()->get('lang') === 'bang' ? 'ইমেল (ঐচ্ছিক)' : 
+                        (request()->get('lang') === 'zh' ? '电子邮箱（可选）' : 'Email (Optional)')
+                    }}" />
                 </div>
-                <input id="email" placeholder="Email Address (Optional)" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="email" name="email" :value="old('email')" autocomplete="username" />
-                {{-- <p class="mt-1 text-xs text-gray-500">
-                    If not provided, an email will be generated based on your WhatsApp number.
-                </p> --}}
+                <input id="email" placeholder="{{ 
+                    request()->get('lang') === 'bang' ? 'ইমেল (ঐচ্ছিক)' : 
+                    (request()->get('lang') === 'zh' ? '电子邮箱（可选）' : 'Email Address (Optional)')
+                }}" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="email" name="email" :value="old('email')" autocomplete="username" />
             </div>
 
             <div class="mt-4 grid grid-cols-3 gap-2">
@@ -58,15 +69,17 @@
                         <x-label for="fin" value="{{ __('FIN/NIRC') }}" />
                         <span class="ml-1 text-red-500 text-xl">*</span>
                     </div>
-                    <input id="fin" class="block w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="fin" maxlength="4" :value="old('fin')" required autocomplete="off" placeholder="Last 4-digits" />
-                    {{-- <p class="mt-1 text-xs text-gray-500">
-                        Format: F/G/M + 7 digits + checksum letter.
-                    </p> --}}
+                    <input id="fin" class="block w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="fin" maxlength="4" :value="old('fin')" required autocomplete="off" 
+                        placeholder="{{ request()->get('lang') === 'bang' ? 'শেষ ৪-সংখ্যার' : (request()->get('lang') === 'zh' ? '最后4位' : 'Last 4-digit')}}" 
+                    />
                 </div>
     
                 <div class="col-span-2" x-data="{ typeOfWork: '{{ old('type_of_work', 'Migrant worker') }}' }">
                     <div class="flex items-center">
-                        <x-label for="type_of_work" value="{{ __('Type of Work') }}" />
+                        <x-label for="type_of_work" value="{{ 
+                            request()->get('lang') === 'bang' ? 'প্রকল্পের ধরণ' : 
+                            (request()->get('lang') === 'zh' ? '工作类型' : 'Type of Work')
+                        }}" />
                     </div>
                     <select 
                         id="type_of_work" 
@@ -74,9 +87,18 @@
                         x-model="typeOfWork"
                         class="block mt-2 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500"
                     >
-                        <option value="Migrant worker" {{ old('type_of_work', 'Migrant worker') === 'Migrant worker' ? 'selected' : '' }}>Migrant worker</option>
-                        <option value="Migrant domestic worker" {{ old('type_of_work') === 'Migrant domestic worker' ? 'selected' : '' }}>Migrant domestic worker</option>
-                        <option value="Others" {{ old('type_of_work') === 'Others' ? 'selected' : '' }}>Others</option>
+                        <option value="Migrant worker" {{ old('type_of_work', 'Migrant worker') === 'Migrant worker' ? 'selected' : '' }}>{{ 
+                            request()->get('lang') === 'bang' ? 'মিরাজ শ্রমিক' : 
+                            (request()->get('lang') === 'zh' ? '外劳' : 'Migrant worker')
+                        }}</option>
+                        <option value="Migrant domestic worker" {{ old('type_of_work') === 'Migrant domestic worker' ? 'selected' : '' }}>{{ 
+                            request()->get('lang') === 'bang' ? 'মিরাজ অভিবাসী শ্রমিক' : 
+                            (request()->get('lang') === 'zh' ? '外劳' : 'Migrant domestic worker')
+                        }}</option>
+                        <option value="Others" {{ old('type_of_work') === 'Others' ? 'selected' : '' }}>{{ 
+                            request()->get('lang') === 'bang' ? 'অন্যান্য' : 
+                            (request()->get('lang') === 'zh' ? '其他' : 'Others')
+                        }}</option>
                     </select>
                     
                     <div x-show="typeOfWork === 'Others'" x-cloak x-transition class="mt-2">
@@ -86,7 +108,7 @@
                             type="text" 
                             name="type_of_work_custom" 
                             value="{{ old('type_of_work_custom') }}" 
-                            placeholder="Please specify your type of work"
+                            placeholder="{{ request()->get('lang') === 'bang' ? 'আপনার কাজের ধরণ বর্ণনা করুন' : (request()->get('lang') === 'zh' ? '请描述您的工作类型' : 'Specify your type of work') }}"
                             x-bind:required="typeOfWork === 'Others'"
                         />
                         @error('type_of_work_custom')
@@ -96,26 +118,26 @@
                 </div>
             </div>
 
-
-            {{-- <div class="mt-4 grid grid-cols-2 gap-4">
-                <div>
-                    <x-label for="age" value="{{ __('Age') }}" />
-                    <x-input id="age" class="block mt-1 w-full" type="number" name="age" :value="old('age')" placeholder="Optional" min="0" max="120" />
-                </div>
-                <div>
-                    <x-label for="gender" value="{{ __('Gender') }}" />
-                    <x-input id="gender" class="block mt-1 w-full" type="text" name="gender" :value="old('gender')" placeholder="Optional" />
-                </div>
-            </div> --}}
-
             <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <input id="password" placeholder="Password" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="password" name="password" required autocomplete="new-password" />
+                <x-label for="password" value="{{ 
+                    request()->get('lang') === 'bang' ? 'নিশ্চিত করুন' : 
+                    (request()->get('lang') === 'zh' ? '密码' : 'Password')
+                }}" />
+                <input id="password" placeholder="{{ 
+                    request()->get('lang') === 'bang' ? 'নিশ্চিত করুন' : 
+                    (request()->get('lang') === 'zh' ? '密码' : 'Password')
+                }}" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="password" name="password" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <input id="password_confirmation" placeholder="Confirm Password" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <x-label for="password_confirmation" value="{{ 
+                    request()->get('lang') === 'bang' ? 'পাসওয়ার্ড পাসওয়ার্ড' : 
+                    (request()->get('lang') === 'zh' ? '确认密码' : 'Confirm Password')
+                }}" />
+                <input id="password_confirmation" placeholder="{{ 
+                    request()->get('lang') === 'bang' ? 'পাসওয়ার্ড পাসওয়ার্ড' : 
+                    (request()->get('lang') === 'zh' ? '确认密码' : 'Confirm Password')
+                }}" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
@@ -130,9 +152,19 @@
                             />
 
                             <div class="ms-2">
-                                {!! __('By selecting ths option, your data can be stored for future forms. You can learn more about how we handle your personal information and your rights by reviewing our :privacy_policy', [
+                                @if(request()->get('lang') === 'en' || request()->get('lang') === '' || !request()->get('lang'))
+                                    {!! __('By selecting ths option, your data can be stored for future forms. You can learn more about how we handle your personal information and your rights by reviewing our :privacy_policy', [
                                         'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
-                                ]) !!}
+                                    ]) !!}
+                                @elseif(request()->get('lang') === 'bang')
+                                    {!! __('এই বিকল্প বাছাই করলে, আপনার তথ্য ভবিষ্যতের ফর্মের জন্য সংরক্ষণ করা যাবে। আপনি আমাদের আপনার ব্যক্তিগত তথ্য এবং আপনার অধিকার সম্পর্কে আরও জানতে আমাদের গোপনীয়তা নীতি দেখুন :privacy_policy', [
+                                        'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('গোপনীয়তা নীতি').'</a>',
+                                    ]) !!}
+                                @elseif(request()->get('lang') === 'zh')
+                                    {!! __('通过选择此选项，您的数据可以存储在未来表单中。您可以通过查看我们的隐私政策了解更多关于我们如何处理您的个人信息和您的权利。:privacy_policy', [
+                                        'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('隐私政策').'</a>',
+                                    ]) !!}
+                                @endif
                             </div>
                         </div>
                     </x-label>
@@ -149,15 +181,21 @@
                 </div>
             @endif
 
-            <div class="flex items-center justify-center mt-12">
+            <div class="flex items-center justify-center my-6">
                 <button 
                     type="submit"
                     x-bind:disabled="submitting"
                     :class="submitting ? 'opacity-80 cursor-not-allowed bg-gray-400 hover:bg-gray-400 active:bg-gray-400 focus:bg-gray-400 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:active:bg-gray-400 disabled:focus:bg-gray-400 disabled:opacity-80 disabled:cursor-not-allowed' : ''"
                     class="cursor-pointer ms-4 w-3/4 flex justify-center py-4 text-white bg-orange-500 hover:bg-orange-600 duration-300 transition-all rounded-full"
                 >
-                    <span x-show="!submitting">{{ __('Register') }}</span>
-                    <span x-show="submitting" x-cloak>{{ __('Registering...') }}</span>
+                    <span x-show="!submitting">{{ 
+                        request()->get('lang') === 'bang' ? 'নিবন্ধন করুন' : 
+                        (request()->get('lang') === 'zh' ? '注册' : 'Register')
+                    }}</span>
+                    <span x-show="submitting" x-cloak>{{ 
+                        request()->get('lang') === 'bang' ? 'নিবন্ধন করছে...' : 
+                        (request()->get('lang') === 'zh' ? '注册中...' : 'Registering...')
+                    }}</span>
                 </button>
             </div>
         </form>
