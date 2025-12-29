@@ -4,7 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Models\Team;
 use App\Models\User;
-use App\Rules\ValidFin;
+use App\Rules\ValidRecaptcha;
 use App\Rules\ValidWhatsAppNumber;
 use App\Services\PointsService;
 use App\Services\TwilioWhatsAppService;
@@ -75,9 +75,12 @@ class CreateNewUser implements CreatesNewUsers
                 // 'unique:users,whatsapp_number',
                 new ValidWhatsAppNumber(app(TwilioWhatsAppService::class))
             ],
-            'fin' => ['required', 'string', 'max:20', 'unique:users,fin'],
+            'fin' => ['required', 'string', 'size:4', 'regex:/^\d{3}[A-Z]$/i'],
             'age' => ['nullable', 'integer', 'min:0', 'max:120'],
             'gender' => ['nullable', 'string', 'max:20'],
+            'type_of_work' => ['nullable', 'string', 'max:255', 'in:Migrant worker,Migrant domestic worker,Others'],
+            'type_of_work_custom' => ['nullable', 'required_if:type_of_work,Others', 'string', 'max:255'],
+            'g-recaptcha-response' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
@@ -88,6 +91,12 @@ class CreateNewUser implements CreatesNewUsers
                 $email = $this->generateEmailFromWhatsApp($input['whatsapp_number']);
             }
 
+            // Determine type_of_work value
+            $typeOfWork = $input['type_of_work'] ?? 'Migrant worker';
+            if ($typeOfWork === 'Others' && !empty($input['type_of_work_custom'] ?? '')) {
+                $typeOfWork = trim($input['type_of_work_custom']);
+            }
+
             $userData = [
                 'name' => $input['name'],
                 'email' => $email,
@@ -96,6 +105,7 @@ class CreateNewUser implements CreatesNewUsers
                 'whatsapp_number' => $input['whatsapp_number'] ?? null,
                 'age' => $input['age'] ?? null,
                 'gender' => $input['gender'] ?? null,
+                'type_of_work' => $typeOfWork,
             ];
 
             // Get FIN from request instead of auto-generating

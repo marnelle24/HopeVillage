@@ -165,3 +165,4 @@ echo "<div class='info'>✅ Cache clearing completed at: " . date('Y-m-d H:i:s')
 echo "<div class='warning'><strong>🔒 Security:</strong> Please delete this file (clear-cache.php) after use!</div>";
 echo "</div></body></html>";
 
+

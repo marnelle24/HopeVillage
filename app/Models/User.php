@@ -39,6 +39,7 @@ class User extends Authenticatable
         'fin',
         'age',
         'gender',
+        'type_of_work',
         'qr_code',
         'is_verified',
         'total_points',

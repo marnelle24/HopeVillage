@@ -1,41 +1,29 @@
 <x-guest-layout>
-    <x-authentication-card>
+    <x-authentication-card x-cloak>
         <x-slot name="logo">
             <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-32">
         </x-slot>
 
         <x-validation-errors class="mb-4" />
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" x-data="{ submitting: false }" @submit="submitting = true">
             @csrf
 
             <div class="mt-4">
                 <div class="flex items-center">
-                    <x-label for="name" value="{{ __('Name') }}" />
+                    <x-label class="tracking-wider" for="name" value="{{ __('Name') }}" />
                     <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
-                <x-input id="name" placeholder="Full Name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                <input id="name" placeholder="Complete Name" class="mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
             <div class="mt-4">
                 <div class="flex items-center">
-                    <x-label for="fin" value="{{ __('Last 4-digit FIN/NIRC') }}" />
-                    <span class="ml-1 text-red-500 text-xl">*</span>
-                </div>
-                <x-input id="fin" class="block mt-1 w-full" type="text" name="fin" maxlength="4" :value="old('fin')" required autocomplete="off" placeholder="123X" />
-                {{-- <p class="mt-1 text-xs text-gray-500">
-                    Format: F/G/M + 7 digits + checksum letter.
-                </p> --}}
-            </div>
-
-            <div class="mt-4">
-                <div class="flex items-center">
-                    <x-label for="whatsapp_number" value="{{ __('Contact Number (WhatsApp)') }}" />
-                    <span class="ml-1 text-red-500 text-xl">*</span>
+                    <x-label for="whatsapp_number" value="{{ __('Mobile Number') }}" />
                 </div>
                 <div class="relative">
                     <input id="whatsapp_number" 
-                           class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" 
+                           class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" 
                            type="tel" 
                            name="whatsapp_number" 
                            value="{{ old('whatsapp_number') }}" 
@@ -58,11 +46,56 @@
                     <x-label for="email" value="{{ __('Email') }}" />
                     <span class="ml-1 text-xs text-gray-500">(Optional)</span>
                 </div>
-                <x-input id="email" placeholder="Email Address (Optional)" class="block mt-1 w-full" type="email" name="email" :value="old('email')" autocomplete="username" />
+                <input id="email" placeholder="Email Address (Optional)" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="email" name="email" :value="old('email')" autocomplete="username" />
                 {{-- <p class="mt-1 text-xs text-gray-500">
                     If not provided, an email will be generated based on your WhatsApp number.
                 </p> --}}
             </div>
+
+            <div class="mt-4 grid grid-cols-3 gap-2">
+                <div class="col-span-1">
+                    <div class="flex items-start">
+                        <x-label for="fin" value="{{ __('FIN/NIRC') }}" />
+                        <span class="ml-1 text-red-500 text-xl">*</span>
+                    </div>
+                    <input id="fin" class="block w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="fin" maxlength="4" :value="old('fin')" required autocomplete="off" placeholder="Last 4-digits" />
+                    {{-- <p class="mt-1 text-xs text-gray-500">
+                        Format: F/G/M + 7 digits + checksum letter.
+                    </p> --}}
+                </div>
+    
+                <div class="col-span-2" x-data="{ typeOfWork: '{{ old('type_of_work', 'Migrant worker') }}' }">
+                    <div class="flex items-center">
+                        <x-label for="type_of_work" value="{{ __('Type of Work') }}" />
+                    </div>
+                    <select 
+                        id="type_of_work" 
+                        name="type_of_work" 
+                        x-model="typeOfWork"
+                        class="block mt-2 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500"
+                    >
+                        <option value="Migrant worker" {{ old('type_of_work', 'Migrant worker') === 'Migrant worker' ? 'selected' : '' }}>Migrant worker</option>
+                        <option value="Migrant domestic worker" {{ old('type_of_work') === 'Migrant domestic worker' ? 'selected' : '' }}>Migrant domestic worker</option>
+                        <option value="Others" {{ old('type_of_work') === 'Others' ? 'selected' : '' }}>Others</option>
+                    </select>
+                    
+                    <div x-show="typeOfWork === 'Others'" x-cloak x-transition class="mt-2">
+                        <input 
+                            id="type_of_work_custom" 
+                            class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" 
+                            type="text" 
+                            name="type_of_work_custom" 
+                            value="{{ old('type_of_work_custom') }}" 
+                            placeholder="Please specify your type of work"
+                            x-bind:required="typeOfWork === 'Others'"
+                        />
+                        @error('type_of_work_custom')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
 
             {{-- <div class="mt-4 grid grid-cols-2 gap-4">
                 <div>
@@ -77,12 +110,12 @@
 
             <div class="mt-4">
                 <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                <input id="password" placeholder="Password" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="password" name="password" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4">
                 <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <input id="password_confirmation" placeholder="Confirm Password" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
@@ -106,10 +139,26 @@
                 </div>
             @endif
 
+            <!-- Google reCAPTCHA -->
+            @if(config('services.recaptcha.site_key'))
+                <div class="mt-4 w-full">
+                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                    @error('g-recaptcha-response')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endif
+
             <div class="flex items-center justify-center mt-12">
-                <x-button class="ms-4 w-3/4 flex justify-center py-4 text-white bg-orange-500 hover:bg-orange-600 active:bg-orange-700 focus:bg-orange-600 rounded-full">
-                    {{ __('Register') }}
-                </x-button>
+                <button 
+                    type="submit"
+                    x-bind:disabled="submitting"
+                    :class="submitting ? 'opacity-80 cursor-not-allowed bg-gray-400 hover:bg-gray-400 active:bg-gray-400 focus:bg-gray-400 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:active:bg-gray-400 disabled:focus:bg-gray-400 disabled:opacity-80 disabled:cursor-not-allowed' : ''"
+                    class="cursor-pointer ms-4 w-3/4 flex justify-center py-4 text-white bg-orange-500 hover:bg-orange-600 duration-300 transition-all rounded-full"
+                >
+                    <span x-show="!submitting">{{ __('Register') }}</span>
+                    <span x-show="submitting" x-cloak>{{ __('Registering...') }}</span>
+                </button>
             </div>
         </form>
     </x-authentication-card>
@@ -147,6 +196,10 @@
         .iti--single-country .iti__selected-flag {
             pointer-events: none;
             cursor: default;
+            border-top-left-radius: 32px;
+            border-bottom-left-radius: 32px;
+            color:#fff;
+            background: #ffc28b;
         }
         .iti--single-country .iti__flag-container {
             pointer-events: none;
@@ -156,6 +209,11 @@
     @endpush
 
     @push('scripts')
+    @if(config('services.recaptcha.site_key'))
+        <!-- Google reCAPTCHA -->
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
+    
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/js/intlTelInput.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

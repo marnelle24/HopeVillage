@@ -4,6 +4,24 @@ import laravel from 'laravel-vite-plugin';
 const ngrokDomain = process.env.VITE_HMR_HOST || process.env.APP_URL?.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const isNgrok = ngrokDomain?.includes('ngrok');
 
+// Plugin to suppress @property CSS warnings
+const suppressCssWarnings = () => {
+    return {
+        name: 'suppress-css-warnings',
+        buildStart() {
+            // Suppress console warnings about @property during build
+            const originalWarn = console.warn;
+            console.warn = (...args) => {
+                const message = args.join(' ');
+                if (message.includes('@property') || message.includes('Unknown at rule') || message.includes('--radialprogress')) {
+                    return;
+                }
+                originalWarn.apply(console, args);
+            };
+        },
+    };
+};
+
 export default defineConfig({
     plugins: [
         laravel({
@@ -14,6 +32,7 @@ export default defineConfig({
             refresh: true,
             detectTls: isNgrok ? ngrokDomain : undefined,
         }),
+        suppressCssWarnings(),
     ],
     build: {
         rollupOptions: {
@@ -25,6 +44,11 @@ export default defineConfig({
                 warn(warning);
             },
         },
+        // Use esbuild for CSS minification to avoid @property warnings
+        cssMinify: 'esbuild',
+    },
+    css: {
+        devSourcemap: true,
     },
     server: {
         host: '0.0.0.0', // Allow external connections
