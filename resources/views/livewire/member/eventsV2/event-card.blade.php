@@ -68,7 +68,7 @@
 >
     <div class="card-body flex-row gap-4 p-4">
         <!-- Event Image -->
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
             <div class="w-20 h-20 rounded-lg bg-base-200 overflow-hidden relative">
                 @if($event['thumbnail_url'] ?? null)
                     <img

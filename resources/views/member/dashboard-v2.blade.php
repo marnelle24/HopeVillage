@@ -2,7 +2,7 @@
     <div class="min-h-screen pb-20">
         <div class="max-w-md mx-auto min-h-screen">
             <!-- Header Section with Avatar and Greeting -->
-            <div class="bg-gradient-to-br from-orange-300 to-orange-400 p-6 pb-8 rounded-b-4xl shadow-lg">
+            <div class="bg-linear-to-br from-orange-300 to-orange-400 p-6 pb-8 rounded-b-4xl shadow-lg">
                 <div class="flex items-center justify-between animate-fade-in">
                     <div class="flex items-start gap-3">
                         <div>
@@ -21,9 +21,9 @@
                                         <p class="text-white font-mono tracking-wider text-sm font-medium">{{ auth()->user()->qr_code }}</p>
                                         {{-- verified badge --}}
                                         @if(auth()->user()->is_verified)
-                                            <span class="text-white text-[11px] font-medium bg-green-400 text-green-300 px-1.5 py-0.5 rounded-full">Verified</span>
+                                            <span class="text-white text-[11px] font-medium bg-green-400 px-1.5 py-0.5 rounded-full">Verified</span>
                                         @else
-                                            <span class="text-white text-[11px] font-medium bg-red-400 text-red-400 px-1.5 py-0.5 rounded-full">Unverified</span>
+                                            <span class="text-white text-[11px] font-medium bg-red-400 px-1.5 py-0.5 rounded-full">Unverified</span>
                                         @endif
                                     </div>
                                 </div>
