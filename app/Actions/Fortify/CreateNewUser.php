@@ -72,7 +72,7 @@ class CreateNewUser implements CreatesNewUsers
                 'required',
                 'string',
                 'max:20',
-                // 'unique:users,whatsapp_number',
+                'unique:users,whatsapp_number',
                 new ValidWhatsAppNumber(app(TwilioWhatsAppService::class))
             ],
             'fin' => ['required', 'string', 'size:4', 'regex:/^\d{3}[A-Z]$/i'],
@@ -83,6 +83,9 @@ class CreateNewUser implements CreatesNewUsers
             'g-recaptcha-response' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+        ], [
+            'whatsapp_number.unique' => 'This mobile number is already registered.',
+            'whatsapp_number.required' => 'This mobile number is required.',
         ])->validate();
 
         return DB::transaction(function () use ($input, $email) {

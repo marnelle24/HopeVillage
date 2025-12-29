@@ -349,7 +349,7 @@
                 
                 if (fullNumber && iti.isValidNumber()) {
                     validationMsg.classList.remove('hidden');
-                    validationMsg.textContent = 'Checking WhatsApp status...';
+                    validationMsg.textContent = 'Checking Mobile Number formats...';
                     validationMsg.classList.remove('text-red-500', 'text-green-500', 'text-yellow-500');
                     
                     try {
@@ -373,11 +373,11 @@
                             validationMsg.textContent = '';
                             validationMsg.classList.add('hidden');
                         } else if (data.is_whatsapp === true) {
-                            validationMsg.textContent = '✓ This number is registered on WhatsApp';
+                            validationMsg.textContent = '✓ Mobile Number format is valid.';
                             validationMsg.classList.add('text-green-600');
                             validationMsg.classList.remove('text-yellow-500', 'text-red-500', 'hidden');
                         } else {
-                            validationMsg.textContent = '⚠ This number may not be registered on WhatsApp';
+                            validationMsg.textContent = '⚠ Mobile Number format is invalid.';
                             validationMsg.classList.add('text-yellow-500');
                             validationMsg.classList.remove('text-green-600', 'text-red-500', 'hidden');
                         }
