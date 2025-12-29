@@ -1,18 +1,4 @@
 <x-app-layout>
-    {{-- <x-slot name="header">
-        <div class="flex flex-1 items-center justify-between">
-            <img src="{{ asset('hv-logo.png') }}" alt="Hope Village Logo" class="w-16">
-            <div class="flex flex-col items-start gap-1 justify-start text-start">
-                <div class="flex items-center gap-2">
-                    <span class="font-semibold text-gray-900 text-sm">My Points</span>
-                </div>
-                <div class="flex items-center gap-1">
-                    <span class="font-semibold text-gray-900 text-sm">{{ auth()->user()->total_points ? number_format(auth()->user()->total_points, 0) : '0' }} points</span>
-                </div>
-            </div>
-        </div>
-    </x-slot> --}}
-
     <div class="min-h-screen pb-20">
         <div class="max-w-md mx-auto min-h-screen">
             <!-- Header Section with Avatar and Greeting -->
@@ -22,7 +8,7 @@
                         <div>
                             <p class="text-orange-100 text-lg font-bold mb-4 drop-shadow">Welcome back!</p>
                             <div class="flex items-start gap-2">
-                                <div class="mt-9 border-2 border-white bg-white/70 shadow-lg rounded-xl p-2">
+                                <div class="border-2 border-white bg-white/70 shadow-lg rounded-xl p-2">
                                     <svg class="size-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 13H16C17.7107 13 19.1506 14.2804 19.3505 15.9795L20 21.5M8 13C5.2421 12.3871 3.06717 10.2687 2.38197 7.52787L2 6M8 13V18C8 19.8856 8 20.8284 8.58579 21.4142C9.17157 22 10.1144 22 12 22C13.8856 22 14.8284 22 15.4142 21.4142C16 20.8284 16 19.8856 16 18V17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"></path> <circle cx="12" cy="6" r="4" stroke="#ffffff" stroke-width="1.5"></circle> </g>
                                     </svg>

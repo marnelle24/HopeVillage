@@ -3,7 +3,7 @@
         <x-member-points-header />
     </x-slot>
 
-    <div class="min-h-screen bg-base-200">
+    <div class="max-w-md mx-auto min-h-screen bg-base-200">
         <div
             class="max-w-7xl mx-auto"
             x-cloak
@@ -104,7 +104,7 @@
                     <button
                         type="button"
                         @click="activeCategory = 'my-events'; tab = 'mine'; setTab('mine')"
-                        :class="isActive('my-events') ? 'bg-orange-500 shadow-md text-white' : 'border border-orange-500 text-orange-500 hover:bg-orange-500'"
+                        :class="isActive('my-events') ? 'bg-orange-500 shadow-md text-white' : 'border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white'"
                         class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 flex items-center gap-2"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -110,7 +110,7 @@
                     </svg>
                 </span>
                 @if(isset($event['start_date']) && $event['start_date'])
-                    {{ \Carbon\Carbon::parse($event['start_date'])->format('M d, Y g:i A') }}
+                    {{ \Carbon\Carbon::parse($event['start_date'])->format('d M Y g:i A') }}
                 @else
                     TBA
                 @endif
