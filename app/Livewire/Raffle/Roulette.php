@@ -10,7 +10,7 @@ use Livewire\Component;
 
 class Roulette extends Component
 {
-    public string $source = 'range'; // range | members_fin | event_attendees
+    public string $source = 'range'; // range | members_fin | members_qr_code | event_attendees
 
     public ?int $rangeStart = 1;
     public ?int $rangeEnd = 5;
@@ -126,6 +126,21 @@ class Roulette extends Component
             return;
         }
 
+        if ($this->source === 'members_qr_code') {
+            $this->entries = User::query()
+                ->where('user_type', 'member')
+                ->whereNotNull('qr_code')
+                ->where('qr_code', '!=', '')
+                ->orderBy('qr_code')
+                ->pluck('qr_code')
+                ->map(fn ($v) => (string) $v)
+                ->unique()
+                ->values()
+                ->all();
+
+            return;
+        }
+
         if ($this->source === 'event_attendees') {
             $this->validate([
                 'selectedEventId' => ['required', 'integer'],
@@ -169,7 +184,8 @@ class Roulette extends Component
         $centerOfSegment = ($index * $segment) + ($segment / 2);
         $target = 360 - $centerOfSegment;
 
-        $fullTurns = random_int(5, 8) * 360;
+        // Use random full turns (8-12) for random spinning speed each time
+        $fullTurns = random_int(8, 12) * 360;
         $this->spinDegrees = (int) round($fullTurns + $target);
 
         $this->dispatch('roulette-spun', degrees: $this->spinDegrees);

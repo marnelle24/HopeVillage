@@ -87,7 +87,8 @@ Route::middleware([
     Route::get('/admin/point-system/{id}/edit', \App\Livewire\PointSystem\Form::class)->name('admin.point-system.edit');
 
     // Raffle / Roulette
-    Route::get('/admin/raffle', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle');
+    Route::get('/admin/raffle-v1', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle.v1');
+    Route::get('/admin/raffle', \App\Livewire\Raffle\RouletteV2::class)->name('admin.raffle');
 
     // Points actions (admin-operated)
     Route::post('/admin/points/location-entry', [PointsActionsController::class, 'locationEntry'])->name('admin.points.location-entry');
@@ -102,6 +103,8 @@ Route::middleware([
     'member',
     // 'hv_verified',
 ])->group(function () {
+
+    //  ====== to be deleted
     Route::get('/member/dashboard-v1', function () {
         return view('member.dashboard');
     })->name('member.dashboard.v1');
@@ -109,6 +112,7 @@ Route::middleware([
     Route::get('/member/events-v1', function () {
         return view('member.events');
     })->name('member.events.v1');
+    //  ====== end of to be deleted
 
     Route::get('/member/events', function () {
         return view('member.events-v2');

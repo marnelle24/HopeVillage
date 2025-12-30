@@ -58,6 +58,9 @@
                             <x-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
                                 {{ __('Raffle') }}
                             </x-nav-link>
+                            {{-- <x-nav-link href="{{ route('admin.raffle.v2') }}" :active="request()->routeIs('admin.raffle.v2')">
+                                {{ __('Raffle V2') }} --}}
+                            {{-- </x-nav-link> --}}
                         @elseif(auth()->user()->isMerchantUser())
                             <x-nav-link href="{{ route('merchant.dashboard') }}" :active="request()->routeIs('merchant.dashboard')">
                                 {{ __('Dashboard') }}
@@ -142,6 +145,9 @@
                     <x-responsive-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
                         {{ __('Raffle') }}
                     </x-responsive-nav-link>
+                    {{-- <x-responsive-nav-link href="{{ route('admin.raffle.v2') }}" :active="request()->routeIs('admin.raffle.v2')">
+                        {{ __('Raffle V2') }} --}}
+                    {{-- </x-responsive-nav-link> --}}
                 @elseif(auth()->user()->isMerchantUser())
                     <x-responsive-nav-link href="{{ route('merchant.dashboard') }}" :active="request()->routeIs('merchant.dashboard')">
                         {{ __('Dashboard') }}
