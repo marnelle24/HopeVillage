@@ -72,9 +72,9 @@
                     <div class="relative">
                         <input id="fin" class="block w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="fin" maxlength="4" value="{{ old('fin') }}" required autocomplete="off" 
                             {{-- placeholder="{{ request()->get('lang') === 'bang' ? 'শেষ ৪-সংখ্যার' : (request()->get('lang') === 'zh' ? '最后4位' : 'Last 4-digit')}}"  --}}
-                            placeholder="***124X"
+                            placeholder="124X"
                         />
-                        <em class="absolute -bottom-4.5 left-0 text-[11px] text-gray-500">Last 4 characters only</em>
+                        <em class="absolute -bottom-4.5 inset-x-0 text-center text-[11px] text-gray-500">{{ request()->get('lang') === 'bang' ? 'শেষ ৪-অক্ষরর মাত্র' : (request()->get('lang') === 'zh' ? '最后4个字符' : 'Last 4 characters only')}}</em>
                     </div>
                 </div>
     
@@ -156,9 +156,12 @@
                         </svg>
                     </button>
                 </div>
+                @error('password')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div class="mt-4 mb-8">
+            <div class="mt-4">
                 <x-label for="password_confirmation" value="{{ 
                     request()->get('lang') === 'bang' ? 'পাসওয়ার্ড পাসওয়ার্ড' : 
                     (request()->get('lang') === 'zh' ? '确认密码' : 'Confirm Password')
@@ -192,6 +195,42 @@
                         </svg>
                     </button>
                 </div>
+            </div>
+
+            <div class="mt-4 mb-8 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <p class="text-xs font-semibold text-gray-700 mb-1"></p>
+                    {{ request()->get('lang') === 'bang' ? 'পাসওয়ার্ডের প্রয়োজনীয়তা:' : 
+                       (request()->get('lang') === 'zh' ? '密码要求：' : 'Password Requirements:') }}
+                </p>
+                <ul class="text-xs text-gray-600 space-y-0.5 list-disc list-inside">
+                    <li>
+                        {{ request()->get('lang') === 'bang' ? 'সর্বনিম্ন ৮টি অক্ষর' : 
+                           (request()->get('lang') === 'zh' ? '至少 8 个字符' : 'Minimum 8 characters') }}
+                    </li>
+                    <li>
+                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি বড় হাতের অক্ষর (A-Z)' : 
+                           (request()->get('lang') === 'zh' ? '至少 1 个大写字母 (A-Z)' : 'At least 1 uppercase letter (A-Z)') }}
+                    </li>
+                    <li>
+                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি ছোট হাতের অক্ষর (a-z)' : 
+                           (request()->get('lang') === 'zh' ? '至少 1 个小写字母 (a-z)' : 'At least 1 lowercase letter (a-z)') }}
+                    </li>
+                    <li>
+                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি সংখ্যা (0-9)' : 
+                           (request()->get('lang') === 'zh' ? '至少 1 个数字 (0-9)' : 'At least 1 number (0-9)') }}
+                    </li>
+                    <li>
+                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি বিশেষ অক্ষর (!@#$%^&*...)' : 
+                           (request()->get('lang') === 'zh' ? '至少 1 个特殊字符 (!@#$%^&*...)' : 'At least 1 special character (!@#$%^&*...)') }}
+                    </li>
+                </ul>
+                <p class="text-xs text-gray-600 mt-2">
+                    <span class="font-semibold">
+                        {{ request()->get('lang') === 'bang' ? 'উদাহরণ:' : 
+                           (request()->get('lang') === 'zh' ? '示例：' : 'Example:') }}
+                    </span> 
+                    <span class="font-mono text-gray-700">MyP@ssw0rd</span>
+                </p>
             </div>
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())

@@ -442,24 +442,12 @@
             @endif
         </div>
 
-        <!-- QR Menu Modal (temporarily commented out) -->
-        {{-- <div
-            x-show="qrOpen"
-            x-transition.opacity
-            x-cloak
-            class="fixed inset-0 z-[60] bg-black/60 flex items-end justify-center p-3"
-            @keydown.escape.window="closeQrModal()"
-            @click="closeQrModal()"
-        >
-            ... QR menu modal content ...
-        </div> --}}
-
         <!-- New Direct QR Code Modal -->
         <div
             x-show="qrCodeModalOpen"
             x-transition.opacity
             x-cloak
-            class="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4"
+            class="fixed inset-0 z-60 bg-black/60 flex items-center justify-center p-4"
             @keydown.escape.window="closeQrCodeModal()"
             @click="closeQrCodeModal()"
             style="display: none;"
