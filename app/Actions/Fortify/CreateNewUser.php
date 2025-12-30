@@ -86,6 +86,9 @@ class CreateNewUser implements CreatesNewUsers
         ], [
             'whatsapp_number.unique' => 'This mobile number is already registered.',
             'whatsapp_number.required' => 'This mobile number is required.',
+            'fin.required' => 'The FIN/NIRC is required.',
+            'fin.regex' => 'The FIN/NIRC is invalid. Example: 123W',
+            'fin.size' => 'It must be the last 4 characters only. (e.g. 124X)',
         ])->validate();
 
         return DB::transaction(function () use ($input, $email) {

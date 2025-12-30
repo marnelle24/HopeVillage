@@ -125,6 +125,102 @@ class TwilioWhatsAppService
     }
 
     /**
+     * Send a generic WhatsApp message.
+     *
+     * @return array{ok: bool, to?: string, sid?: string|null, status?: string|null, error?: string}
+     */
+    public function sendMessage(string $phoneNumber, string $message): array
+    {
+        if (!$this->enabled()) {
+            Log::warning('Twilio WhatsApp not enabled (missing config).');
+            return [
+                'ok' => false,
+                'error' => 'Twilio is not configured.',
+            ];
+        }
+
+        $to = $this->normalizeWhatsAppAddress($phoneNumber);
+        if (!$to) {
+            Log::warning('Twilio WhatsApp invalid destination number format.', [
+                'input' => $phoneNumber,
+            ]);
+            return [
+                'ok' => false,
+                'error' => 'Invalid WhatsApp number format.',
+            ];
+        }
+
+        $sid = (string) config('services.twilio.account_sid');
+        $from = (string) config('services.twilio.whatsapp_from');
+
+        // Auth: prefer API Key if present, otherwise Account SID + Auth Token
+        $username = null;
+        $password = null;
+        $authMode = null;
+
+        $apiKeySid = (string) config('services.twilio.api_key_sid');
+        $apiKeySecret = (string) config('services.twilio.api_key_secret');
+        if ($apiKeySid !== '' && $apiKeySecret !== '') {
+            $username = $apiKeySid;
+            $password = $apiKeySecret;
+            $authMode = 'api_key';
+        } else {
+            $token = (string) config('services.twilio.auth_token');
+            $username = $sid;
+            $password = $token;
+            $authMode = 'auth_token';
+        }
+
+        $response = Http::withBasicAuth($username, $password)
+            ->asForm()
+            ->post("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json", [
+                'From' => $from,
+                'To' => $to,
+                'Body' => $message,
+            ]);
+
+        if (!$response->successful()) {
+            $payload = $response->json();
+            $twilioMessage = is_array($payload) ? ($payload['message'] ?? null) : null;
+            $twilioCode = is_array($payload) ? ($payload['code'] ?? null) : null;
+
+            Log::error('Twilio WhatsApp send failed.', [
+                'status' => $response->status(),
+                'to' => $to,
+                'from' => $from,
+                'auth_mode' => $authMode,
+                'body' => $payload ?: $response->body(),
+            ]);
+
+            $details = $twilioMessage ?: 'Twilio rejected the request.';
+            if ($twilioCode) {
+                $details .= " (Twilio code: {$twilioCode})";
+            }
+
+            return [
+                'ok' => false,
+                'to' => $to,
+                'error' => $details,
+            ];
+        }
+
+        Log::info('Twilio WhatsApp send accepted.', [
+            'to' => $to,
+            'from' => $from,
+            'auth_mode' => $authMode,
+            'sid' => $response->json('sid'),
+            'status' => $response->json('status'),
+        ]);
+
+        return [
+            'ok' => true,
+            'to' => $to,
+            'sid' => $response->json('sid'),
+            'status' => $response->json('status'),
+        ];
+    }
+
+    /**
      * Validate if a phone number is valid and can potentially receive WhatsApp messages.
      * Uses Twilio Lookup API to validate phone number format.
      * 

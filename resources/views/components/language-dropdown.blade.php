@@ -6,6 +6,16 @@
         { code: 'zh', name: 'Chinese', flag: '🇨🇳' }
     ],
     open: false,
+    init() {
+        // Set current language from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+        if (langParam) {
+            this.currentLang = langParam;
+        } else {
+            this.currentLang = 'en';
+        }
+    },
     getCurrentLanguage() {
         return this.languages.find(lang => lang.code === this.currentLang) || this.languages[0];
     },
@@ -23,17 +33,7 @@
         // Reload page with new language parameter
         window.location.href = url.toString();
     }
-}" 
-x-init="
-    // Set current language from URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const langParam = urlParams.get('lang');
-    if (langParam) {
-        currentLang = langParam;
-    } else {
-        currentLang = 'en';
-    }
-"
+}"
 @click.away="open = false"
 class="relative inline-block text-left">
     <button 

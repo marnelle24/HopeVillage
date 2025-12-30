@@ -83,6 +83,35 @@ class WhatsAppCloudApiService
     }
 
     /**
+     * Send a generic WhatsApp message.
+     */
+    public function sendMessage(string $phoneNumber, string $message): void
+    {
+        if (!$this->enabled()) {
+            return;
+        }
+
+        $to = $this->toWhatsAppId($phoneNumber);
+        if (!$to) {
+            return;
+        }
+
+        $version = config('services.whatsapp.api_version');
+        $phoneNumberId = config('services.whatsapp.phone_number_id');
+
+        Http::withToken(config('services.whatsapp.cloud_api_token'))
+            ->acceptJson()
+            ->post("https://graph.facebook.com/{$version}/{$phoneNumberId}/messages", [
+                'messaging_product' => 'whatsapp',
+                'to' => $to,
+                'type' => 'text',
+                'text' => [
+                    'body' => $message,
+                ],
+            ]);
+    }
+
+    /**
      * Convert user input into a WhatsApp Cloud API 'to' identifier (digits only, E.164 without '+').
      */
     private function toWhatsAppId(string $phoneNumber): ?string

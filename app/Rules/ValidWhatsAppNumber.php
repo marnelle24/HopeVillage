@@ -29,8 +29,9 @@ class ValidWhatsAppNumber implements ValidationRule
         // Validate phone number format using Twilio Lookup API
         if (!$this->whatsAppService->isValidWhatsAppNumber($phoneNumber)) {
             $validationResult = $this->whatsAppService->validatePhoneNumber($phoneNumber);
-            $errorMessage = $validationResult['error'] ?? 'Please ensure the number is valid and can receive WhatsApp messages.';
-            $fail('The :attribute is invalid. ' . $errorMessage);
+            $errorMessage = $validationResult['error'] ?? 'Please ensure the number is valid and can receive messages.';
+            // $fail('The Mobile Number is invalid. ' . $errorMessage);
+            $fail('The Mobile Number is invalid.');
         }
     }
 }

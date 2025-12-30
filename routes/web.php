@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\PointsActionsController;
 use App\Http\Controllers\VerificationCodeController;
@@ -9,6 +10,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+// Custom Password Reset Routes (override Fortify's default)
+Route::get('/forgot-password', [PasswordResetController::class, 'show'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'store'])->name('password.email');
 
 // WhatsApp Validation Check (needs CSRF protection, so in web routes)
 Route::post('/api/check-whatsapp', [WhatsAppValidationController::class, 'check'])
