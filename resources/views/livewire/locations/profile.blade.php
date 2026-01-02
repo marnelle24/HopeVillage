@@ -668,11 +668,11 @@
                                         <a href="{{ route('admin.events.profile', $event->event_code) }}" class="group-hover:text-indigo-600 text-md font-semibold text-indigo-400 hover:text-indigo-600 transition-colors duration-300">
                                             {{ $event->title }}
                                             <p class="text-xs text-gray-500 mt-1">
-                                                {{ $event->start_date->format('M d, Y') }}
+                                                {{ $event->start_date->format('d M Y') }}
                                                 @if($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d'))
                                                     {{ $event->start_date->format('g:i A') }} - {{ $event->end_date->format('g:i A') }}
                                                 @else
-                                                    - {{ $event->end_date->format('M d, Y g:i A') }}
+                                                    - {{ $event->end_date->format('d M Y g:i A') }}
                                                 @endif
                                             </p>
                                             @php

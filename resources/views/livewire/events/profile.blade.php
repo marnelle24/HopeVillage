@@ -57,7 +57,7 @@
                                 <div>
                                     <label class="text-sm font-medium text-gray-500">Start Date & Time</label>
                                     <p class="text-gray-900">
-                                        {{ $event->start_date->format('M d, Y g:i A') }}
+                                        {{ $event->start_date->format('d M Y g:i A') }}
                                     </p>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
                                 <div>
                                     <label class="text-sm font-medium text-gray-500">End Date & Time</label>
                                     <p class="text-gray-900">
-                                        {{ $event->end_date->format('M d, Y g:i A') }}
+                                        {{ $event->end_date->format('d M Y g:i A') }}
                                     </p>
                                 </div>
                             </div>

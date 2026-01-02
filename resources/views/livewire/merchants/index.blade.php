@@ -64,13 +64,13 @@
                             type="text" 
                             wire:model.live.debounce.300ms="search" 
                             placeholder="Search merchants..." 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            class="w-full px-4 py-2 border text-gray-800 border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                     </div>
                     <div>
                         <select 
                             wire:model.live="statusFilter" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            class="w-full px-4 py-2 border text-gray-800 border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                             <option value="all">All Status</option>
                             <option value="active">Active</option>

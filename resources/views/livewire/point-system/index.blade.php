@@ -73,14 +73,14 @@
                             wire:model.live.debounce.300ms="search" 
                             placeholder="Search configurations..." 
                             @if(!$pointSystemEnabled) disabled @endif
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
+                            class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                     </div>
                     <div>
                         <select 
                             wire:model.live="statusFilter" 
                             @if(!$pointSystemEnabled) disabled @endif
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
+                            class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                             <option value="all">All Status</option>
                             <option value="active">Active</option>
@@ -91,7 +91,7 @@
                         <select 
                             wire:model.live="activityTypeFilter" 
                             @if(!$pointSystemEnabled) disabled @endif
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
+                            class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                             <option value="">All Activity Types</option>
                             @foreach($activityTypes as $activityType)
@@ -103,7 +103,7 @@
                         <select 
                             wire:model.live="locationFilter" 
                             @if(!$pointSystemEnabled) disabled @endif
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
+                            class="w-full px-4 py-2 border text-gray-800 border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
                         >
                             <option value="">All Locations</option>
                             @foreach($locations as $location)

@@ -123,7 +123,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
-                                            {{ $event->start_date->format('M d, Y') }}
+                                            {{ $event->start_date->format('d M, Y') }}
                                         </div>
                                         <div class="text-sm text-gray-500">
                                             {{ $event->start_date->format('g:i A') }} - {{ $event->end_date->format('g:i A') }}

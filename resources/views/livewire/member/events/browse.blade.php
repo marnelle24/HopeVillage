@@ -21,7 +21,7 @@
                 $end = $event->end_date;
                 $schedule = 'TBA';
                 if ($start && $end) {
-                    $schedule = $start->format('M d, Y');
+                    $schedule = $start->format('d M Y');
                     if ($start->format('Y-m-d') === $end->format('Y-m-d')) {
                         $schedule .= ' • ' . $start->format('g:i A') . ' - ' . $end->format('g:i A');
                     } else {

@@ -63,62 +63,58 @@
                 }}" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="email" name="email" value="{{ old('email') }}" autocomplete="username" />
             </div>
 
-            <div class="mt-4 grid grid-cols-3 gap-2">
-                <div class="col-span-1">
-                    <div class="flex items-start">
-                        <x-label for="fin" value="{{ __('FIN/NIRC') }}" />
-                        <span class="ml-1 text-red-500 text-xl">*</span>
-                    </div>
-                    <div class="relative">
-                        <input id="fin" class="block w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="fin" maxlength="4" value="{{ old('fin') }}" required autocomplete="off" 
-                            {{-- placeholder="{{ request()->get('lang') === 'bang' ? 'শেষ ৪-সংখ্যার' : (request()->get('lang') === 'zh' ? '最后4位' : 'Last 4-digit')}}"  --}}
-                            placeholder="124X"
-                        />
-                        <em class="absolute -bottom-4.5 inset-x-0 text-center text-[11px] text-gray-500">{{ request()->get('lang') === 'bang' ? 'শেষ ৪-অক্ষরর মাত্র' : (request()->get('lang') === 'zh' ? '最后4个字符' : 'Last 4 characters only')}}</em>
-                    </div>
+            <div class="mt-4">
+                <div class="flex items-start">
+                    <x-label for="fin" value="{{ __('FIN/NIRC') }}" />
+                    <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
-    
-                <div class="col-span-2" x-data="{ typeOfWork: '{{ old('type_of_work', 'Migrant worker') }}' }">
-                    <div class="flex items-center">
-                        <x-label for="type_of_work" value="{{ 
-                            request()->get('lang') === 'bang' ? 'প্রকল্পের ধরণ' : 
-                            (request()->get('lang') === 'zh' ? '工作类型' : 'Type of Work')
-                        }}" />
-                    </div>
-                    <select 
-                        id="type_of_work" 
-                        name="type_of_work" 
-                        x-model="typeOfWork"
-                        class="block mt-2 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500"
-                    >
-                        <option value="Migrant worker" {{ old('type_of_work', 'Migrant worker') === 'Migrant worker' ? 'selected' : '' }}>{{ 
-                            request()->get('lang') === 'bang' ? 'মিরাজ শ্রমিক' : 
-                            (request()->get('lang') === 'zh' ? '外劳' : 'Migrant worker')
-                        }}</option>
-                        <option value="Migrant domestic worker" {{ old('type_of_work') === 'Migrant domestic worker' ? 'selected' : '' }}>{{ 
-                            request()->get('lang') === 'bang' ? 'মিরাজ অভিবাসী শ্রমিক' : 
-                            (request()->get('lang') === 'zh' ? '外劳' : 'Migrant domestic worker')
-                        }}</option>
-                        <option value="Others" {{ old('type_of_work') === 'Others' ? 'selected' : '' }}>{{ 
-                            request()->get('lang') === 'bang' ? 'অন্যান্য' : 
-                            (request()->get('lang') === 'zh' ? '其他' : 'Others')
-                        }}</option>
-                    </select>
-                    
-                    <div x-show="typeOfWork === 'Others'" x-cloak x-transition class="mt-2">
-                        <input 
-                            id="type_of_work_custom" 
-                            class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" 
-                            type="text" 
-                            name="type_of_work_custom" 
-                            value="{{ old('type_of_work_custom') }}" 
-                            placeholder="{{ request()->get('lang') === 'bang' ? 'আপনার কাজের ধরণ বর্ণনা করুন' : (request()->get('lang') === 'zh' ? '请描述您的工作类型' : 'Specify your type of work') }}"
-                            x-bind:required="typeOfWork === 'Others'"
-                        />
-                        @error('type_of_work_custom')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div class="relative">
+                    <input id="fin" class="block w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="fin" maxlength="4" value="{{ old('fin') }}" required autocomplete="off" 
+                        placeholder="{{ request()->get('lang') === 'bang' ? 'শেষ ৪-অক্ষরর মাত্র (e.g. 124X)' : (request()->get('lang') === 'zh' ? '最后4个字符 (e.g. 124X)' : 'Last 4-characters (e.g. 124X)')}}" 
+                    />
+                </div>
+            </div>
+
+            <div class="mt-4" x-data="{ typeOfWork: '{{ old('type_of_work', 'Migrant worker') }}' }">
+                <div class="flex items-center">
+                    <x-label for="type_of_work" value="{{ 
+                        request()->get('lang') === 'bang' ? 'প্রকল্পের ধরণ' : 
+                        (request()->get('lang') === 'zh' ? '工作类型' : 'Type of Work')
+                    }}" />
+                </div>
+                <select 
+                    id="type_of_work" 
+                    name="type_of_work" 
+                    x-model="typeOfWork"
+                    class="block mt-2 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500"
+                >
+                    <option value="Migrant worker" {{ old('type_of_work', 'Migrant worker') === 'Migrant worker' ? 'selected' : '' }}>{{ 
+                        request()->get('lang') === 'bang' ? 'মিরাজ শ্রমিক' : 
+                        (request()->get('lang') === 'zh' ? '外劳' : 'Migrant worker')
+                    }}</option>
+                    <option value="Migrant domestic worker" {{ old('type_of_work') === 'Migrant domestic worker' ? 'selected' : '' }}>{{ 
+                        request()->get('lang') === 'bang' ? 'মিরাজ অভিবাসী শ্রমিক' : 
+                        (request()->get('lang') === 'zh' ? '外劳' : 'Migrant domestic worker')
+                    }}</option>
+                    <option value="Others" {{ old('type_of_work') === 'Others' ? 'selected' : '' }}>{{ 
+                        request()->get('lang') === 'bang' ? 'অন্যান্য' : 
+                        (request()->get('lang') === 'zh' ? '其他' : 'Others')
+                    }}</option>
+                </select>
+                
+                <div x-show="typeOfWork === 'Others'" x-cloak x-transition class="mt-2">
+                    <input 
+                        id="type_of_work_custom" 
+                        class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" 
+                        type="text" 
+                        name="type_of_work_custom" 
+                        value="{{ old('type_of_work_custom') }}" 
+                        placeholder="{{ request()->get('lang') === 'bang' ? 'আপনার কাজের ধরণ বর্ণনা করুন' : (request()->get('lang') === 'zh' ? '请描述您的工作类型' : 'Specify your type of work') }}"
+                        x-bind:required="typeOfWork === 'Others'"
+                    />
+                    @error('type_of_work_custom')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 

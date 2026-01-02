@@ -62,7 +62,7 @@
             @endif
 
             <!-- Search and Filter -->
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4">
+            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 text-gray-800">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <input 
@@ -161,11 +161,11 @@
                                                 </svg>
                                             </td>
                                             <td class="md:text-sm text-md text-gray-500 pl-1">
-                                                {{ $event->start_date->format('M d, Y') }}
+                                                {{ $event->start_date->format('d M Y') }}
                                                 @if($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d'))
                                                     {{ $event->start_date->format('g:i A') }} - {{ $event->end_date->format('g:i A') }}
                                                 @else
-                                                    - {{ $event->end_date->format('M d, Y') }}
+                                                    - {{ $event->end_date->format('d M Y') }}
                                                 @endif
                                             </td>
                                         </tr>

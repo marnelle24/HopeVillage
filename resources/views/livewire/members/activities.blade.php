@@ -21,7 +21,7 @@
                             type="text"
                             wire:model.live.debounce.300ms="search"
                             placeholder="Search by member name, email, FIN, or description..."
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                     </div>
 
@@ -30,7 +30,7 @@
                         <div>
                             <select
                                 wire:model.live="locationFilter"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option value="">All Locations</option>
                                 @foreach($locations as $location)
@@ -43,7 +43,7 @@
                         <div>
                             <select
                                 wire:model.live="activityTypeFilter"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option value="">All Activity Types</option>
                                 @foreach($activityTypes as $type)
@@ -55,7 +55,7 @@
                         <div>
                             <select
                                 wire:model.live="dateFilter"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option value="all">All Time</option>
                                 <option value="today">Today</option>
@@ -99,7 +99,7 @@
                                         <div class="text-sm text-gray-900">{{ $activity->location->name ?? '-' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $activity->activity_time->format('M d, Y') }}</div>
+                                        <div class="text-sm text-gray-900">{{ $activity->activity_time->format('d M Y') }}</div>
                                         <div class="text-xs text-gray-500">{{ $activity->activity_time->format('g:i A') }}</div>
                                     </td>
                                 </tr>
