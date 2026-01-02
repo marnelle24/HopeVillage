@@ -2,23 +2,43 @@
 
 namespace App\Livewire\Members;
 
+use App\Actions\Fortify\PasswordValidationRules;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Index extends Component
 {
     use WithPagination;
+    use PasswordValidationRules;
 
     public string $search = '';
     public string $verifiedFilter = 'all'; // all | verified | unverified
     public bool $showMessage = false;
+    
+    // Password reset properties
+    public ?int $selectedUserId = null;
+    public string $password = '';
+    public string $password_confirmation = '';
+    public bool $showPasswordReset = false;
 
     protected $paginationTheme = 'tailwind';
 
     public function mount(): void
     {
         $this->showMessage = session()->has('message') || session()->has('error');
+        
+        // Check for password reset action in URL
+        $action = request()->query('action');
+        $userId = request()->query('userid');
+        
+        if ($action === 'password-reset' && $userId) {
+            $this->selectedUserId = (int) $userId;
+            $this->showPasswordReset = true;
+        }
     }
 
     public function updatingSearch(): void
@@ -33,6 +53,7 @@ class Index extends Component
 
     public function delete($userId): void
     {
+        
         // Only allow admin users to delete members
         if (!auth()->user()->isAdmin()) {
             session()->flash('error', 'You do not have permission to delete members.');
@@ -44,10 +65,119 @@ class Index extends Component
             ->where('user_type', 'member')
             ->firstOrFail();
 
+        // Capture member details before deletion
+        $memberDetails = [
+            'id' => $member->id,
+            'name' => $member->name,
+            'email' => $member->email,
+            'fin' => $member->fin,
+        ];
+
         $member->delete();
 
+        // Get admin user details
+        $adminUser = auth()->user();
+        
         session()->flash('message', 'Member deleted successfully.');
         $this->showMessage = true;
+
+        Log::info('Member deleted successfully', [
+            'admin_user' => [
+                'id' => $adminUser->id,
+                'name' => $adminUser->name,
+                'email' => $adminUser->email,
+            ],
+            'deleted_member' => $memberDetails,
+            'deleted_at' => now()->toIso8601String(),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    public function triggerPasswordReset($userId)
+    {
+        // Only allow admin users to reset passwords
+        if (!auth()->user()->isAdmin()) {
+            session()->flash('error', 'You do not have permission to reset passwords.');
+            $this->showMessage = true;
+            return;
+        }
+
+        // Redirect with URL parameters
+        return $this->redirect(route('admin.members.index', [
+            'action' => 'password-reset',
+            'userid' => $userId
+        ]), navigate: true);
+    }
+
+    public function cancelPasswordReset()
+    {
+        $this->selectedUserId = null;
+        $this->password = '';
+        $this->password_confirmation = '';
+        $this->showPasswordReset = false;
+        
+        // Redirect without URL parameters
+        return $this->redirect(route('admin.members.index'), navigate: true);
+    }
+
+    public function resetPassword()
+    {
+        // Only allow admin users to reset passwords
+        if (!auth()->user()->isAdmin()) {
+            session()->flash('error', 'You do not have permission to reset passwords.');
+            $this->showMessage = true;
+            return;
+        }
+
+        // Validate password
+        Validator::make([
+            'password' => $this->password,
+            'password_confirmation' => $this->password_confirmation,
+        ], [
+            'password' => $this->passwordRules(),
+        ])->validate();
+
+        // Find the user
+        $user = User::where('id', $this->selectedUserId)
+            ->where('user_type', 'member')
+            ->firstOrFail();
+
+        // Update password
+        $user->forceFill([
+            'password' => Hash::make($this->password),
+        ])->save();
+
+        // Log the password reset action
+        $adminUser = auth()->user();
+        Log::info('Member password reset by administrator', [
+            'admin_user' => [
+                'id' => $adminUser->id,
+                'name' => $adminUser->name,
+                'email' => $adminUser->email,
+            ],
+            'member_user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'fin' => $user->fin,
+            ],
+            'reset_at' => now()->toIso8601String(),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        // Reset form and show success message
+        $this->password = '';
+        $this->password_confirmation = '';
+        $this->selectedUserId = null;
+        $this->showPasswordReset = false;
+
+        session()->flash('message', 'Password reset successfully.');
+        $this->showMessage = true;
+
+        // Redirect without URL parameters
+        return $this->redirect(route('admin.members.index'), navigate: true);
     }
 
     public function render()
@@ -73,10 +203,18 @@ class Index extends Component
         $members = $query
             ->withCount(['memberActivities', 'eventRegistrations'])
             ->orderByDesc('created_at')
-            ->paginate(12);
+            ->paginate(6);
+
+        $selectedUser = null;
+        if ($this->showPasswordReset && $this->selectedUserId) {
+            $selectedUser = User::where('id', $this->selectedUserId)
+                ->where('user_type', 'member')
+                ->first();
+        }
 
         return view('livewire.members.index', [
             'members' => $members,
+            'selectedUser' => $selectedUser,
         ])->layout('components.layouts.app');
     }
 }

@@ -47,7 +47,7 @@
                             </label>
                             <label class="flex items-center gap-2" x-bind:class="isSpinning ? 'opacity-50 cursor-not-allowed' : ''">
                                 <input type="radio" wire:model.live="source" value="event_attendees" class="text-indigo-600" x-bind:disabled="isSpinning">
-                                <span class="text-sm text-gray-800 font-semibold">Event attendees (FIN/NIRC)</span>
+                                <span class="text-sm text-gray-800 font-semibold">Event attendees (QR Code)</span>
                             </label>
                         </div>
     
@@ -56,12 +56,12 @@
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label class="text-xs font-semibold text-gray-600">Start</label>
-                                        <input type="number" wire:model.live="rangeStart" class="mt-1 w-full text-gray-700 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" x-bind:disabled="isSpinning">
+                                        <input type="number" wire:model.live="rangeStart" class="mt-1 w-full text-gray-700 rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500" x-bind:disabled="isSpinning">
                                         @error('rangeStart') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                                     </div>
                                     <div>
                                         <label class="text-xs font-semibold text-gray-600">End</label>
-                                        <input type="number" wire:model.live="rangeEnd" class="mt-1 w-full text-gray-700 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" x-bind:disabled="isSpinning">
+                                        <input type="number" wire:model.live="rangeEnd" class="mt-1 w-full text-gray-700 rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500" x-bind:disabled="isSpinning">
                                         @error('rangeEnd') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                                     </div>
                                 </div>
@@ -70,7 +70,7 @@
                             @if($source === 'event_attendees')
                                 <div>
                                     <label class="text-xs font-semibold text-gray-600">Select Event</label>
-                                    <select wire:model.live="selectedEventId" class="mt-1 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" x-bind:disabled="isSpinning">
+                                    <select wire:model.live="selectedEventId" class="mt-1 w-full rounded-lg text-gray-800 border-gray-300 focus:border-orange-500 focus:ring-orange-500" x-bind:disabled="isSpinning">
                                         <option value="">-- choose --</option>
                                         @foreach($events as $e)
                                             <option value="{{ $e['id'] }}">{{ $e['title'] }} ({{ $e['attendee_count'] }} {{ $e['attendee_count'] == 1 ? 'attendee' : 'attendees' }})</option>
@@ -122,7 +122,7 @@
                                                     @elseif($source === 'members_qr_code')
                                                         Member QR Code
                                                     @elseif($source === 'event_attendees')
-                                                        Event Attendee (FIN/NIRC)
+                                                        Event Attendee (QR Code)
                                                     @endif
                                                 </th>
                                             </tr>

@@ -159,19 +159,19 @@ class RouletteV2 extends Component
                 'selectedEventId' => ['required', 'integer'],
             ]);
 
-            $fins = EventRegistration::query()
+            $qrCodes = EventRegistration::query()
                 ->where('event_id', $this->selectedEventId)
                 ->where('status', 'attended')
                 ->whereNotNull('user_id')
-                ->with('user:id,fin')
+                ->with('user:id,qr_code')
                 ->get()
-                ->map(fn (EventRegistration $r) => $r->user?->fin)
-                ->filter(fn ($fin) => is_string($fin) && trim($fin) !== '')
-                ->map(fn ($fin) => strtoupper(trim($fin)))
+                ->map(fn (EventRegistration $r) => $r->user?->qr_code)
+                ->filter(fn ($qrCode) => is_string($qrCode) && trim($qrCode) !== '')
+                ->map(fn ($qrCode) => strtoupper(trim($qrCode)))
                 ->unique()
                 ->values();
 
-            $this->entries = $fins->all();
+            $this->entries = $qrCodes->all();
 
             $this->dispatch('entries-loaded');
             return;
@@ -186,7 +186,7 @@ class RouletteV2 extends Component
         $availableEntries = $this->getAvailableEntries();
 
         if (count($availableEntries) === 0) {
-            $this->addError('entries', 'No entries available. All entries have been selected as winners.');
+            $this->addError('entries', 'No entries available.');
             return;
         }
 
@@ -223,10 +223,32 @@ class RouletteV2 extends Component
     public function onSpinComplete($winnerIndex): void
     {
         $this->winnerIndex = $winnerIndex;
-        $this->winner = $this->entries[$winnerIndex] ?? null;
+        
+        // Use the winner value that was already determined in spin() method
+        // If not set, fallback to getting from entries array (shouldn't happen normally)
+        if ($this->winner === null) {
+            $this->winner = $this->entries[$winnerIndex] ?? null;
+        }
+        
+        // Validate winner is not null
+        if ($this->winner === null) {
+            return;
+        }
         
         // Ensure winner is a string
         $winnerValue = is_string($this->winner) ? $this->winner : (string) $this->winner;
+        
+        // Validate winner value is not empty
+        if (trim($winnerValue) === '') {
+            return;
+        }
+        
+        // Check if this winner already exists in the winners array to prevent duplicates
+        $existingWinner = collect($this->winners)->firstWhere('value', $winnerValue);
+        if ($existingWinner !== null) {
+            // Winner already exists, don't add duplicate
+            return;
+        }
         
         // Fetch member details based on entry source
         $memberDetails = $this->getMemberDetails($winnerValue);
@@ -280,8 +302,8 @@ class RouletteV2 extends Component
                 ->where('user_type', 'member')
                 ->first();
         } elseif ($this->source === 'event_attendees') {
-            // For event attendees, find by FIN through event registration
-            $user = User::where('fin', strtoupper(trim($value)))
+            // For event attendees, find by QR code through event registration
+            $user = User::where('qr_code', strtoupper(trim($value)))
                 ->where('user_type', 'member')
                 ->first();
         }
@@ -311,7 +333,7 @@ class RouletteV2 extends Component
         return match($this->source) {
             'members_qr_code' => 'qr_code',
             'members_fin' => 'fin',
-            'event_attendees' => 'fin',
+            'event_attendees' => 'qr_code',
             'range' => 'number',
             default => 'unknown',
         };

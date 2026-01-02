@@ -102,7 +102,7 @@
                                     <div class="mt-1 flex gap-2">
                                         <select
                                             wire:model="selectedUserType"
-                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                                            class="flex-1 px-3 py-2 text-gray-800 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                         >
                                             <option value="member">Member</option>
                                             <option value="admin">Administrator</option>
@@ -111,7 +111,7 @@
                                         <button
                                             wire:click="updateUserType"
                                             wire:confirm="Are you sure you want to change this user's type? This action will be logged."
-                                            class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md"
+                                            class="bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded-md"
                                             title="Update User Type"
                                         >
                                             <svg class="size-5" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#ffffff" stroke="#ffffff">
