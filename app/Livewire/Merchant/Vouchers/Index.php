@@ -16,6 +16,8 @@ class Index extends Component
 
     protected $paginationTheme = 'tailwind';
 
+    protected $listeners = ['voucher-deleted' => '$refresh'];
+
     public function mount()
     {
         $this->showMessage = session()->has('message');
@@ -77,7 +79,8 @@ class Index extends Component
         }
 
         if ($this->statusFilter !== 'all') {
-            $query->where('is_active', $this->statusFilter === 'active');
+            $isActive = $this->statusFilter === 'active';
+            $query->where('is_active', $isActive);
         }
 
         $vouchers = $query->orderBy('created_at', 'desc')->paginate(10);

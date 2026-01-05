@@ -4,9 +4,11 @@ namespace App\Livewire\Merchant\Vouchers;
 
 use App\Models\Voucher;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Form extends Component
 {
+    use WithFileUploads;
     public $voucherCode;
     public $voucherId;
     public $name = '';
@@ -20,6 +22,8 @@ class Form extends Component
     public $usage_limit = '';
     public $is_active = true;
     public $showMessage = false;
+    public $voucherImage;
+    public $existingVoucherImage = null;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -32,6 +36,7 @@ class Form extends Component
         'valid_until' => 'nullable|date|after_or_equal:valid_from',
         'usage_limit' => 'nullable|integer|min:1',
         'is_active' => 'boolean',
+        'voucherImage' => 'nullable|image|max:2048',
     ];
 
     public function mount($voucher_code = null)
@@ -63,13 +68,23 @@ class Form extends Component
             $this->valid_from = $voucher->valid_from ? $voucher->valid_from->format('Y-m-d\TH:i') : '';
             $this->valid_until = $voucher->valid_until ? $voucher->valid_until->format('Y-m-d\TH:i') : '';
             $this->usage_limit = $voucher->usage_limit;
-            $this->is_active = $voucher->is_active;
+            $this->is_active = (bool) $voucher->is_active;
+            
+            $media = $voucher->getFirstMedia('image');
+            if ($media) {
+                $this->existingVoucherImage = $media->getUrl();
+            }
         }
     }
 
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);
+        
+        // Ensure is_active is always a boolean
+        if ($propertyName === 'is_active') {
+            $this->is_active = (bool) $this->is_active;
+        }
     }
 
     public function save()
@@ -85,6 +100,9 @@ class Form extends Component
 
         $this->validate();
 
+        // Ensure is_active is properly set (defaults to true if not explicitly set)
+        $isActive = $this->is_active !== null ? (bool) $this->is_active : true;
+
         $data = [
             'merchant_id' => $merchant->id,
             'name' => $this->name,
@@ -96,7 +114,7 @@ class Form extends Component
             'valid_from' => $this->valid_from ? date('Y-m-d H:i:s', strtotime($this->valid_from)) : null,
             'valid_until' => $this->valid_until ? date('Y-m-d H:i:s', strtotime($this->valid_until)) : null,
             'usage_limit' => $this->usage_limit ?: null,
-            'is_active' => $this->is_active,
+            'is_active' => $isActive,
         ];
 
         if ($this->voucherCode) {
@@ -110,9 +128,37 @@ class Form extends Component
             $message = 'Voucher created successfully.';
         }
 
+        // Handle voucher image upload
+        if ($this->voucherImage) {
+            // Clear existing image
+            $voucher->clearMediaCollection('image');
+            
+            // Add new image
+            $voucher->addMedia($this->voucherImage->getRealPath())
+                ->usingName($voucher->name . ' - Image')
+                ->toMediaCollection('image');
+        }
+
         session()->flash('message', $message);
         $this->showMessage = true;
         return redirect()->route('merchant.vouchers.index');
+    }
+
+    public function removeVoucherImage()
+    {
+        if ($this->voucherCode) {
+            $merchant = auth()->user()->currentMerchant();
+            if ($merchant) {
+                $voucher = Voucher::where('voucher_code', $this->voucherCode)
+                    ->where('merchant_id', $merchant->id)
+                    ->first();
+                if ($voucher) {
+                    $voucher->clearMediaCollection('image');
+                    $this->existingVoucherImage = null;
+                    $this->dispatch('voucher-image-removed');
+                }
+            }
+        }
     }
 
     public function render()

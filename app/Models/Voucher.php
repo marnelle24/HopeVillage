@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Voucher extends Model
+class Voucher extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     protected $fillable = [
         'merchant_id',
@@ -87,23 +90,98 @@ class Voucher extends Model
      */
     public function isValid(): bool
     {
+        // First check if the voucher is active
         if (!$this->is_active) {
             return false;
         }
 
         $now = now();
-        if ($this->valid_from && $now->lt($this->valid_from)) {
-            return false;
+
+        // Check if voucher has started (valid_from)
+        // If valid_from is set, current time must be >= valid_from
+        if ($this->valid_from !== null) {
+            $validFrom = $this->valid_from;
+            // Ensure we have a Carbon instance
+            if (!($validFrom instanceof \Carbon\Carbon)) {
+                $validFrom = \Carbon\Carbon::parse($validFrom);
+            }
+            // Current time must be greater than or equal to valid_from
+            if ($now->lt($validFrom)) {
+                return false;
+            }
         }
 
-        if ($this->valid_until && $now->gt($this->valid_until)) {
-            return false;
+        // Check if voucher has expired (valid_until)
+        // If valid_until is set, current time must be <= valid_until
+        if ($this->valid_until !== null) {
+            $validUntil = $this->valid_until;
+            // Ensure we have a Carbon instance
+            if (!($validUntil instanceof \Carbon\Carbon)) {
+                $validUntil = \Carbon\Carbon::parse($validUntil);
+            }
+            // Current time must be less than or equal to valid_until
+            if ($now->gt($validUntil)) {
+                return false;
+            }
         }
 
+        // Check if usage limit has been reached
         if ($this->usage_limit && $this->usage_count >= $this->usage_limit) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Get the status reason if voucher is not valid
+     */
+    public function getStatusReason(): ?string
+    {
+        if (!$this->is_active) {
+            return 'Inactive';
+        }
+
+        $now = now();
+        
+        // Check if voucher has started (valid_from)
+        if ($this->valid_from !== null) {
+            if ($now->isBefore($this->valid_from)) {
+                return 'Not Yet Valid';
+            }
+        }
+
+        // Check if voucher has expired (valid_until)
+        if ($this->valid_until !== null) {
+            if ($now->isAfter($this->valid_until)) {
+                return 'Expired';
+            }
+        }
+
+        // Check if usage limit has been reached
+        if ($this->usage_limit && $this->usage_count >= $this->usage_limit) {
+            return 'Usage Limit Reached';
+        }
+
+        return null; // Valid
+    }
+
+    /**
+     * Register media collections for voucher images
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+    }
+
+    /**
+     * Get the image URL
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('image');
+        return $media ? $media->getUrl() : null;
     }
 }
