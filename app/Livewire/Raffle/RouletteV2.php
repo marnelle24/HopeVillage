@@ -26,6 +26,9 @@ class RouletteV2 extends Component
     /** @var array<int, array{place:int,value:string,member:array|null}> */
     public array $winners = [];
 
+    /** @var array<int, array{place:int,value:string,member:array|null}> */
+    public array $rejected = [];
+
     /** @var array<int, array{id:int,title:string,attendee_count:int}> */
     public array $events = [];
 
@@ -213,9 +216,19 @@ class RouletteV2 extends Component
         // Get winner values
         $winnerValues = collect($this->winners)->pluck('value')->toArray();
         
-        // Filter out entries that are already winners
+        // Get rejected values (ensure they are strings)
+        $rejectedValues = collect($this->rejected)
+            ->map(function ($value) {
+                return is_string($value) ? $value : (string) $value;
+            })
+            ->toArray();
+        
+        // Filter out entries that are already winners or rejected
         return collect($this->entries)
-            ->filter(fn ($entry) => !in_array((string) $entry, $winnerValues, true))
+            ->filter(function ($entry) use ($winnerValues, $rejectedValues) {
+                $entryStr = (string) $entry;
+                return !in_array($entryStr, $winnerValues, true) && !in_array($entryStr, $rejectedValues, true);
+            })
             ->values()
             ->all();
     }
@@ -344,9 +357,48 @@ class RouletteV2 extends Component
         $this->resetWinners();
     }
 
+    public function reSpin(): void
+    {
+        // Store the latest winner in rejected array and remove from winners array if it exists
+        if ($this->latestWinner !== null) {
+            $winnerValue = $this->latestWinner['value'] ?? null;
+            if ($winnerValue !== null) {
+                // Add to rejected array
+                $this->rejected[] = $this->latestWinner['value'];
+                
+                // Remove from winners array
+                $this->winners = collect($this->winners)
+                    ->reject(fn ($winner) => ($winner['value'] ?? '') === $winnerValue)
+                    ->values()
+                    ->map(function ($winner, $index) {
+                        $winner['place'] = $index + 1;
+                        return $winner;
+                    })
+                    ->all();
+            }
+        }
+
+        // Reset latest winner state
+        $this->latestWinner = null;
+        $this->winner = null;
+        $this->winnerIndex = null;
+
+        // Update entries to exclude rejected values
+        $availableEntries = $this->getAvailableEntries();
+        $this->entries = $availableEntries;
+
+        // Dispatch event to update wheel with entries excluding rejected values
+        $this->dispatch('entries-loaded');
+        
+        // Trigger a new spin after a short delay to allow wheel to update
+        // Use JavaScript to handle the delay and spin
+        $this->dispatch('trigger-respin');
+    }
+
     private function resetWinners(): void
     {
         $this->winners = [];
+        $this->rejected = [];
         $this->winner = null;
         $this->winnerIndex = null;
         $this->latestWinner = null;

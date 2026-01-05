@@ -286,6 +286,12 @@
                         $wire.updateWheelAfterModalClose();
                     }, 100);
                 }
+            },
+            closeModalWithoutUpdate() { 
+                const modal = document.getElementById('winner-modal');
+                if (modal) {
+                    modal.close();
+                }
             }
         }"
         x-init="
@@ -383,18 +389,25 @@
                 <div class="py-6">
                     <p class="text-sm text-gray-600 mb-3">The winner is:</p>
                     <p class="text-4xl font-bold text-primary break-all px-4">
-                        {{ $winner }}
+                        {{ is_string($winner) ? $winner : (is_array($winner) ? ($winner['value'] ?? '') : (string) $winner) }}
                     </p>
                 </div>
             @else
                 <p class="text-gray-600 py-4">No winner selected.</p>
             @endif
-            <div class="modal-action justify-center">
+            <div class="modal-action justify-center gap-3">
+                <button 
+                    wire:click="reSpin"
+                    @click="closeModalWithoutUpdate()"
+                    class="bg-blue-500 hover:bg-blue-600 transition-all duration-300 cursor-pointer text-lg flex-1 text-white px-4 py-2 rounded-full font-bold border-none"
+                >
+                    Redraw
+                </button>
                 <button 
                     @click="closeModal()"
-                    class="bg-orange-500 hover:bg-orange-600 transition-all duration-300 cursor-pointer text-lg w-1/2 text-white px-4 py-2 rounded-full font-bold border-none"
+                    class="bg-orange-500 hover:bg-orange-600 transition-all duration-300 cursor-pointer text-lg flex-1 text-white px-4 py-2 rounded-full font-bold border-none"
                 >
-                    Close
+                    Confirm Winner
                 </button>
             </div>
         </div>
@@ -532,6 +545,15 @@
                     }, 100);
                 }
             }
+        });
+        
+        // Listen for trigger-respin event to spin after wheel is updated
+        Livewire.on('trigger-respin', () => {
+            // Wait for wheel to be updated, then trigger spin
+            setTimeout(() => {
+                // Call the spin method which will handle everything
+                $wire.spin();
+            }, 300); // Wait 300ms for wheel to update
         });
         
                // Listen for wheel rest event
