@@ -83,7 +83,7 @@ class Index extends Component
             $query->where('is_active', $isActive);
         }
 
-        $vouchers = $query->orderBy('created_at', 'desc')->paginate(10);
+        $vouchers = $query->orderBy('created_at', 'desc')->get();
 
         return view('livewire.merchant.vouchers.index', [
             'vouchers' => $vouchers,

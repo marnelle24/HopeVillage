@@ -1,17 +1,31 @@
 <div>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ $voucherCode ? __('Edit Voucher') : __('Create Voucher') }}
-            </h2>
-            <a href="{{ route('merchant.vouchers.index') }}" class="text-gray-600 hover:text-gray-900">
-                ← Back to Vouchers
-            </a>
-        </div>
-    </x-slot>
-
+    <div class="shrink-0 flex items-center justify-between px-4 pt-4">
+        <a href="{{ route('dashboard') }}">
+            {{-- <x-application-mark class="block h-9 w-auto" /> --}}
+            {{-- <span class="text-xl font-bold text-gray-800">Hope Village</span> --}}
+            <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-16">
+        </a>
+        {{-- add a logout button --}}
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="flex items-center hover:text-red-800 text-sm font-semibold bg-orange-500 text-white px-3 py-2 rounded-lg">
+                <svg class="size-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1" fill="#000000">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g style="fill:none;stroke:#ffffff;stroke-width:12px;stroke-linecap:round;stroke-linejoin:round;"> <path d="m 50,10 0,35"></path> <path d="M 26,20 C -3,48 16,90 51,90 79,90 89,67 89,52 89,37 81,26 74,20"></path> </g> </g>
+                </svg>
+                <span class="ml-1">Logout</span>
+            </button>
+        </form>
+    </div>
     <div class="py-12 lg:px-0 px-4">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mt-2 mb-6">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ $voucherCode ? __('Update Voucher') : __('Create Voucher') }}
+                </h2>
+                <a href="{{ route('merchant.vouchers.index') }}" class="text-gray-600 hover:text-gray-900 text-sm">
+                    ← Back to Vouchers
+                </a>
+            </div>
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -247,7 +261,7 @@
                             </div>
         
                             <!-- Is Active -->
-                            <div class="mb-6">
+                            <div class="mb-10">
                                 <label class="flex items-center">
                                     <input 
                                         type="checkbox" 
@@ -260,7 +274,7 @@
                             </div>
         
                             <!-- Submit Buttons -->
-                            <div class="flex justify-start gap-4">
+                            <div class="flex justify-start gap-4 mb-4">
                                 <a 
                                     href="{{ route('merchant.vouchers.index') }}" 
                                     class="px-6 py-2 border border-gray-300 rounded-full text-gray-700 text-lg hover:bg-gray-100 transition"

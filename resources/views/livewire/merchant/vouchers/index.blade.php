@@ -1,33 +1,42 @@
 <div class="pb-16">
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
-                {{ __('My Vouchers') }}
-            </h2>
-            @if($merchant->is_active)
-                <a href="{{ route('merchant.vouchers.create') }}" class="md:block hidden bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
-                    Create Voucher
-                </a>
-                <a href="{{ route('merchant.vouchers.create') }}" class="md:hidden block bg-indigo-600 hover:bg-indigo-500 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                </a>
-            @else
-                <span class="md:block hidden bg-gray-400 cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg" title="Your merchant account is pending approval">
-                    Create Voucher
-                </span>
-                <span class="md:hidden block bg-gray-400 cursor-not-allowed text-white p-2 rounded-full" title="Your merchant account is pending approval">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                </span>
-            @endif
-        </div>
-    </x-slot>
 
-    <div class="py-12">
+    <div class="shrink-0 flex items-center justify-between px-4 pt-4">
+        <a href="{{ route('dashboard') }}">
+            {{-- <x-application-mark class="block h-9 w-auto" /> --}}
+            {{-- <span class="text-xl font-bold text-gray-800">Hope Village</span> --}}
+            <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-16">
+        </a>
+        {{-- add a logout button --}}
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="flex items-center hover:text-red-800 text-sm font-semibold bg-orange-500 text-white px-3 py-2 rounded-lg">
+                <svg class="size-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1" fill="#000000">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g style="fill:none;stroke:#ffffff;stroke-width:12px;stroke-linecap:round;stroke-linejoin:round;"> <path d="m 50,10 0,35"></path> <path d="M 26,20 C -3,48 16,90 51,90 79,90 89,67 89,52 89,37 81,26 74,20"></path> </g> </g>
+                </svg>
+                <span class="ml-1">Logout</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="py-12 lg:px-0 px-4">
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
+            <div class="mb-6 flex justify-between items-center">
+                <div class="">
+                    <h3 class="text-2xl font-nunito font-bold text-gray-900">Manage Vouchers</h3>
+                    <p class="text-gray-600 font-nunito text-sm">Manage your vouchers here</p>
+                </div>
+                <a 
+                    title="Add New Voucher"
+                    href="{{ route('merchant.vouchers.create') }}" 
+                    class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold p-3 rounded-full hover:scale-105 transition-all duration-300"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                </a>
+            </div>
+
+
             @if(!$merchant->is_active)
                 <div class="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded relative md:mx-0 mx-4" role="alert">
                     <span class="block sm:inline">
@@ -68,7 +77,7 @@
                     x-transition:leave="transition ease-out duration-500"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" 
+                    class="md:mx-0 mx-4 mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" 
                     role="alert"
                 >
                     <span class="block sm:inline">{{ session('message') }}</span>
@@ -76,9 +85,9 @@
             @endif
 
             <!-- Search and Filter -->
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+            <div class="mb-8">
+                <div class="flex gap-2">
+                    <div class="w-3/4">
                         <input 
                             type="text" 
                             wire:model.live.debounce.300ms="search" 
@@ -86,7 +95,7 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-full text-gray-700 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                         >
                     </div>
-                    <div>
+                    <div class="w-1/4">
                         <select 
                             wire:model.live="statusFilter" 
                             class="w-full px-4 py-2 border border-gray-300 rounded-full text-gray-700 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
@@ -99,31 +108,47 @@
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-2 grid-cols-1 gap-4 md:px-0 px-4">
-                @forelse($vouchers as $voucher)
-                    <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
-                @empty
-                    <div class="col-span-full text-center text-gray-300 text-lg py-12 border-dashed border-2 border-gray-200 rounded-lg p-4 bg-white">
-                        <p class="text-gray-500 mb-4">No vouchers found.</p>
-                        @if($merchant->is_active)
-                            <a href="{{ route('merchant.vouchers.create') }}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
-                                Create Your First Voucher
-                            </a>
-                        @else
-                            <div class="inline-block">
-                                <span class="bg-gray-400 cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg" title="Your merchant account is pending approval">
-                                    Create Your First Voucher
-                                </span>
-                                <p class="text-sm text-yellow-600 mt-2">Your merchant account is pending approval</p>
+            <div class="my-4 md:px-0 px-4">
+                <h3 class="text-xl font-bold text-gray-600">My Active Vouchers ({{ $vouchers->count() }})</h3>
+                <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by you</p>
+            </div>
+            @if ($vouchers->count() > 0)
+                <div class="w-full overflow-x-auto md:px-0 px-4 pb-4 scroll-smooth voucher-scroll-container">
+                    <div class="flex flex-nowrap gap-4 items-stretch min-w-max">
+                        @foreach($vouchers as $voucher)
+                            <div class="shrink-0 w-69">
+                                <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
                             </div>
-                        @endif
+                        @endforeach
                     </div>
-                @endforelse
+                </div>
+            @else
+                <div class="md:mx-0 mx-4 text-center text-gray-300 text-lg py-12 border-dashed border-2 border-gray-300 rounded-lg p-4 bg-gray-200">
+                    <p class="text-gray-500 mb-4">No vouchers found.</p>
+                </div>
+            @endif
+
+            <br />
+            <br />
+            <div class="my-4 md:px-0 px-4">
+                <h3 class="text-xl font-bold text-gray-600">Other Vouchers ({{ $vouchers->count() }})</h3>
+                <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by administrator</p>
             </div>
-            <!-- Pagination -->
-            <div class="mt-6 md:px-0 px-4">
-                {{ $vouchers->links() }}
-            </div>
+            @if (!$vouchers->count() > 0)
+                <div class="w-full overflow-x-auto md:px-0 px-4 pb-4 scroll-smooth voucher-scroll-container">
+                    <div class="flex flex-nowrap gap-4 items-stretch min-w-max">
+                        @foreach($vouchers as $voucher)
+                            <div class="shrink-0 w-69">
+                                <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <div class="md:mx-0 mx-4 text-center text-gray-300 text-lg py-12 border-dashed border-2 border-gray-300 rounded-lg p-4 bg-gray-200">
+                    <p class="text-gray-500 mb-4">No vouchers found.</p>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -215,3 +240,16 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    .voucher-scroll-container {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+    }
+    
+    .voucher-scroll-container::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+</style>
+@endpush
