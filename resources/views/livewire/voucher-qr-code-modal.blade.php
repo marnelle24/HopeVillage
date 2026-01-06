@@ -92,31 +92,64 @@
                         </button>
                     </div>
                 </div>
-                @elseif($voucher)
+                @elseif($voucher || $adminVoucher)
                 <!-- Voucher Information (for merchants or when voucher is loaded) -->
                 <div class="text-center py-4 w-full">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">{{ $voucher->name }}</h3>
-                    <p class="text-sm text-gray-600 mb-4">{{ $voucher->description }}</p>
-                    
-                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                        <p class="text-sm text-gray-600 mb-1">Voucher Code</p>
-                        <p class="text-lg font-mono font-bold text-gray-900">{{ $voucher->voucher_code }}</p>
-                    </div>
-                    
-                    <div class="flex items-center justify-center gap-4 mb-4">
-                        {{-- <div>
-                            <p class="text-xs text-gray-500">Discount</p>
-                            <p class="text-lg font-bold text-indigo-600">
-                                {{ $voucher->discount_type === 'percentage' ? $voucher->discount_value . '%' : '$' . number_format($voucher->discount_value, 2) }}
-                            </p>
-                        </div> --}}
-                        <div>
-                            <p class="text-xs text-gray-500">Status</p>
-                            <p class="text-lg font-bold {{ $voucher->is_active ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $voucher->is_active ? 'Active' : 'Inactive' }}
-                            </p>
+                    @if($adminVoucher)
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $adminVoucher->name }}</h3>
+                        <p class="text-sm text-gray-600 mb-4">{{ $adminVoucher->description }}</p>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <p class="text-sm text-gray-600 mb-1">Voucher Code</p>
+                            <p class="text-lg font-mono font-bold text-gray-900">{{ $adminVoucher->voucher_code }}</p>
                         </div>
-                    </div>
+                        
+                        <div class="flex flex-col items-center gap-3 mb-4">
+                            {{-- <div>
+                                <p class="text-xs text-gray-500">Points Cost</p>
+                                <p class="text-lg font-bold text-orange-600">
+                                    {{ number_format($adminVoucher->points_cost) }} Points
+                                </p>
+                            </div> --}}
+                            <div>
+                                <p class="text-xs text-gray-500">Status</p>
+                                <p class="text-lg font-bold {{ $adminVoucher->is_active ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $adminVoucher->is_active ? 'Active' : 'Inactive' }}
+                                </p>
+                            </div>
+                            @if($adminVoucher->merchants && $adminVoucher->merchants->isNotEmpty())
+                            <div class="w-full">
+                                <p class="text-xs text-gray-500 mb-1">Allowed Merchants</p>
+                                <p class="text-sm text-gray-700">
+                                    {{ $adminVoucher->merchants->pluck('name')->join(', ') }}
+                                </p>
+                            </div>
+                            @endif
+                        </div>
+                    @else
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">{{ $voucher->name }}</h3>
+                        <p class="text-sm text-gray-600 mb-4">{{ $voucher->description }}</p>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <p class="text-sm text-gray-600 mb-1">Voucher Code</p>
+                            <p class="text-lg font-mono font-bold text-gray-900">{{ $voucher->voucher_code }}</p>
+                        </div>
+                        
+                        <div class="flex items-center justify-center gap-4 mb-4">
+                            {{-- <div>
+                                <p class="text-xs text-gray-500">Discount</p>
+                                <p class="text-lg font-bold text-indigo-600">
+                                    {{ $voucher->discount_type === 'percentage' ? $voucher->discount_value . '%' : '$' . number_format($voucher->discount_value, 2) }}
+                                </p>
+                            </div> --}}
+                            <div>
+                                <p class="text-xs text-gray-500">Status</p>
+                                <p class="text-lg font-bold {{ $voucher->is_active ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $voucher->is_active ? 'Active' : 'Inactive' }}
+                                </p>
+                            </div>
+                        </div>
+                    @endif
                     
                     @if($redeemer)
                         <!-- Redeemer Information -->
@@ -158,15 +191,15 @@
                         </div>
                     @endif
                     
-                    @if(auth()->check() && auth()->user()->isMerchantUser())
+                    {{-- @if(auth()->check() && auth()->user()->isMerchantUser())
                         <div class="mt-4 p-3 bg-blue-50 rounded-lg">
                             <p class="text-sm text-blue-800">Merchant View: Voucher information displayed.</p>
                         </div>
-                    @endif
+                    @endif --}}
                     
                     <!-- Action Buttons -->
                     <div class="mt-6 flex gap-3 justify-center">
-                        @if(auth()->check() && auth()->user()->isMerchantUser() && $redeemer && $voucher && $redeemerVoucherStatus === 'claimed' && !$processing && !$success)
+                        @if(auth()->check() && auth()->user()->isMerchantUser() && $redeemer && ($voucher || $adminVoucher) && $redeemerVoucherStatus === 'claimed' && !$processing && !$success)
                         <!-- REDEEM Button for Merchants -->
                         <button
                             @click="$wire.processRedeemerVoucherRedemption()"

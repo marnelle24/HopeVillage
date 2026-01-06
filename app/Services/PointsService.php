@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ActivityType;
+use App\Models\AdminVoucher;
 use App\Models\Event;
 use App\Models\PointLog;
 use App\Models\PointSystemConfig;
@@ -20,6 +21,7 @@ class PointsService
     public const ACTIVITY_EVENT_ATTEND = 'member_attend_event';
     public const ACTIVITY_VOUCHER_CLAIM = 'member_claim_voucher';
     public const ACTIVITY_VOUCHER_REDEEM = 'member_redeem_voucher';
+    public const ACTIVITY_ADMIN_VOUCHER_CLAIM = 'member_claim_admin_voucher';
 
     // Fallback points (used only if no admin configuration exists)
     private const FALLBACK_POINTS_ACCOUNT_VERIFICATION = 10;
@@ -215,6 +217,76 @@ class PointsService
             // Keep user's running total in sync.
             $user->increment('total_points', $points);
         });
+    }
+
+    /**
+     * Deduct points from user's balance
+     */
+    public function deduct(
+        User $user,
+        int $points,
+        string $activityName,
+        ?string $description = null,
+        ?int $locationId = null,
+        ?int $amenityId = null,
+    ): void {
+        // Check if point system is globally enabled
+        $pointSystemEnabled = (bool) Setting::get('point_system_enabled', true);
+        
+        if (!$pointSystemEnabled) {
+            throw new \Exception('Point system is disabled.');
+        }
+
+        // Check sufficient balance
+        if ($user->total_points < $points) {
+            throw new \Exception('Insufficient points balance.');
+        }
+
+        DB::transaction(function () use ($user, $points, $activityName, $description, $locationId, $amenityId) {
+            $activityType = ActivityType::query()->firstOrCreate(
+                ['name' => $activityName],
+                ['description' => $activityName, 'is_active' => true]
+            );
+
+            // Get or create the point system configuration
+            $config = $this->getOrCreateConfig(
+                $activityType->id,
+                $locationId,
+                $amenityId,
+                $activityName,
+                $description
+            );
+
+            // Create PointLog entry with negative points
+            PointLog::query()->create([
+                'user_id' => $user->id,
+                'member_activity_id' => null,
+                'point_system_config_id' => $config->id,
+                'activity_type_id' => $activityType->id,
+                'location_id' => $locationId,
+                'amenity_id' => $amenityId,
+                'points' => -$points, // Negative points for deduction
+                'description' => $description ?? $activityName,
+                'awarded_at' => now(),
+            ]);
+
+            // Decrement user's running total
+            $user->decrement('total_points', $points);
+        });
+    }
+
+    /**
+     * Deduct points for admin voucher claim
+     */
+    public function deductAdminVoucherClaim(User $user, AdminVoucher $adminVoucher): void
+    {
+        $this->deduct(
+            user: $user,
+            points: $adminVoucher->points_cost,
+            activityName: self::ACTIVITY_ADMIN_VOUCHER_CLAIM,
+            description: 'Claimed admin voucher ' . $adminVoucher->voucher_code . ' - ' . $adminVoucher->name,
+            locationId: null,
+        );
     }
 }
 

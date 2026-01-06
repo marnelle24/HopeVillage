@@ -43,6 +43,12 @@ class Merchant extends Model implements HasMedia
         return $this->hasMany(Voucher::class);
     }
 
+    public function adminVouchers(): BelongsToMany
+    {
+        return $this->belongsToMany(AdminVoucher::class, 'admin_voucher_merchant')
+            ->withTimestamps();
+    }
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'merchant_user')

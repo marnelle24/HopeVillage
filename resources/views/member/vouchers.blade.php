@@ -69,7 +69,17 @@
 
             <!-- Active / Claimable -->
             <div x-show="tab === 'active'" x-cloak>
-                @livewire('member.vouchers.browse', key('member-vouchers-browse-page'))
+                <!-- Merchant Vouchers -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Merchant Vouchers</h3>
+                    @livewire('member.vouchers.browse', key('member-vouchers-browse-page'))
+                </div>
+                
+                <!-- Admin Vouchers -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Admin Vouchers (Points Exchange)</h3>
+                    @livewire('member.admin-vouchers.browse', key('member-admin-vouchers-browse-page'))
+                </div>
             </div>
 
             <!-- Claimed / Redeemed -->
@@ -78,6 +88,8 @@
             </div>
         </div>
     </div>
+    <br />
+    <br />
 </x-app-layout>
 
 

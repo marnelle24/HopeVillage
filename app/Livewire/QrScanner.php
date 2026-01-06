@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 /**
@@ -58,18 +59,25 @@ class QrScanner extends Component
 
     public function handleScanResult($result)
     {
-        $this->scanResult = $result;
-        
-        // Get the authenticated user's FIN
-        $user = auth()->user();
-        $memberFin = $user?->fin ?? null;
-        $isMerchant = $user && $user->isMerchantUser();
-        $isMember = $user && $user->isMember();
+        try {
+            Log::info('QR code scanned', [
+                'raw_result' => $result,
+                'user_id' => auth()->id(),
+                'user_type' => auth()->user()?->user_type,
+            ]);
+            
+            $this->scanResult = $result;
+            
+            // Get the authenticated user's FIN
+            $user = auth()->user();
+            $memberFin = $user?->fin ?? null;
+            $isMerchant = $user && $user->isMerchantUser();
+            $isMember = $user && $user->isMember();
 
-        $qrUpper = strtoupper(trim($result)); // uppercase the result
-        $qrType = null;
+            $qrUpper = strtoupper(trim($result)); // uppercase the result
+            $qrType = null;
 
-        if($isMerchant && str_starts_with($qrUpper, 'VOU-')) 
+        if($isMerchant && (str_starts_with($qrUpper, 'VOU-') || str_starts_with($qrUpper, 'AVOU-'))) 
         {
             $scannedVoucher = explode('_', $qrUpper);
             $voucherCode = $scannedVoucher[0]; // voucher qr code
@@ -83,11 +91,17 @@ class QrScanner extends Component
                 'member_fin' => $redeemerQrCode,
             ];
 
-            $qrType = 'VOU';
-            $displayData['type'] = 'voucher';
-            $displayData['code'] = $voucherCode;
-            $displayData['description'] = 'Voucher QR Code';
-
+            if (str_starts_with($qrUpper, 'VOU-')) {
+                $qrType = 'VOU';
+                $displayData['type'] = 'voucher';
+                $displayData['code'] = $voucherCode;
+                $displayData['description'] = 'Voucher QR Code';
+            } elseif (str_starts_with($qrUpper, 'AVOU-')) {
+                $qrType = 'AVOU';
+                $displayData['type'] = 'admin-voucher';
+                $displayData['code'] = $voucherCode;
+                $displayData['description'] = 'Admin Voucher QR Code';
+            }
         }
         else
         {
@@ -122,27 +136,50 @@ class QrScanner extends Component
 
         }
 
-        $this->resultData = $displayData;
-        $this->showResultModal = true;
-        
-        // Set the selected QR type and code for component rendering
-        if ($isMember && $qrType === 'LOC') {
-            $this->selectedQrType = 'location';
-            $this->selectedQrCode = $result;
-            $this->dispatch('openLocationQrModal', $result);
-        } elseif ($isMember && $qrType === 'EVT') {
-            $this->selectedQrType = 'event';
-            $this->selectedQrCode = $result;
-            $this->dispatch('openEventQrModal', $result);
+            $this->resultData = $displayData;
+            $this->showResultModal = true;
+            
+            // Set the selected QR type and code for component rendering
+            if ($isMember && $qrType === 'LOC') {
+                $this->selectedQrType = 'location';
+                $this->selectedQrCode = $result;
+                Log::info('Dispatching location QR modal', ['location_code' => $result]);
+                $this->dispatch('openLocationQrModal', $result);
+            } elseif ($isMember && $qrType === 'EVT') {
+                $this->selectedQrType = 'event';
+                $this->selectedQrCode = $result;
+                Log::info('Dispatching event QR modal', ['event_code' => $result]);
+                $this->dispatch('openEventQrModal', $result);
+            }
+            elseif ($isMerchant && ($qrType === 'VOU' || $qrType === 'AVOU')) {
+                $this->selectedQrType = 'voucher';
+                $this->selectedQrCode = $voucherCode;
+                Log::info('Dispatching voucher QR modal', [
+                    'voucher_type' => $qrType,
+                    'voucher_code' => $voucherCode,
+                    'redeemer_qr_code' => $redeemerQrCode,
+                ]);
+                // Pass both voucher code and redeemer QR code
+                $this->dispatch('openVoucherQrModal', $voucherCode, $redeemerQrCode);
+            }
+            
+            Log::info('QR code scan processed successfully', [
+                'qr_type' => $qrType,
+                'display_type' => $displayData['type'] ?? null,
+            ]);
+            
+            $this->dispatch('qr-code-scanned', $result);
+        } catch (\Exception $e) {
+            Log::error('Failed to handle QR scan result', [
+                'raw_result' => $result,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            
+            $this->scanError = 'Failed to process QR code: ' . $e->getMessage();
+            $this->showResultModal = false;
         }
-        elseif ($isMerchant && $qrType === 'VOU') {
-            $this->selectedQrType = 'voucher';
-            $this->selectedQrCode = $voucherCode;
-            // Pass both voucher code and redeemer QR code
-            $this->dispatch('openVoucherQrModal', $voucherCode, $redeemerQrCode);
-        }
-        
-        $this->dispatch('qr-code-scanned', $result);
     }
     
     public function closeResultModal()

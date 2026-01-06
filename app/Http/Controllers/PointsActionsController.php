@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminVoucher;
 use App\Models\ActivityType;
 use App\Models\Event;
 use App\Models\EventRegistration;
@@ -151,6 +152,59 @@ class PointsActionsController extends Controller
             $voucher->increment('usage_count');
 
             app(PointsService::class)->awardVoucherRedeem($user, $voucher);
+        });
+
+        return response()->json([
+            'ok' => true,
+            'total_points' => $user->fresh()->total_points,
+        ]);
+    }
+
+    /**
+     * Redeem a claimed admin voucher
+     * Expects: fin, voucher_code
+     */
+    public function redeemAdminVoucher(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'fin' => ['required', 'string'],
+            'voucher_code' => ['required', 'string', 'exists:admin_vouchers,voucher_code'],
+        ]);
+
+        $user = User::query()->where('fin', $data['fin'])->firstOrFail();
+        $adminVoucher = AdminVoucher::query()->where('voucher_code', $data['voucher_code'])->firstOrFail();
+
+        $pivot = $user->adminVouchers()
+            ->where('admin_vouchers.id', $adminVoucher->id)
+            ->first();
+
+        if (!$pivot) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Admin voucher not claimed by this member.',
+            ], 422);
+        }
+
+        if ($pivot->pivot->status === 'redeemed') {
+            return response()->json([
+                'ok' => true,
+                'already_redeemed' => true,
+                'total_points' => $user->total_points,
+            ]);
+        }
+
+        DB::transaction(function () use ($user, $adminVoucher) {
+            // Mark redeemed on pivot
+            $user->adminVouchers()->updateExistingPivot($adminVoucher->id, [
+                'status' => 'redeemed',
+                'redeemed_at' => now(),
+            ]);
+
+            // Update admin voucher usage count
+            $adminVoucher->increment('usage_count');
+
+            // Note: No points are awarded for admin voucher redemption
+            // Points were already deducted when the voucher was claimed
         });
 
         return response()->json([

@@ -35,6 +35,34 @@ class MyVouchers extends Component
             ->get();
     }
 
+    public function getClaimedAdminVouchersProperty(): Collection
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return collect();
+        }
+
+        return $user->adminVouchers()
+            ->with('merchants')
+            ->wherePivot('status', 'claimed')
+            ->latest('user_admin_voucher.claimed_at')
+            ->get();
+    }
+
+    public function getRedeemedAdminVouchersProperty(): Collection
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return collect();
+        }
+
+        return $user->adminVouchers()
+            ->with('merchants')
+            ->wherePivot('status', 'redeemed')
+            ->latest('user_admin_voucher.redeemed_at')
+            ->get();
+    }
+
     public function render()
     {
         return view('livewire.member.vouchers.my-vouchers');
