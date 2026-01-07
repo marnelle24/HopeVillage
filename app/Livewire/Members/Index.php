@@ -17,6 +17,7 @@ class Index extends Component
 
     public string $search = '';
     public string $verifiedFilter = 'all'; // all | verified | unverified
+    public string $dateSort = 'desc'; // desc | asc
     public bool $showMessage = false;
     
     // Password reset properties
@@ -51,6 +52,13 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function sortByDate(): void
+    {
+        // Toggle between desc and asc
+        $this->dateSort = $this->dateSort === 'desc' ? 'asc' : 'desc';
+        $this->resetPage();
+    }
+
     public function delete($userId): void
     {
         
@@ -73,15 +81,15 @@ class Index extends Component
             'fin' => $member->fin,
         ];
 
-        $member->delete();
+        $member->delete(); // This will now perform a soft delete
 
         // Get admin user details
         $adminUser = auth()->user();
         
-        session()->flash('message', 'Member deleted successfully.');
+        session()->flash('message', 'Member has been deleted successfully. The member can be restored if needed.');
         $this->showMessage = true;
 
-        Log::info('Member deleted successfully', [
+        Log::info('Member soft deleted successfully', [
             'admin_user' => [
                 'id' => $adminUser->id,
                 'name' => $adminUser->name,
@@ -200,10 +208,14 @@ class Index extends Component
             $query->where('is_verified', false);
         }
 
-        $members = $query
-            ->withCount(['memberActivities', 'eventRegistrations'])
-            ->orderByDesc('created_at')
-            ->paginate(6);
+        // Apply date sorting
+        if ($this->dateSort === 'asc') {
+            $query->orderBy('created_at', 'asc');
+        } else {
+            $query->orderByDesc('created_at');
+        }
+
+        $members = $query->paginate(6);
 
         $selectedUser = null;
         if ($this->showPasswordReset && $this->selectedUserId) {

@@ -22,8 +22,6 @@
                     <!-- Logo -->
                     <div class="shrink-0 flex items-center">
                         <a href="{{ route('dashboard') }}">
-                            {{-- <x-application-mark class="block h-9 w-auto" /> --}}
-                            {{-- <span class="text-xl font-bold text-gray-800">Hope Village</span> --}}
                             <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-12">
                         </a>
                     </div>
@@ -46,7 +44,7 @@
                             <x-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
                                 {{ __('Member Activities') }}
                             </x-nav-link>
-                            <x-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
+                            <x-nav-link href="{{ route('admin.admin-vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
                                 {{ __('Vouchers') }}
                             </x-nav-link>
                             <x-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants*')">
@@ -58,9 +56,6 @@
                             <x-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
                                 {{ __('Raffle') }}
                             </x-nav-link>
-                            {{-- <x-nav-link href="{{ route('admin.raffle.v2') }}" :active="request()->routeIs('admin.raffle.v2')">
-                                {{ __('Raffle V2') }} --}}
-                            {{-- </x-nav-link> --}}
                         @elseif(auth()->user()->isMerchantUser())
                             <x-nav-link href="{{ route('merchant.dashboard') }}" :active="request()->routeIs('merchant.dashboard')">
                                 {{ __('Dashboard') }}

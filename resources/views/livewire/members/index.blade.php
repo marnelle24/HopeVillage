@@ -229,7 +229,7 @@
             @endif
 
             @if(!$showPasswordReset)
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg md:mx-0 mx-4">
+            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg md:mx-0 mx-4 min-h-[500px]">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -238,7 +238,24 @@
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">FIN</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Verified</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Points</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Activities</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <button 
+                                        wire:click="sortByDate" 
+                                        class="flex items-center cursor-pointer gap-1 hover:text-gray-700 transition-colors"
+                                        title="Sort by Date Registered"
+                                    >
+                                        <span>Date Registered</span>
+                                        @if($dateSort === 'desc')
+                                            <svg class="w-4 h-4 hover:scale-110 transition-all duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                                            </svg>
+                                        @else
+                                            <svg class="w-4 h-4 hover:scale-110 transition-all duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                                            </svg>
+                                        @endif
+                                    </button>
+                                </th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
@@ -270,67 +287,106 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm font-semibold text-gray-800">{{ $member->total_points }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-700">
-                                        <div class="text-xs text-gray-600">Member Activities: <span class="font-semibold">{{ $member->member_activities_count }}</span></div>
-                                        <div class="text-xs text-gray-600">Event Registrations: <span class="font-semibold">{{ $member->event_registrations_count }}</span></div>
+                                        <div class="text-xs text-gray-600">
+                                            {{ $member->created_at ? $member->created_at->format('d M Y') : 'N/A' }}
+                                            , {{ $member->created_at ? $member->created_at->format('g:i A') : '' }}
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <div class="flex items-center justify-end gap-1">
-                                            @if($member->fin)
-                                                <a
-                                                    title="View Member Profile"
-                                                    href="{{ route('admin.members.profile', $member->fin) }}"
-                                                    class="flex gap-1 items-center hover:scale-105 cursor-pointer duration-300 text-xs text-indigo-500 hover:text-indigo-600 transition-all"
-                                                >
-                                                    <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                    </svg>
-                                                    View Profile
-                                                </a>
-                                            @else
-                                                <span class="inline-flex items-center gap-2 bg-gray-400 text-white text-xs font-semibold px-3 py-2 rounded-lg cursor-not-allowed">
-                                                    View
-                                                </span>
-                                            @endif
-                                            @if(auth()->user()->isAdmin())
-                                                <span class="text-gray-500 text-xs px-1">|</span>
-                                                {{-- add the delete button --}}
-                                                <button
-                                                    wire:click="delete({{ $member->id }})"
-                                                    wire:confirm="Are you sure you want to delete this member? This action cannot be undone."
-                                                    class="flex gap-1 items-center text-red-500 hover:text-red-600 transition-all hover:scale-105 cursor-pointer duration-300 text-xs"
-                                                    title="Delete Member"
-                                                >
-                                                    <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                    </svg>
-                                                    Delete
-                                                </button>
-                                            @endif
-                                            @if(auth()->user()->isAdmin())
-                                                <span class="text-gray-500 text-xs px-1">|</span>
-                                                <button
-                                                    wire:click="triggerPasswordReset({{ $member->id }})"
-                                                    class="flex gap-1 items-center text-indigo-500 hover:text-indigo-600 transition-all hover:scale-105 cursor-pointer duration-300 text-xs"
-                                                    title="Reset Password"
-                                                >
-                                                    <svg class="size-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                                    </svg>
+                                        <div 
+                                            x-data="{ 
+                                                open: false,
+                                                position: { top: 0, right: 0 },
+                                                setPosition($el) {
+                                                    const rect = $el.getBoundingClientRect();
+                                                    this.position = {
+                                                        top: rect.bottom,
+                                                        right: window.innerWidth - rect.right - window.scrollX
+                                                    };
+                                                }
+                                            }" 
+                                            class="relative inline-block text-left"
+                                            @click.away="open = false"
+                                        >
+                                            <!-- Hamburger Button -->
+                                            <button
+                                                @click="open = !open; $nextTick(() => { if(open) setPosition($el); })"
+                                                x-ref="button"
+                                                class="inline-flex items-center justify-center text-gray-400 hover:text-gray-600 hover:scale-110 transition-all focus:outline-none focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                                                title="Actions"
+                                            >
+                                                <svg class="w-7 h-7 stroke-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                                                </svg>
+                                            </button>
 
-                                                    Password
-                                                </button>
-                                                {{-- <button
-                                                    wire:click="delete({{ $member->id }})"
-                                                    wire:confirm="Are you sure you want to delete this member? This action cannot be undone."
-                                                    class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
-                                                    title="Delete Member"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                    </svg>
-                                                </button> --}}
-                                            @endif
+                                            <!-- Dropdown Menu -->
+                                            <div
+                                                x-show="open"
+                                                x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="transform opacity-100 scale-100"
+                                                x-transition:leave-end="transform opacity-0 scale-95"
+                                                x-cloak
+                                                :style="`position: fixed; top: ${position.top}px; right: ${position.right}px;`"
+                                                class="w-52 z-[9999] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            >
+                                                <div class="py-1" role="menu" aria-orientation="vertical">
+                                                    @if($member->fin)
+                                                        <a
+                                                            href="{{ route('admin.members.profile', $member->fin) }}"
+                                                            class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                                            role="menuitem"
+                                                            @click="open = false"
+                                                        >
+                                                            <svg class="w-4 h-4 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                            </svg>
+                                                            <span>View Profile</span>
+                                                        </a>
+                                                    @else
+                                                        <div class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 cursor-not-allowed" role="menuitem">
+                                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                            </svg>
+                                                            <span>View Profile (No FIN)</span>
+                                                        </div>
+                                                    @endif
+
+                                                    @if(auth()->user()->isAdmin())
+                                                        <div class="border-t border-gray-100 my-1"></div>
+                                                        
+                                                        <button
+                                                            wire:click="triggerPasswordReset({{ $member->id }})"
+                                                            @click="open = false"
+                                                            class="flex w-full items-center cursor-pointer gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                                            role="menuitem"
+                                                        >
+                                                            <svg class="w-4 h-4 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                            </svg>
+                                                            <span>Reset Password</span>
+                                                        </button>
+
+                                                        <button
+                                                            wire:click="delete({{ $member->id }})"
+                                                            wire:confirm="Are you sure you want to delete this member? This action will soft delete the member and they will be hidden from the members list. The member can be restored later if needed."
+                                                            @click="open = false"
+                                                            class="flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                                            role="menuitem"
+                                                        >
+                                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                            </svg>
+                                                            <span>Delete Member</span>
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
