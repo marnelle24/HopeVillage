@@ -12,10 +12,12 @@ class Card extends Component
     public bool $showQr = false;
     public ?string $qrImage = null;
     public ?string $qrPayload = null;
+    public ?string $type = null;
 
-    public function mount(string $value): void
+    public function mount(string $value, string $type): void
     {
         $this->value = $value;
+        $this->type = $type;
     }
 
     public function redeem(): void

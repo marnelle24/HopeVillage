@@ -131,6 +131,10 @@ Route::middleware([
         return view('member.vouchers');
     })->name('member.vouchers');
 
+    Route::get('/member/vouchers-v2', function () {
+        return view('member.vouchers-v2');
+    })->name('member.vouchers.v2');
+
     // Backward/alternate URL: /member/voucher?status=...
     Route::get('/member/voucher', function () {
         return redirect()->route('member.vouchers', request()->query());
