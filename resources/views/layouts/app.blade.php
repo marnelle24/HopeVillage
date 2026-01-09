@@ -55,12 +55,12 @@
         >
             <template x-for="toast in toasts" :key="toast.id">
                 <div 
-                    class="bg-orange-500 p-2 rounded-lg shadow-lg mb-2 min-w-[300px] max-w-[90vw] flex items-center justify-between"
+                    class="p-2 rounded-lg shadow-lg mb-2 min-w-[300px] max-w-[90vw] flex items-center justify-between"
                     :class="{
-                        '': toast.type === 'success',
-                        '': toast.type === 'error',
-                        '': toast.type === 'info',
-                        '': toast.type === 'warning'
+                        'bg-green-500 text-white border-green-500': toast.type === 'success',
+                        'bg-red-500 text-white border-red-500': toast.type === 'error',
+                        'bg-blue-500 text-white border-blue-500': toast.type === 'info',
+                        'bg-yellow-500 text-white border-yellow-500': toast.type === 'warning'
                     }"
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 transform translate-x-full"

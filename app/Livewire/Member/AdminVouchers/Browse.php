@@ -51,7 +51,12 @@ class Browse extends Component
                 $adminVoucher->increment('usage_count');
             });
 
+            // Refresh user to get updated points
+            $user->refresh();
+            
             $this->dispatch('notify', type: 'success', message: 'Admin voucher claimed! ' . number_format($adminVoucher->points_cost) . ' points deducted.');
+            // Dispatch event to update points header in real-time
+            $this->dispatch('points-updated');
         } catch (\Exception $e) {
             $this->dispatch('notify', type: 'error', message: 'Failed to claim voucher: ' . $e->getMessage());
         }

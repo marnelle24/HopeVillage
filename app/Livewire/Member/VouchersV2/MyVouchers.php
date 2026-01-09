@@ -7,6 +7,91 @@ use Livewire\Component;
 
 class MyVouchers extends Component
 {
+    public $previousClaimedVouchers = [];
+
+    protected $listeners = [
+        'voucher-redeemed' => 'handleVoucherRedeemed',
+    ];
+
+    public function mount()
+    {
+        $this->storePreviousVoucherStates();
+    }
+
+    public function hydrate()
+    {
+        // Check for status changes when component hydrates (on each poll/update)
+        $this->checkVoucherStatusChanges();
+    }
+
+    protected function storePreviousVoucherStates()
+    {
+        $this->previousClaimedVouchers = $this->allClaimedVouchers->map(function ($voucher) {
+            return [
+                'voucher_code' => $voucher->voucher_code,
+                'type' => $voucher->type,
+                'status' => 'claimed', // All vouchers in claimed list are claimed
+            ];
+        })->keyBy('voucher_code')->toArray();
+    }
+
+    protected function checkVoucherStatusChanges()
+    {
+        // Only check if we have previous states stored (skip first render)
+        if (empty($this->previousClaimedVouchers)) {
+            $this->storePreviousVoucherStates();
+            return;
+        }
+
+        $currentClaimed = $this->allClaimedVouchers->keyBy('voucher_code');
+        $previousClaimed = collect($this->previousClaimedVouchers);
+
+        // Check if any previously claimed vouchers are no longer in the claimed list
+        foreach ($previousClaimed as $voucherCode => $previousVoucher) {
+            if (!$currentClaimed->has($voucherCode)) {
+                // Voucher was in claimed list but is now gone - it was likely redeemed
+                // Check if it's now in redeemed list
+                $redeemedVouchers = $this->allRedeemedVouchers->keyBy('voucher_code');
+                if ($redeemedVouchers->has($voucherCode)) {
+                    $redeemedVoucher = $redeemedVouchers->get($voucherCode);
+                    $voucherName = $redeemedVoucher->name ?? 'Voucher';
+                    
+                    // Determine merchant name for better message
+                    $merchantName = '';
+                    if ($redeemedVoucher->type === 'merchant' && isset($redeemedVoucher->merchant)) {
+                        $merchantName = " at {$redeemedVoucher->merchant->name}";
+                    } elseif ($redeemedVoucher->type === 'admin' && isset($redeemedVoucher->redeemed_merchant)) {
+                        $merchantName = " at {$redeemedVoucher->redeemed_merchant->name}";
+                    }
+                    
+                    // Show success notification (only if not already notified via event)
+                    $this->dispatch('notify', 
+                        type: 'success',
+                        message: "Your voucher '{$voucherName}' has been successfully redeemed{$merchantName}!"
+                    );
+                }
+            }
+        }
+
+        // Update stored states for next poll
+        $this->storePreviousVoucherStates();
+    }
+
+    public function handleVoucherRedeemed($data)
+    {
+        // Only show notification if it's for the current user
+        $currentUser = auth()->user();
+        if (!$currentUser || !isset($data['member_id']) || $data['member_id'] != $currentUser->id) {
+            return;
+        }
+
+        // Dispatch toast notification
+        $this->dispatch('notify', 
+            type: $data['type'] ?? 'success',
+            message: $data['message'] ?? 'Voucher redemption status updated.'
+        );
+    }
+
     public function getClaimedProperty(): Collection
     {
         $user = auth()->user();

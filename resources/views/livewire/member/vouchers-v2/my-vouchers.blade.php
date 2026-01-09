@@ -6,10 +6,11 @@
     <div>
         <div class="mb-4">
             <h2 class="text-xl font-bold text-gray-800 mb-1">Claimed Vouchers</h2>
-            <p class="text-xs text-gray-600">Tap a voucher to flip, then click Redeem to show the QR code</p>
+            <p class="text-xs text-gray-600">Your claimed vouchers and ready to redeem. <br />
+                Click the voucher to show the QR code and redeem.</p>
         </div>
 
-        <div class="flex flex-nowrap gap-4 min-h-[200px] items-center overflow-x-auto overflow-y-hidden pb-4 scrollbar-hide snap-x snap-mandatory"
+        <div class="flex flex-nowrap gap-4 min-h-[200px] items-start overflow-x-auto overflow-y-hidden pb-4 scrollbar-hide snap-x snap-mandatory"
             x-data="{ 
                 startX: null,
                 onTouchStart(e) { this.startX = e.touches?.[0]?.clientX ?? null },

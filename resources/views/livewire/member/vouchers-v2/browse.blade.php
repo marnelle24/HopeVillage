@@ -110,12 +110,16 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="flex flex-nowrap gap-4 min-h-[200px] items-start overflow-x-auto overflow-y-hidden pb-4 scrollbar-hide snap-x snap-mandatory">
             @forelse($this->claimableAdminVouchers as $adminVoucher)
-                <div class="group relative border border-gray-200 rounded-2xl bg-white overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                
+                <div
+                    class="shrink-0 w-48 snap-center relative h-full border border-orange-200 group group-hover:border-orange-400/70 rounded-2xl bg-white overflow-hidden opacity-90 hover:opacity-100 transition-all duration-300 hover:shadow-lg"
+                > 
+                    {{-- class="group relative border border-gray-200 rounded-2xl bg-white overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"> --}}
                     <!-- Voucher Image -->
                     @if($adminVoucher->image_url)
-                        <div class="relative h-48 overflow-hidden">
+                        <div class="relative h-24 overflow-hidden">
                             <img src="{{ $adminVoucher->image_url }}" alt="{{ $adminVoucher->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div class="absolute top-3 right-3">
@@ -123,12 +127,12 @@
                             </div>
                         </div>
                     @else
-                        <div class="relative h-48 bg-gradient-to-br from-purple-100 via-purple-50 to-pink-50 flex items-center justify-center">
+                        <div class="relative h-24 bg-gradient-to-br from-purple-100 via-purple-50 to-pink-50 flex items-center justify-center">
                             <div class="text-center">
-                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 mx-auto text-purple-400 mb-2">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto text-purple-600 mb-2">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M16 2H0V6C1.10457 6 2 6.89543 2 8C2 9.10457 1.10457 10 0 10V14H16V10C14.8954 10 14 9.10457 14 8C14 6.89543 14.8954 6 16 6V2ZM8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" fill="currentColor"></path>
                                 </svg>
-                                <span class="px-2 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full">Points Exchange</span>
+                                {{-- <span class="px-2 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full">Points Exchange</span> --}}
                             </div>
                         </div>
                     @endif
@@ -136,13 +140,13 @@
                     <!-- Voucher Content -->
                     <div class="p-4">
                         <div class="mb-2">
-                            <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-1">{{ $adminVoucher->name }}</h3>
+                            <h3 class="font-bold text-md text-gray-800 mb-1 line-clamp-1">{{ $adminVoucher->name }}</h3>
                         </div>
                         
                         <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ $adminVoucher->description }}</p>
                         
                         <!-- Points Cost -->
-                        <div class="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                        <div class="mb-4 p-2 bg-purple-50 rounded-lg border border-purple-100">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs text-gray-600 flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
@@ -184,7 +188,7 @@
                                 wire:loading.attr="disabled"
                                 wire:target="claimAdminVoucher({{ $adminVoucher->id }})"
                                 @class([
-                                    'w-full px-4 py-3 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed',
+                                    'w-full cursor-pointer text-xs px-4 py-3 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed',
                                     'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700' => $hasEnoughPoints,
                                     'bg-gray-300 text-gray-500 cursor-not-allowed' => !$hasEnoughPoints,
                                 ])
@@ -215,7 +219,7 @@
                     </div>
                 </div>
             @empty
-                <div class="col-span-full border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50/50 p-8 text-center">
+                <div class="w-full border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50/50 p-8 text-center">
                     <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>

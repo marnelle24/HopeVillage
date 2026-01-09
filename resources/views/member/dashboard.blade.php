@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-member-points-header />
+        @livewire('member.points-header')
     </x-slot>
     <div class="py-12 md:px-0 px-4">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">

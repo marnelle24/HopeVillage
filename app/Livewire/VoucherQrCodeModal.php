@@ -265,8 +265,26 @@ class VoucherQrCodeModal extends Component
                         'merchant_name' => $this->voucher->merchant?->name,
                     ]);
                     
-                    // Only automatically process voucher redemption for members
+                    // Check merchant ownership if merchant user is viewing
                     $user = auth()->user();
+                    if ($user && $user->isMerchantUser()) {
+                        $currentMerchant = $user->currentMerchant();
+                        if ($currentMerchant && $this->voucher->merchant_id !== $currentMerchant->id) {
+                            $errorMsg = 'This voucher does not belong to your merchant. Only the voucher owner can redeem it.';
+                            Log::warning('Merchant attempted to redeem voucher not owned by them', [
+                                'merchant_id' => $currentMerchant->id,
+                                'merchant_name' => $currentMerchant->name,
+                                'voucher_code' => $this->voucher->voucher_code,
+                                'voucher_merchant_id' => $this->voucher->merchant_id,
+                                'voucher_merchant_name' => $this->voucher->merchant?->name,
+                            ]);
+                            $this->error = $errorMsg;
+                            $this->processing = false;
+                            return;
+                        }
+                    }
+                    
+                    // Only automatically process voucher redemption for members
                     if ($user && $user->isMember()) {
                         $this->processVoucherRedemption();
                     }
@@ -589,6 +607,15 @@ class VoucherQrCodeModal extends Component
                             'voucher_id' => $this->adminVoucher->id,
                         ]);
                         $this->error = $errorMsg;
+                        
+                        // Dispatch error event to notify member
+                        $this->dispatch('voucher-redeemed', [
+                            'type' => 'error',
+                            'message' => "Voucher '{$this->adminVoucher->name}' is not claimed. Please claim it first.",
+                            'voucher_code' => $this->adminVoucher->voucher_code,
+                            'member_id' => $this->redeemer->id,
+                        ])->to('member.vouchers-v2.my-vouchers');
+                        
                         $this->processing = false;
                         return;
                     }
@@ -610,6 +637,15 @@ class VoucherQrCodeModal extends Component
                             'redeemed_at_merchant_id' => $pivot->pivot->redeemed_at_merchant_id,
                         ]);
                         $this->error = $errorMsg;
+                        
+                        // Dispatch error event to notify member
+                        $this->dispatch('voucher-redeemed', [
+                            'type' => 'error',
+                            'message' => "Voucher '{$this->adminVoucher->name}' has already been redeemed.",
+                            'voucher_code' => $this->adminVoucher->voucher_code,
+                            'member_id' => $this->redeemer->id,
+                        ])->to('member.vouchers-v2.my-vouchers');
+                        
                         $this->processing = false;
                         return;
                     }
@@ -623,6 +659,15 @@ class VoucherQrCodeModal extends Component
                             'current_status' => $pivot->pivot->status,
                         ]);
                         $this->error = $errorMsg;
+                        
+                        // Dispatch error event to notify member
+                        $this->dispatch('voucher-redeemed', [
+                            'type' => 'error',
+                            'message' => "Voucher '{$this->adminVoucher->name}' must be claimed before redemption.",
+                            'voucher_code' => $this->adminVoucher->voucher_code,
+                            'member_id' => $this->redeemer->id,
+                        ])->to('member.vouchers-v2.my-vouchers');
+                        
                         $this->processing = false;
                         return;
                     }
@@ -653,6 +698,14 @@ class VoucherQrCodeModal extends Component
                     $this->success = true;
                     $this->successMessage = "Admin voucher redeemed successfully!";
                     
+                    // Dispatch event to notify member in real-time
+                    $this->dispatch('voucher-redeemed', [
+                        'type' => 'success',
+                        'message' => "Your voucher '{$this->adminVoucher->name}' has been successfully redeemed at {$currentMerchant->name}!",
+                        'voucher_code' => $this->adminVoucher->voucher_code,
+                        'member_id' => $this->redeemer->id,
+                    ])->to('member.vouchers-v2.my-vouchers');
+                    
                         // Update redeemer voucher status
                         $this->redeemerVoucherStatus = 'redeemed';
                         
@@ -668,7 +721,19 @@ class VoucherQrCodeModal extends Component
                         'trace' => $e->getTraceAsString(),
                     ]);
                     
-                    $this->error = 'Failed to redeem admin voucher: ' . ($e->getMessage() ?? 'Unknown error');
+                    $errorMessage = 'Failed to redeem admin voucher: ' . ($e->getMessage() ?? 'Unknown error');
+                    $this->error = $errorMessage;
+                    
+                    // Dispatch error event to notify member
+                    if ($this->redeemer) {
+                        $this->dispatch('voucher-redeemed', [
+                            'type' => 'error',
+                            'message' => "Failed to redeem voucher '{$this->adminVoucher->name}': " . ($e->getMessage() ?? 'Unknown error'),
+                            'voucher_code' => $this->adminVoucher->voucher_code,
+                            'member_id' => $this->redeemer->id,
+                        ])->to('member.vouchers-v2.my-vouchers');
+                    }
+                    
                     $this->processing = false;
                 }
             } else {
@@ -683,6 +748,44 @@ class VoucherQrCodeModal extends Component
                     'voucher_code' => $this->voucherCode,
                 ]);
                 $this->error = $errorMsg;
+                $this->processing = false;
+                return;
+            }
+            
+            // Check if merchant owns this voucher
+            $currentMerchant = $currentUser->currentMerchant();
+            if (!$currentMerchant) {
+                $errorMsg = 'Merchant information not found.';
+                Log::error('Merchant not found for voucher redemption', [
+                    'user_id' => $currentUser->id,
+                    'voucher_code' => $this->voucherCode,
+                ]);
+                $this->error = $errorMsg;
+                $this->processing = false;
+                return;
+            }
+            
+            if ($this->voucher->merchant_id !== $currentMerchant->id) {
+                $errorMsg = 'This voucher does not belong to your merchant. Only the voucher owner can redeem it.';
+                Log::warning('Merchant attempted to redeem voucher not owned by them', [
+                    'merchant_id' => $currentMerchant->id,
+                    'merchant_name' => $currentMerchant->name,
+                    'voucher_code' => $this->voucher->voucher_code,
+                    'voucher_merchant_id' => $this->voucher->merchant_id,
+                    'voucher_merchant_name' => $this->voucher->merchant?->name,
+                ]);
+                $this->error = $errorMsg;
+                
+                // Dispatch error event to notify member
+                if ($this->redeemer) {
+                    $this->dispatch('voucher-redeemed', [
+                        'type' => 'error',
+                        'message' => "Failed to redeem voucher '{$this->voucher->name}': This voucher does not belong to the scanning merchant.",
+                        'voucher_code' => $this->voucher->voucher_code,
+                        'member_id' => $this->redeemer->id,
+                    ])->to('member.vouchers-v2.my-vouchers');
+                }
+                
                 $this->processing = false;
                 return;
             }
@@ -721,6 +824,15 @@ class VoucherQrCodeModal extends Component
                             'voucher_id' => $this->voucher->id,
                         ]);
                         $this->error = $errorMsg;
+                        
+                        // Dispatch error event to notify member
+                        $this->dispatch('voucher-redeemed', [
+                            'type' => 'error',
+                            'message' => "Voucher '{$this->voucher->name}' is not claimed. Please claim it first.",
+                            'voucher_code' => $this->voucher->voucher_code,
+                            'member_id' => $this->redeemer->id,
+                        ])->to('member.vouchers-v2.my-vouchers');
+                        
                         $this->processing = false;
                         return;
                     }
@@ -741,6 +853,15 @@ class VoucherQrCodeModal extends Component
                             'redeemed_at' => $pivot->pivot->redeemed_at,
                         ]);
                         $this->error = $errorMsg;
+                        
+                        // Dispatch error event to notify member
+                        $this->dispatch('voucher-redeemed', [
+                            'type' => 'error',
+                            'message' => "Voucher '{$this->voucher->name}' has already been redeemed.",
+                            'voucher_code' => $this->voucher->voucher_code,
+                            'member_id' => $this->redeemer->id,
+                        ])->to('member.vouchers-v2.my-vouchers');
+                        
                         $this->processing = false;
                         return;
                     }
@@ -754,6 +875,15 @@ class VoucherQrCodeModal extends Component
                             'current_status' => $pivot->pivot->status,
                         ]);
                         $this->error = $errorMsg;
+                        
+                        // Dispatch error event to notify member
+                        $this->dispatch('voucher-redeemed', [
+                            'type' => 'error',
+                            'message' => "Voucher '{$this->voucher->name}' must be claimed before redemption.",
+                            'voucher_code' => $this->voucher->voucher_code,
+                            'member_id' => $this->redeemer->id,
+                        ])->to('member.vouchers-v2.my-vouchers');
+                        
                         $this->processing = false;
                         return;
                     }
@@ -778,6 +908,7 @@ class VoucherQrCodeModal extends Component
                     
                     Log::info('Voucher redeemed by merchant - SUCCESS', [
                         'merchant_id' => $currentUser->id,
+                        'merchant_name' => $currentUser->currentMerchant()?->name,
                         'member_fin' => $this->redeemer->fin,
                         'member_id' => $this->redeemer->id,
                         'voucher_code' => $this->voucher->voucher_code,
@@ -790,6 +921,15 @@ class VoucherQrCodeModal extends Component
                     // Set success message
                     $this->success = true;
                     $this->successMessage = "Voucher redeemed successfully!";
+                    
+                    // Dispatch event to notify member in real-time
+                    $merchantName = $currentUser->currentMerchant()?->name ?? 'the merchant';
+                    $this->dispatch('voucher-redeemed', [
+                        'type' => 'success',
+                        'message' => "Your voucher '{$this->voucher->name}' has been successfully redeemed at {$merchantName}!" . ($pointsAwarded > 0 ? " You earned {$pointsAwarded} points!" : ''),
+                        'voucher_code' => $this->voucher->voucher_code,
+                        'member_id' => $this->redeemer->id,
+                    ])->to('member.vouchers-v2.my-vouchers');
                     
                     // Update redeemer voucher status
                     $this->redeemerVoucherStatus = 'redeemed';
@@ -805,7 +945,19 @@ class VoucherQrCodeModal extends Component
                     'trace' => $e->getTraceAsString(),
                 ]);
                 
-                $this->error = 'Failed to redeem voucher: ' . ($e->getMessage() ?? 'Unknown error');
+                $errorMessage = 'Failed to redeem voucher: ' . ($e->getMessage() ?? 'Unknown error');
+                $this->error = $errorMessage;
+                
+                // Dispatch error event to notify member
+                if ($this->redeemer) {
+                    $this->dispatch('voucher-redeemed', [
+                        'type' => 'error',
+                        'message' => "Failed to redeem voucher '{$this->voucher->name}': " . ($e->getMessage() ?? 'Unknown error'),
+                        'voucher_code' => $this->voucher->voucher_code,
+                        'member_id' => $this->redeemer->id,
+                    ])->to('member.vouchers-v2.my-vouchers');
+                }
+                
                 $this->processing = false;
             }
             }

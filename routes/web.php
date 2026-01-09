@@ -117,6 +117,11 @@ Route::middleware([
     Route::get('/member/events-v1', function () {
         return view('member.events');
     })->name('member.events.v1');
+
+    Route::get('/member/vouchers-v1', function () {
+        return view('member.vouchers');
+    })->name('member.vouchers.v1');
+
     //  ====== end of to be deleted
 
     Route::get('/member/events', function () {
@@ -128,12 +133,8 @@ Route::middleware([
     })->name('member.dashboard');
 
     Route::get('/member/vouchers', function () {
-        return view('member.vouchers');
-    })->name('member.vouchers');
-
-    Route::get('/member/vouchers-v2', function () {
         return view('member.vouchers-v2');
-    })->name('member.vouchers.v2');
+    })->name('member.vouchers');
 
     // Backward/alternate URL: /member/voucher?status=...
     Route::get('/member/voucher', function () {

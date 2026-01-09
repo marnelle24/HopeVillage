@@ -18,17 +18,21 @@
 @endphp
 
 <div
-    x-data="{ showQr: @entangle('showQr') }"
+    x-data="{ showQr: @entangle('showQr'), showOverlay: false }"
     class="shrink-0"
 >
 
     @if($type === 'merchant')
-        <div class="relative h-full border border-orange-200 group group-hover:border-orange-400/70 rounded-2xl bg-white overflow-hidden opacity-90 hover:opacity-100 transition-all duration-300 hover:shadow-lg">
+        <div 
+            @mouseleave="showOverlay = false"
+            class="relative h-full border border-orange-200 group group-hover:border-orange-400/70 rounded-2xl bg-white overflow-hidden opacity-90 hover:opacity-100 transition-all duration-300 hover:shadow-lg">
             <div 
-                wire:click="redeem"
-                @click.stop
-                class="absolute z-50 inset-0 flex items-center justify-center hover:bg-black/40 transition-all duration-300 group-hover:cursor-pointer">
-                <span class="opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 text-white text-lg drop-shadow-lg font-bold transition-all duration-300 cursor-pointer">
+                @click.stop="showOverlay ? $wire.redeem() : (showOverlay = true)"
+                :class="showOverlay ? 'bg-black/40' : ''"
+                class="absolute z-50 inset-0 flex items-center justify-center hover:bg-black/40 transition-all duration-300 cursor-pointer">
+                <span 
+                    :class="showOverlay ? 'opacity-100 -translate-y-1' : 'opacity-0'"
+                    class="text-white text-lg drop-shadow-lg font-bold transition-all duration-300 hover:opacity-100 hover:-translate-y-1">
                     Redeem Now
                 </span>
             </div>
@@ -51,6 +55,9 @@
             </div>
             <div class="p-3 bg-gradient-to-b from-white to-orange-50/30">
                 <h3 class="font-bold text-sm text-gray-800 mb-1 line-clamp-1">{{ $voucher->name }}</h3>
+                @if($merchant && $merchant->name)
+                    <p class="text-xs text-gray-600 mb-2">You can redeem this voucher at <span class="font-bold">{{ $merchant->name }}</span></p>
+                @endif
                 <div class="flex items-center justify-start gap-1 text-[11px] text-gray-500 mt-4 pt-3 border-t border-orange-100">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -62,12 +69,16 @@
     @endif
 
     @if($type === 'admin')
-        <div class="relative h-full border border-blue-200 group group-hover:border-blue-400/70 rounded-2xl bg-white overflow-hidden opacity-90 hover:opacity-100 transition-all duration-300 hover:shadow-lg">
+        <div 
+            @mouseleave="showOverlay = false"
+            class="relative h-full border border-blue-200 group group-hover:border-blue-400/70 rounded-2xl bg-white overflow-hidden transition-all duration-300 hover:shadow-lg">
             <div 
-                wire:click="redeem"
-                @click.stop
-                class="absolute z-50 inset-0 flex items-center justify-center hover:bg-black/40 transition-all duration-300 group-hover:cursor-pointer">
-                <span class="opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 text-white text-lg drop-shadow-lg font-bold transition-all duration-300 cursor-pointer">
+                @click.stop="showOverlay ? $wire.redeem() : (showOverlay = true)"
+                :class="showOverlay ? 'bg-black/40' : ''"
+                class="absolute z-50 inset-0 flex items-center justify-center hover:bg-black/40 transition-all duration-300 cursor-pointer">
+                <span 
+                    :class="showOverlay ? 'opacity-100 -translate-y-1' : 'opacity-0'"
+                    class="text-white text-lg drop-shadow-lg font-bold transition-all duration-300 hover:opacity-100 hover:-translate-y-1">
                     Redeem Now
                 </span>
             </div>
@@ -90,6 +101,10 @@
             </div>
             <div class="p-3 bg-gradient-to-b from-white to-blue-50/30">
                 <h3 class="font-bold text-sm text-gray-800 mb-1 line-clamp-1">{{ $voucher->name }}</h3>
+                {{-- add here the merchant name if available --}}
+                @if($merchants && $merchants->isNotEmpty())
+                    <p class="text-xs text-gray-600 mb-2">You can redeem this voucher at <span class="font-bold">{{ $merchants->pluck('name')->join(', ') }}</span></p>
+                @endif
                 <div class="flex items-center justify-start gap-1 text-[11px] text-gray-500 mt-4 pt-3 border-t border-blue-100">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>

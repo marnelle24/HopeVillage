@@ -1,7 +1,7 @@
 <x-app-layout>
     @if(auth()->user()->isMember())
         <x-slot name="header">
-            <x-member-points-header />
+            @livewire('member.points-header')
         </x-slot>
     @else
         <x-slot name="header">
