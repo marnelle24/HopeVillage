@@ -85,6 +85,7 @@ Route::middleware([
     Route::get('/admin/admin-vouchers', \App\Livewire\AdminVouchers\Index::class)->name('admin.admin-vouchers.index');
     Route::get('/admin/admin-vouchers/create', \App\Livewire\AdminVouchers\Form::class)->name('admin.admin-vouchers.create');
     Route::get('/admin/admin-vouchers/{voucher_code}/edit', \App\Livewire\AdminVouchers\Form::class)->name('admin.admin-vouchers.edit');
+    Route::get('/admin/admin-vouchers/{voucher_code}/profile', \App\Livewire\AdminVouchers\Profile::class)->name('admin.admin-vouchers.profile');
 
     // Point System CRUD Routes
     Route::get('/admin/point-system', \App\Livewire\PointSystem\Index::class)->name('admin.point-system.index');

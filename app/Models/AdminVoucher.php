@@ -20,6 +20,7 @@ class AdminVoucher extends Model implements HasMedia
         'name',
         'description',
         'points_cost',
+        'amount_cost',
         'valid_from',
         'valid_until',
         'usage_limit',
@@ -32,6 +33,7 @@ class AdminVoucher extends Model implements HasMedia
     {
         return [
             'points_cost' => 'integer',
+            'amount_cost' => 'decimal:2',
             'valid_from' => 'datetime',
             'valid_until' => 'datetime',
             'usage_limit' => 'integer',

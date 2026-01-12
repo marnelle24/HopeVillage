@@ -11,7 +11,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -53,6 +53,54 @@
 
             <form wire:submit="save">
                 <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
+                    <div class="flex gap-4 lg:flex-row flex-col">
+                        <div class="w-full lg:w-1/3">
+                            <!-- Voucher Image Upload -->
+                            <div class="mb-4">
+                                <label for="voucherImage" class="block text-sm font-medium text-gray-700 mb-2">Voucher Image</label>
+                                
+                                @if($existingVoucherImage && !$voucherImage)
+                                    <div class="mb-4 relative inline-block">
+                                        <img src="{{ $existingVoucherImage }}" alt="Current Image" class="w-full max-w-md h-64 object-cover rounded-lg border border-gray-300">
+                                        <button 
+                                            type="button" 
+                                            wire:click="removeVoucherImage"
+                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition"
+                                            title="Remove Image"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+        
+                                @if($voucherImage)
+                                    <div class="mt-2 mb-4">
+                                        <img src="{{ $voucherImage->temporaryUrl() }}" alt="Preview" class="w-full max-w-md h-64 object-cover rounded-lg border border-gray-300">
+                                    </div>
+                                @endif
+        
+                                @if(!$voucherImage && !$existingVoucherImage)
+                                    <div class="w-full max-w-md h-64 mb-4 bg-gray-200 rounded-lg flex flex-col items-center justify-center border border-gray-300">
+                                        <p class="text-gray-400 text-sm">IMG</p>
+                                        <p class="text-gray-400 text-sm">Upload</p>
+                                    </div>
+                                @endif
+        
+                                <input 
+                                    type="file" 
+                                    id="voucherImage"
+                                    wire:model="voucherImage" 
+                                    accept="image/jpeg,image/png,image/webp"
+                                    class="block w-full max-w-md text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold bg-gray-200/50 border border-gray-300 rounded-lg file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200"
+                                >
+                                @error('voucherImage') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <p class="text-xs text-gray-500 mt-1">Maximum file size: 2MB. Accepted formats: JPEG, PNG, WebP</p>
+                            </div>
+                        </div>
+
+                        <div class="w-full lg:w-2/3">
                     <!-- Name -->
                     <div class="mb-4">
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name <span class="text-red-500">*</span></label>
@@ -79,50 +127,77 @@
                         @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
-                    <!-- Points Cost -->
-                    <div class="mb-4">
-                        <label for="points_cost" class="block text-sm font-medium text-gray-700 mb-2">Points Cost <span class="text-red-500">*</span></label>
-                        <input 
-                            placeholder="0"
-                            type="number" 
-                            id="points_cost"
-                            wire:model.blur="points_cost" 
-                            min="0"
-                            step="1"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-1 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('points_cost') border-red-500 @enderror"
-                        >
-                        <p class="text-xs text-gray-500 mt-1">Points required for members to claim this voucher</p>
-                        @error('points_cost') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    <!-- Points Cost and Amount Cost -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="points_cost" class="block text-sm font-medium text-gray-700 mb-2">Points Cost <span class="text-red-500">*</span></label>
+                            <input 
+                                placeholder="0"
+                                type="number" 
+                                id="points_cost"
+                                wire:model.blur="points_cost" 
+                                min="0"
+                                step="1"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-1 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('points_cost') border-red-500 @enderror"
+                            >
+                            <p class="text-xs text-gray-500 mt-1">Points required for members to claim this voucher</p>
+                            @error('points_cost') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label for="amount_cost" class="block text-sm font-medium text-gray-700 mb-2">Amount Cost</label>
+                            <input 
+                                placeholder="0.00"
+                                type="number" 
+                                id="amount_cost"
+                                wire:model.blur="amount_cost" 
+                                min="0"
+                                step="0.01"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-1 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('amount_cost') border-red-500 @enderror"
+                            >
+                            <p class="text-xs text-gray-500 mt-1">Monetary cost of the voucher (optional)</p>
+                            @error('amount_cost') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
                     <!-- Allowed Merchants -->
                     <div class="mb-4">
-                        <label for="merchants" class="block text-sm font-medium text-gray-700 mb-2">Allowed Merchants <span class="text-red-500">*</span></label>
-                        <select 
-                            id="merchants"
-                            wire:model.blur="selectedMerchants" 
-                            multiple
-                            size="8"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-1 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('selectedMerchants') border-red-500 @enderror"
-                        >
-                            @foreach($merchants as $merchant)
-                                <option value="{{ $merchant->id }}">{{ $merchant->name }}</option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple merchants</p>
+                        <div class="mb-2 flex gap-1">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Allowed Merchants <span class="text-red-500">*</span>
+                            </label>
+                            <p class="text-xs text-gray-500 mt-1">(Select one or more merchants where this voucher can be redeemed)</p>
+                        </div>
+                        <div class="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto @error('selectedMerchants') border-red-500 @enderror">
+                            <div class="space-y-2 max-h-64 overflow-y-auto">
+                                @foreach($merchants as $merchant)
+                                    <label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model.live.debounce.500ms="selectedMerchants"
+                                            value="{{ $merchant->id }}"
+                                            class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                        >
+                                        <div class="ml-3 flex-1">
+                                            <p class="text-sm font-medium text-gray-900">{{ $merchant->name }}</p>
+                                            @if($merchant->email)
+                                                <p class="text-xs text-gray-500 mt-0.5">{{ $merchant->email }}</p>
+                                            @endif
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                         @error('selectedMerchants') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         @if(count($selectedMerchants) > 0)
-                            <div class="mt-2 flex flex-wrap gap-2">
+                            <span class="text-xs text-gray-500 font-medium">Selected ({{ count($selectedMerchants) }}):</span>
+                            <div class="flex flex-wrap gap-2">
                                 @foreach($selectedMerchants as $merchantId)
                                     @php
                                         $merchant = $merchants->firstWhere('id', $merchantId);
                                     @endphp
                                     @if($merchant)
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-sm">
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 border border-orange-300 text-orange-800 rounded-full text-xs">
                                             {{ $merchant->name }}
-                                            <button type="button" wire:click="$set('selectedMerchants', array_values(array_filter($selectedMerchants, fn($id) => $id != $merchantId)))" class="text-indigo-600 hover:text-indigo-800">
-                                                ×
-                                            </button>
                                         </span>
                                     @endif
                                 @endforeach
@@ -178,6 +253,8 @@
                             >
                             <span class="ml-2 text-md text-gray-700">Active</span>
                         </label>
+                    </div>
+                        </div>
                     </div>
 
                     <!-- Submit Buttons -->
