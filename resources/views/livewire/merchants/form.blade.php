@@ -1,17 +1,25 @@
 <div>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ $merchantCode ? __('Edit Merchant') : __('Create Merchant') }}
-            </h2>
-            <a href="{{ route('admin.merchants.index') }}" class="text-gray-600 hover:text-gray-900">
-                ← Back to Merchants
-            </a>
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ $merchantCode ? __('Edit Merchant') : __('Create Merchant') }}
+                </h2>
+                <a href="{{ route('admin.merchants.index') }}" class="text-orange-500 font-medium hover:text-orange-700 hover:scale-105 transition-all duration-300 py-2 px-4">
+                    <span class="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                        </svg>
+                        Back to Merchants
+                    </span>
+                </a>
+            </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-12"> 
+
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -111,7 +119,7 @@
                                     type="text" 
                                     id="name"
                                     wire:model.blur="name" 
-                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('name') border-red-500 @enderror"
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('name') border-red-500 @enderror"
                                 >
                                 @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
@@ -124,7 +132,7 @@
                                     id="description"
                                     wire:model.blur="description" 
                                     rows="4"
-                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('description') border-red-500 @enderror"
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('description') border-red-500 @enderror"
                                 ></textarea>
                                 @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
@@ -137,7 +145,7 @@
                                     type="text" 
                                     id="contact_name"
                                     wire:model.blur="contact_name" 
-                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('contact_name') border-red-500 @enderror"
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('contact_name') border-red-500 @enderror"
                                 >
                                 @error('contact_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
@@ -151,7 +159,7 @@
                                         type="text" 
                                         id="phone"
                                         wire:model.blur="phone" 
-                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('phone') border-red-500 @enderror"
+                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('phone') border-red-500 @enderror"
                                     >
                                     @error('phone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
@@ -162,7 +170,7 @@
                                         type="email" 
                                         id="email"
                                         wire:model.blur="email" 
-                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('email') border-red-500 @enderror"
+                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('email') border-red-500 @enderror"
                                     >
                                     @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
@@ -176,7 +184,7 @@
                                     type="text" 
                                     id="address"
                                     wire:model.blur="address" 
-                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('address') border-red-500 @enderror"
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('address') border-red-500 @enderror"
                                 >
                                 @error('address') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
@@ -190,7 +198,7 @@
                                         type="text" 
                                         id="city"
                                         wire:model.blur="city" 
-                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('city') border-red-500 @enderror"
+                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('city') border-red-500 @enderror"
                                     >
                                     @error('city') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
@@ -201,7 +209,7 @@
                                         type="text" 
                                         id="province"
                                         wire:model.blur="province" 
-                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('province') border-red-500 @enderror"
+                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('province') border-red-500 @enderror"
                                     >
                                     @error('province') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
@@ -212,7 +220,7 @@
                                         type="text" 
                                         id="postal_code"
                                         wire:model.blur="postal_code" 
-                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('postal_code') border-red-500 @enderror"
+                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('postal_code') border-red-500 @enderror"
                                     >
                                     @error('postal_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
@@ -226,7 +234,7 @@
                                     type="url" 
                                     id="website"
                                     wire:model.blur="website" 
-                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('website') border-red-500 @enderror"
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('website') border-red-500 @enderror"
                                 >
                                 @error('website') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
@@ -237,7 +245,7 @@
                                     <input 
                                         type="checkbox" 
                                         wire:model.blur="is_active" 
-                                        class="w-6 h-6 rounded-none border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        class="w-6 h-6 rounded-none border-gray-300 text-gray-700 shadow-sm focus:border-orange-300 focus:ring focus:ring-orange-200 focus:ring-opacity-50"
                                     >
                                     <span class="ml-2 text-md text-gray-700">Active</span>
                                 </label>
@@ -247,13 +255,13 @@
                             <div class="flex justify-end gap-4">
                                 <a 
                                     href="{{ route('admin.merchants.index') }}" 
-                                    class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                                    class="px-6 py-2 border border-gray-300 rounded-full text-gray-700 text-lg font-medium hover:bg-gray-50 transition"
                                 >
                                     Cancel
                                 </a>
                                 <button 
                                     type="submit" 
-                                    class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                                    class="px-6 py-2 bg-orange-500 text-white rounded-full cursor-pointer text-lg font-medium hover:bg-orange-600 transition"
                                 >
                                     {{ $merchantCode ? 'Update' : 'Create' }} Merchant
                                 </button>

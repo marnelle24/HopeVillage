@@ -1,22 +1,29 @@
 <div>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
-                {{ __('Merchants Management') }}
-            </h2>
-            <a href="{{ route('admin.merchants.create') }}" class="md:block hidden bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">
-                Add New Merchant
-            </a>
-            <a href="{{ route('admin.merchants.create') }}" class="md:hidden block bg-indigo-600 hover:bg-indigo-500 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-            </a>
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
+                    {{ __('Merchants Management') }}
+                </h2>
+                <a href="{{ route('admin.merchants.create') }}" class="md:block hidden text-orange-500 font-medium hover:text-orange-600 hover:scale-105 transition-all duration-300 py-2 px-4">
+                    <span class="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Add New Merchant
+                    </span>
+                </a>
+                <a href="{{ route('admin.merchants.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                </a>
+            </div>
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -58,8 +65,8 @@
 
             <!-- Search and Filter -->
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2">
                         <input 
                             type="text" 
                             wire:model.live.debounce.300ms="search" 
@@ -67,7 +74,7 @@
                             class="w-full px-4 py-2 border text-gray-800 border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                     </div>
-                    <div>
+                    <div class="md:col-span-1">
                         <select 
                             wire:model.live="statusFilter" 
                             class="w-full px-4 py-2 border text-gray-800 border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
@@ -83,12 +90,12 @@
 
             <div class="grid grid-cols-1 gap-4 md:px-0 px-4">
                 @forelse($merchants as $merchant)
-                    <div class="w-full bg-blue-50 overflow-hidden border-2 border-gray-300 flex md:flex-row flex-col md:justify-between justify-start items-center rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                    <div class="w-full bg-white overflow-hidden border-2 border-gray-300 flex md:flex-row flex-col md:justify-between justify-start items-center rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                         <div class="flex-1 flex items-start h-full w-full">
                             @if($merchant->logo_url)
                                 <img src="{{ $merchant->logo_url }}" alt="{{ $merchant->name }}" class="w-32 h-full object-cover rounded-lg">
                             @else
-                                <span class="text-blue-800 opacity-50 drop-shadow-lg text-3xl font-bold w-32 h-full bg-blue-200 rounded-l-lg flex items-center justify-center">
+                                <span class="text-orange-400 drop-shadow-lg text-3xl font-bold w-32 h-full bg-orange-100 rounded-l-lg flex items-center justify-center">
                                     {{ strtoupper(substr($merchant->name, 0, 2)) }}
                                 </span>
                             @endif
@@ -101,6 +108,18 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                             </svg>
                                             <span class="text-xs">{{ $merchant->merchant_code }}</span>
+                                        </span>
+                                        @php
+                                            if ($merchant->is_active) {
+                                                $status = 'Active';
+                                                $statusClass = 'bg-green-100 text-green-800 border border-green-300/50';
+                                            } else {
+                                                $status = 'Pending Approval';
+                                                $statusClass = 'bg-red-100 text-red-800 border border-red-300';
+                                            }
+                                        @endphp
+                                        <span class="flex items-center gap-1 {{ $statusClass }} rounded-lg px-2 py-1 text-xs">
+                                            <span class="text-sm">{{ $status }}</span>
                                         </span>
                                         {{-- @if(!$merchant->is_active)
                                             <span class="px-2 py-1 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg text-xs font-semibold">
@@ -150,19 +169,6 @@
                                             </span>
                                         </div>
                                         <div class="flex md:flex-row flex-col md:items-end items-start gap-3">
-                                            @php
-                                                if ($merchant->is_active) {
-                                                    $status = 'Active';
-                                                    $statusClass = 'bg-green-100 text-green-800 border border-green-300/50';
-                                                } else {
-                                                    $status = 'Pending Approval';
-                                                    $statusClass = 'bg-red-100 text-red-800 border border-red-300';
-                                                }
-                                            @endphp
-                                            <span class="flex items-center gap-1 {{ $statusClass }} mt-2 rounded-lg px-2.5 py-1 text-xs">
-                                                <span class="text-sm">{{ $status }}</span>
-                                            </span>
-
                                             @if(!$merchant->is_active)
                                                 <div class="flex items-center gap-1">
                                                     <button 

@@ -1,12 +1,19 @@
 <div>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ $voucherCode ? __('Edit Admin Voucher') : __('Create Admin Voucher') }}
-            </h2>
-            <a href="{{ route('admin.admin-vouchers.index') }}" class="text-gray-600 hover:text-gray-900">
-                ← Back to Admin Vouchers
-            </a>
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-lg md:text-xl text-gray-800 leading-tight">
+                    {{ $voucherCode ? __('Edit Admin Voucher') : __('Create Admin Voucher') }}
+                </h2>
+                <a href="{{ route('admin.admin-vouchers.index') }}" class="text-orange-500 font-medium hover:text-orange-600 hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center gap-1 text-sm md:text-base line-clamp-1 text-right">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                        </svg>
+                        Back to Admin Vouchers
+                    </span>
+                </a>
+            </div>
         </div>
     </x-slot>
 

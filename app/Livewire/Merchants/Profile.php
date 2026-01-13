@@ -3,6 +3,7 @@
 namespace App\Livewire\Merchants;
 
 use App\Models\Merchant;
+use App\Services\QrCodeService;
 use Livewire\Component;
 
 class Profile extends Component
@@ -20,15 +21,25 @@ class Profile extends Component
 
     public function loadMerchant()
     {
-        $this->merchant = Merchant::with(['vouchers' => function ($query) {
-            $query->latest()->take(10);
-        }, 'users'])->where('merchant_code', $this->merchantCode)->firstOrFail();
+        $this->merchant = Merchant::with([
+            'vouchers' => function ($query) {
+                $query->latest();
+            },
+            'adminVouchers' => function ($query) {
+                $query->latest();
+            },
+            'users'
+        ])->where('merchant_code', $this->merchantCode)->firstOrFail();
     }
 
     public function render()
     {
+        $qrCodeService = app(QrCodeService::class);
+        $qrCodeImage = $qrCodeService->generateQrCodeImage($this->merchant->merchant_code, 400);
+
         return view('livewire.merchants.profile', [
             'merchant' => $this->merchant,
+            'qrCodeImage' => $qrCodeImage,
         ])->layout('components.layouts.app');
     }
 }
