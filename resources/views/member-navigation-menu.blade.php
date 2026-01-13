@@ -308,7 +308,7 @@
                         <img :src="qrCodeModalImage" alt="My QR code" class="w-64 h-64 object-contain">
                     </div>
 
-                    <button class="bg-blue-500 hover:bg-blue-600 border border-blue-700 transition-all duration-300 hover:scale-105 text-white px-4 py-3 rounded-md w-1/2 mx-auto" @click="$dispatch('openQrScanner')">Scan QR a Code</button>
+                    <button class="bg-blue-500 hover:bg-blue-600 border border-blue-700 transition-all duration-300 hover:scale-105 text-white px-4 py-3 rounded-md w-1/2 mx-auto" @click="$dispatch('openQrScanner')">Scan a QR Code</button>
                 </div>
             </template>
         </div>

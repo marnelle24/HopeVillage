@@ -122,9 +122,9 @@
                         <div class="relative h-24 overflow-hidden">
                             <img src="{{ $adminVoucher->image_url }}" alt="{{ $adminVoucher->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute top-3 right-3">
+                            {{-- <div class="absolute top-3 right-3">
                                 <span class="px-2 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full">Points Exchange</span>
-                            </div>
+                            </div> --}}
                         </div>
                     @else
                         <div class="relative h-24 bg-gradient-to-br from-purple-100 via-purple-50 to-pink-50 flex items-center justify-center">

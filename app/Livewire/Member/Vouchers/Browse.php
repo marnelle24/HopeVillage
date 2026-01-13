@@ -33,6 +33,9 @@ class Browse extends Component
             'claimed_at' => now(),
         ]);
 
+        // Increment usage count on claim
+        $voucher->increment('usage_count');
+
         app(PointsService::class)->awardVoucherClaim($user, $voucher);
 
         $this->dispatch('notify', type: 'success', message: 'Voucher claimed!');

@@ -148,8 +148,7 @@ class PointsActionsController extends Controller
                 'redeemed_at' => now(),
             ]);
 
-            // Update voucher usage count (basic tracking)
-            $voucher->increment('usage_count');
+            // Note: usage_count is only incremented on claim, not redemption
 
             app(PointsService::class)->awardVoucherRedeem($user, $voucher);
         });
@@ -200,9 +199,7 @@ class PointsActionsController extends Controller
                 'redeemed_at' => now(),
             ]);
 
-            // Update admin voucher usage count
-            $adminVoucher->increment('usage_count');
-
+            // Note: usage_count is only incremented on claim, not redemption
             // Note: No points are awarded for admin voucher redemption
             // Points were already deducted when the voucher was claimed
         });

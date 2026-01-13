@@ -65,7 +65,7 @@
 
             <div class="mt-4">
                 <div class="flex items-start">
-                    <x-label for="fin" value="{{ __('FIN/NIRC') }}" />
+                    <x-label for="fin" value="{{ __('FIN/NRIC') }}" />
                     <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
                 <div class="relative">
@@ -242,7 +242,7 @@
 
                             <div class="ms-2">
                                 @if(request()->get('lang') === 'en' || request()->get('lang') === '' || !request()->get('lang'))
-                                    {!! __('By selecting ths option, your data can be stored for future forms. You can learn more about how we handle your personal information and your rights by reviewing our :privacy_policy', [
+                                    {!! __('By selecting this option, your data can be stored for future forms. You can learn more about how we handle your personal information and your rights by reviewing our :privacy_policy', [
                                         'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
                                     ]) !!}
                                 @elseif(request()->get('lang') === 'bang')

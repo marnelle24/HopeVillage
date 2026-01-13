@@ -3,6 +3,7 @@
 namespace App\Livewire\AdminVouchers;
 
 use App\Models\AdminVoucher;
+use App\Services\QrCodeService;
 use Livewire\Component;
 
 class Profile extends Component
@@ -66,10 +67,14 @@ class Profile extends Component
 
     public function render()
     {
+        $qrCodeService = app(QrCodeService::class);
+        $qrCodeImage = $qrCodeService->generateQrCodeImage($this->voucher->voucher_code, 400);
+
         return view('livewire.admin-vouchers.profile', [
             'voucher' => $this->voucher,
             'claimedMembers' => $this->claimedMembers,
             'redeemedMembers' => $this->redeemedMembers,
+            'qrCodeImage' => $qrCodeImage,
         ])->layout('components.layouts.app');
     }
 }

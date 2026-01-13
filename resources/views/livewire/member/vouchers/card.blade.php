@@ -42,13 +42,32 @@
                 </svg>
                 @if($voucher && $voucher->valid_until)
                     @php
-                        $daysLeft = round(\Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($voucher->valid_until), false));
+                        $now = \Carbon\Carbon::now();
+                        $validUntil = \Carbon\Carbon::parse($voucher->valid_until);
+                        $isExpired = $now->isAfter($validUntil);
+                        
+                        if (!$isExpired) {
+                            $diffInSeconds = $now->diffInSeconds($validUntil, false);
+                            $diffInMinutes = $now->diffInMinutes($validUntil, false);
+                            $diffInHours = $now->diffInHours($validUntil, false);
+                            $diffInDays = $now->diffInDays($validUntil, false);
+                            
+                            if ($diffInDays > 0) {
+                                $timeLeft = $diffInDays . ' ' . ($diffInDays === 1 ? 'day' : 'days') . ' left';
+                            } elseif ($diffInHours > 0) {
+                                $timeLeft = $diffInHours . ' ' . ($diffInHours === 1 ? 'hour' : 'hours') . ' left';
+                            } elseif ($diffInMinutes > 0) {
+                                $timeLeft = $diffInMinutes . ' ' . ($diffInMinutes === 1 ? 'min' : 'mins') . ' left';
+                            } else {
+                                $timeLeft = 'Expiring soon';
+                            }
+                        }
                     @endphp
                     <div class="absolute top-2 right-2">
-                        @if($daysLeft > 0)
-                            <span class="px-2 py-1 bg-gray-500 text-white text-[11px] font-semibold rounded-full">{{ $daysLeft }} {{ $daysLeft === 1 ? 'day' : 'days' }} left</span>
-                        @else
+                        @if($isExpired)
                             <span class="px-2 py-1 bg-red-500 text-white text-[11px] font-semibold rounded-full">Expired</span>
+                        @else
+                            <span class="px-2 py-1 bg-gray-500 text-white text-[11px] font-semibold rounded-full">{{ $timeLeft }}</span>
                         @endif
                     </div>
                 @endif
@@ -88,19 +107,40 @@
                 </svg>
                 @if($voucher && $voucher->valid_until)
                     @php
-                        $daysLeft = round(\Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($voucher->valid_until), false));
+                        $now = \Carbon\Carbon::now();
+                        $validUntil = \Carbon\Carbon::parse($voucher->valid_until);
+                        $isExpired = $now->isAfter($validUntil);
+                        
+                        if (!$isExpired) 
+                        {
+                            $diffInSeconds = $now->diffInSeconds($validUntil, false);
+                            $diffInMinutes = $now->diffInMinutes($validUntil, false);
+                            $diffInHours = $now->diffInHours($validUntil, false);
+                            $diffInDays = $now->diffInDays($validUntil, false);
+                            
+                            if ($diffInDays > 0) {
+                                $timeLeft = $diffInDays . ' ' . ($diffInDays === 1 ? 'day' : 'days') . ' left';
+                            } elseif ($diffInHours > 0) {
+                                $timeLeft = $diffInHours . ' ' . ($diffInHours === 1 ? 'hour' : 'hours') . ' left';
+                            } elseif ($diffInMinutes > 0) {
+                                $timeLeft = $diffInMinutes . ' ' . ($diffInMinutes === 1 ? 'min' : 'mins') . ' left';
+                            } else {
+                                $timeLeft = 'Expiring soon';
+                            }
+                        }
                     @endphp
                     <div class="absolute top-2 right-2 z-0">
-                        @if($daysLeft > 0)
-                            <span class="px-2 py-1 bg-gray-500 text-white text-[11px] font-semibold rounded-full">{{ $daysLeft }} {{ $daysLeft === 1 ? 'day' : 'days' }} left</span>
-                        @else
+                        @if($isExpired)
                             <span class="px-2 py-1 bg-red-500 text-white text-[11px] font-semibold rounded-full">Expired</span>
+                        @else
+                            {{-- <span class="px-2 py-1 bg-gray-500 text-white text-[11px] font-semibold rounded-full">{{ $timeLeft }}</span> --}}
+                            <span class="px-2 py-1 bg-green-600 text-white text-[11px] font-semibold rounded-full">{{ 'Expiring soon..' }}</span>
                         @endif
                     </div>
                 @endif
             </div>
             <div class="p-3 bg-gradient-to-b from-white to-blue-50/30">
-                <h3 class="font-bold text-sm text-gray-800 mb-1 line-clamp-1">{{ $voucher->name }}</h3>
+                <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-1">{{ $voucher->name }}</h3>
                 {{-- add here the merchant name if available --}}
                 @if($merchants && $merchants->isNotEmpty())
                     <p class="text-xs text-gray-600 mb-2">You can redeem this voucher at <span class="font-bold">{{ $merchants->pluck('name')->join(', ') }}</span></p>
@@ -124,31 +164,29 @@
             @keydown.escape.window="showQr = false"
         >
             <div class="bg-white w-full max-w-lg flex flex-col items-center justify-center rounded-2xl p-5" @click.stop>
-                {{-- @if($voucher && $voucher->name)
-                    <p class="text-sm text-gray-800">
-                        Redeem 
-                        <span class="font-bold">{{ $voucher->name }} </span>
-                        voucher
-                        @if($merchant && $merchant->name)
-                            from
-                            <span class="font-bold">{{ $merchant->name }}</span>
-                        @endif
-                    </p>
-                @elseif($adminVoucher && $adminVoucher->name)
-                    <p class="text-sm text-gray-800">
-                        Redeem 
-                        <span class="font-bold">{{ $adminVoucher->name }} </span>
-                        voucher
-                        @if($merchants && $merchants->isNotEmpty())
-                            from
-                            <span class="font-bold">{{ $merchants->pluck('name')->join(', ') }}</span>
-                        @endif
-                    </p>
-                @endif --}}
+                <h3 class="text-lg font-bold text-gray-800 text-center">{{ $voucher->name }}</h3>
+                <p class="mb-2 text-xs text-gray-600 text-center font-semibold">({{ $value }})</p>
                 @if($qrImage)
-                    <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64">
+                    <div class="relative">
+                        <img src="{{ $qrImage }}" alt="Voucher QR" class="w-64">
+                        @if($isExpired)
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-lg text-white font-semibold bg-red-500/90 px-3 py-1.5 rounded-full">Expired</span>
+                            </div>
+                        @endif
+                    </div>
                 @endif
-                <p class="mt-2 text-xs text-gray-600 text-center font-bold">{{ $value }}</p>
+                <h3 class="text-sm font-bold text-gray-800 text-center">Valid Until: {{ $voucher->valid_until ? \Carbon\Carbon::parse($voucher->valid_until)->format('d M Y g:i A') : 'N/A' }}</h3>
+                @if($type === 'admin')
+                    <p class="mt-2 flex flex-col items-center justify-center text-sm text-gray-800 text-center">
+                        <span class="font-normal">Redeemable Merchants:</span>
+                        <span class="font-bold">{{ $merchants->pluck('name')->join(', ') }}</span>
+                    </p>
+                @else
+                    <p class="text-sm text-gray-800 text-center">
+                        You can redeem this voucher at <span class="font-bold">{{ $merchant->name }}</span>
+                    </p>
+                @endif
             </div>
         </div>
     </template>

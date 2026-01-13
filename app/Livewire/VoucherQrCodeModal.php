@@ -373,8 +373,7 @@ class VoucherQrCodeModal extends Component
                         'redeemed_at' => now(),
                     ]);
 
-                    // Update admin voucher usage count
-                    $this->adminVoucher->increment('usage_count');
+                    // Note: usage_count is only incremented on claim, not redemption
 
                     Log::info('Admin voucher redeemed', [
                         'member_fin' => $user->fin,
@@ -448,8 +447,7 @@ class VoucherQrCodeModal extends Component
                         'redeemed_at' => now(),
                     ]);
 
-                    // Update voucher usage count
-                    $this->voucher->increment('usage_count');
+                    // Note: usage_count is only incremented on claim, not redemption
 
                     // Award points for voucher redemption
                     $pointsBefore = $user->total_points;
@@ -679,8 +677,7 @@ class VoucherQrCodeModal extends Component
                         'redeemed_at_merchant_id' => $currentMerchant->id,
                     ]);
                     
-                    // Update admin voucher usage count
-                    $this->adminVoucher->increment('usage_count');
+                    // Note: usage_count is only incremented on claim, not redemption
                     
                     Log::info('Admin voucher redeemed by merchant - SUCCESS', [
                         'merchant_id' => $currentUser->id,
@@ -894,8 +891,7 @@ class VoucherQrCodeModal extends Component
                         'redeemed_at' => now(),
                     ]);
                     
-                    // Update voucher usage count
-                    $this->voucher->increment('usage_count');
+                    // Note: usage_count is only incremented on claim, not redemption
                     
                     // Award points for voucher redemption
                     $pointsBefore = $this->redeemer->total_points;

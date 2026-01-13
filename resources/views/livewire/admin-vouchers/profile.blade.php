@@ -6,11 +6,6 @@
                     {{ $voucher->name }} - Profile
                 </h2>
             </div>
-            <div class="flex gap-2">
-                <a href="{{ route('admin.admin-vouchers.edit', $voucher->voucher_code) }}" class="bg-slate-600 md:text-base text-xs hover:bg-slate-700 text-white font-normal py-2 px-4 rounded-lg">
-                    Edit Voucher
-                </a>
-            </div>
         </div>
     </x-slot>
 
@@ -25,7 +20,28 @@
                 <div class="lg:col-span-3 space-y-6">
                     <!-- Voucher Information Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Voucher Information</h3>
+                        <div class="flex items-center justify-between mb-4 border-b pb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Voucher Information</h3>
+                            @php
+                                $statusReason = $voucher->getStatusReason();
+                                $isExpired = $statusReason === 'Expired';
+                                $isFull = $voucher->usage_limit && $voucher->usage_count >= $voucher->usage_limit;
+                                
+                                if ($isExpired) {
+                                    $statusLabel = 'Expired';
+                                    $statusClass = 'bg-red-500 text-white';
+                                } elseif ($isFull) {
+                                    $statusLabel = 'Full';
+                                    $statusClass = 'bg-orange-500 text-white';
+                                } else {
+                                    $statusLabel = 'On Going';
+                                    $statusClass = 'bg-green-500 text-white';
+                                }
+                            @endphp
+                            <span class="px-3 uppercase py-1 inline-flex text-lg tracking-widest font-thin rounded-sm {{ $statusClass }}">
+                                {{ $statusLabel }}
+                            </span>
+                        </div>
                         
                         <div class="space-y-4">
                             @if($voucher->image_url)
@@ -56,11 +72,16 @@
                                     <p>
                                         @php
                                             $isValid = $voucher->is_active && $voucher->isValid();
+                                            $statusReason = $voucher->getStatusReason();
                                             $statusClass = $isValid ? 'bg-green-100 text-green-800 border border-green-500' : 'bg-red-100 text-red-800 border border-red-500';
+                                            $statusText = $isValid ? 'Active' : ($statusReason ?: 'Inactive');
                                         @endphp
-                                        <span class="px-3 py-1 inline-flex text-md leading-5 font-semibold rounded-full {{ $statusClass }}">
-                                            {{ $isValid ? 'Active' : 'Inactive' }}
+                                        <span class="px-3 py-1 inline-flex text-md leading-5 font-semibold rounded-full {{ $statusClass }}" title="{{ $statusReason ? 'Reason: ' . $statusReason : '' }}">
+                                            {{ $statusText }}
                                         </span>
+                                        @if($statusReason && !$isValid)
+                                            <p class="text-xs text-red-600 mt-1">{{ $statusReason }}</p>
+                                        @endif
                                     </p>
                                 </div>
                             </div>
@@ -153,8 +174,6 @@
                                             <thead class="bg-gray-50">
                                                 <tr>
                                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">FIN</th>
-                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claimed At</th>
                                                 </tr>
                                             </thead>
@@ -163,12 +182,6 @@
                                                     <tr class="hover:bg-gray-50">
                                                         <td class="px-6 py-4 whitespace-nowrap">
                                                             <div class="text-sm font-medium text-gray-900">{{ $member['name'] }}</div>
-                                                        </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap">
-                                                            <div class="text-sm text-gray-500 font-mono">{{ $member['fin'] }}</div>
-                                                        </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap">
-                                                            <div class="text-sm text-gray-500">{{ $member['email'] }}</div>
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-nowrap">
                                                             <div class="text-sm text-gray-500">
@@ -195,11 +208,9 @@
                                             <thead class="bg-gray-50">
                                                 <tr>
                                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">FIN</th>
-                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Claimed At</th>
                                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Redeemed At</th>
-                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Merchant</th>
+                                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Merchant</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="bg-white divide-y divide-gray-200">
@@ -207,12 +218,6 @@
                                                     <tr class="hover:bg-gray-50">
                                                         <td class="px-6 py-4 whitespace-nowrap">
                                                             <div class="text-sm font-medium text-gray-900">{{ $member['name'] }}</div>
-                                                        </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap">
-                                                            <div class="text-sm text-gray-500 font-mono">{{ $member['fin'] }}</div>
-                                                        </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap">
-                                                            <div class="text-sm text-gray-500">{{ $member['email'] }}</div>
                                                         </td>
                                                         <td class="px-6 py-4 whitespace-nowrap">
                                                             <div class="text-sm text-gray-500">
@@ -224,7 +229,7 @@
                                                                 {{ $member['redeemed_at'] ? \Carbon\Carbon::parse($member['redeemed_at'])->format('d M Y g:i A') : 'N/A' }}
                                                             </div>
                                                         </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                        <td class="px-6 py-4 whitespace-nowrap text-right">
                                                             <div class="text-sm text-gray-500">
                                                                 @if($member['merchant'])
                                                                     <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs">
@@ -255,6 +260,94 @@
 
                 <!-- Right Column - Quick Actions -->
                 <div class="space-y-6">
+                    <!-- Voucher QR Code Card -->
+                    <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Voucher QR Code</h3>
+                        <div 
+                            x-data="{
+                                qrCodeImage: '{{ $qrCodeImage }}',
+                                voucherCode: '{{ $voucher->voucher_code }}',
+                                async downloadQR() {
+                                    try {
+                                        const response = await fetch(this.qrCodeImage);
+                                        const blob = await response.blob();
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `voucher-qr-${this.voucherCode}.png`;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                        document.body.removeChild(a);
+                                    } catch (error) {
+                                        console.error('Download failed:', error);
+                                        alert('Failed to download QR code. Please try again.');
+                                    }
+                                },
+                                async shareQR() {
+                                    try {
+                                        if (navigator.share) {
+                                            const response = await fetch(this.qrCodeImage);
+                                            const blob = await response.blob();
+                                            const file = new File([blob], `voucher-qr-${this.voucherCode}.png`, { type: 'image/png' });
+                                            await navigator.share({
+                                                title: 'Voucher QR Code: {{ $voucher->name }}',
+                                                text: `Voucher Code: ${this.voucherCode}`,
+                                                files: [file]
+                                            });
+                                        } else if (navigator.clipboard) {
+                                            await navigator.clipboard.writeText(this.voucherCode);
+                                            alert('Voucher code copied to clipboard!');
+                                        } else {
+                                            // Fallback: copy voucher code to clipboard manually
+                                            const textArea = document.createElement('textarea');
+                                            textArea.value = this.voucherCode;
+                                            document.body.appendChild(textArea);
+                                            textArea.select();
+                                            document.execCommand('copy');
+                                            document.body.removeChild(textArea);
+                                            alert('Voucher code copied to clipboard!');
+                                        }
+                                    } catch (error) {
+                                        console.error('Share failed:', error);
+                                        // Fallback to copy voucher code
+                                        try {
+                                            await navigator.clipboard.writeText(this.voucherCode);
+                                            alert('Voucher code copied to clipboard!');
+                                        } catch (e) {
+                                            alert('Sharing not available. Voucher Code: ' + this.voucherCode);
+                                        }
+                                    }
+                                }
+                            }"
+                        >
+                            <div class="flex items-center justify-center mb-4">
+                                <img :src="qrCodeImage" alt="Voucher QR Code" class="w-full max-w-md h-64 object-contain rounded-lg border border-gray-300" id="qr-code-image">
+                            </div>
+                            <div class="flex gap-3 justify-center">
+                                <button 
+                                    @click="downloadQR()"
+                                    class="flex items-center text-xs gap-1 px-3 py-1 bg-transparent hover:bg-gray-200 cursor-pointer text-gray-500 border border-gray-500 font-medium rounded-lg transition-colors duration-200"
+                                >
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                    </svg>
+                                    Download
+                                </button>
+                                <button 
+                                    @click="shareQR()"
+                                    class="flex items-center text-xs gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 cursor-pointer text-white border border-green-600 font-medium rounded-lg transition-colors duration-200"
+                                >
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                                    </svg>
+
+                                    Share
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Quick Actions</h3>
@@ -274,7 +367,7 @@
                         @if($voucher->merchants->isNotEmpty())
                             <div class="space-y-2">
                                 @foreach($voucher->merchants as $merchant)
-                                    <div class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                                         <svg class="w-5 h-5 text-indigo-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
                                         </svg>

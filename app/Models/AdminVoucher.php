@@ -98,31 +98,38 @@ class AdminVoucher extends Model implements HasMedia
             return false;
         }
 
+        // Get current time
         $now = now();
 
         // Check if voucher has started (valid_from)
-        // If valid_from is set, current time must be >= valid_from
+        // If valid_from is set, current time must be >= valid_from (inclusive)
         if ($this->valid_from !== null) {
             $validFrom = $this->valid_from;
             // Ensure we have a Carbon instance
             if (!($validFrom instanceof \Carbon\Carbon)) {
                 $validFrom = \Carbon\Carbon::parse($validFrom);
             }
-            // Current time must be greater than or equal to valid_from
+            
+            // Current time must be greater than or equal to valid_from (inclusive)
+            // Using lt() which is exclusive: returns true only if now < validFrom
+            // So if now >= validFrom (inclusive), the voucher has started
             if ($now->lt($validFrom)) {
                 return false;
             }
         }
 
         // Check if voucher has expired (valid_until)
-        // If valid_until is set, current time must be <= valid_until
+        // If valid_until is set, current time must be <= valid_until (inclusive)
         if ($this->valid_until !== null) {
             $validUntil = $this->valid_until;
             // Ensure we have a Carbon instance
             if (!($validUntil instanceof \Carbon\Carbon)) {
                 $validUntil = \Carbon\Carbon::parse($validUntil);
             }
-            // Current time must be less than or equal to valid_until
+            
+            // Current time must be less than or equal to valid_until (inclusive)
+            // Using gt() which is exclusive: returns true only if now > validUntil
+            // So if now <= validUntil (inclusive), the voucher is still valid
             if ($now->gt($validUntil)) {
                 return false;
             }
@@ -145,18 +152,37 @@ class AdminVoucher extends Model implements HasMedia
             return 'Inactive';
         }
 
+        // Get current time
         $now = now();
         
         // Check if voucher has started (valid_from)
+        // If valid_from is set, check if current time is before valid_from
         if ($this->valid_from !== null) {
-            if ($now->isBefore($this->valid_from)) {
+            $validFrom = $this->valid_from;
+            // Ensure we have a Carbon instance
+            if (!($validFrom instanceof \Carbon\Carbon)) {
+                $validFrom = \Carbon\Carbon::parse($validFrom);
+            }
+            
+            // Check if current time is before the valid_from date/time (exclusive)
+            // If now < validFrom, voucher hasn't started yet
+            if ($now->lt($validFrom)) {
                 return 'Not Yet Valid';
             }
         }
 
         // Check if voucher has expired (valid_until)
+        // If valid_until is set, check if current time is after valid_until
         if ($this->valid_until !== null) {
-            if ($now->isAfter($this->valid_until)) {
+            $validUntil = $this->valid_until;
+            // Ensure we have a Carbon instance
+            if (!($validUntil instanceof \Carbon\Carbon)) {
+                $validUntil = \Carbon\Carbon::parse($validUntil);
+            }
+            
+            // Check if current time is after the valid_until date/time (exclusive)
+            // If now > validUntil, voucher has expired
+            if ($now->gt($validUntil)) {
                 return 'Expired';
             }
         }

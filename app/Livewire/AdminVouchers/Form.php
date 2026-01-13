@@ -78,7 +78,7 @@ class Form extends Component
             'valid_from' => $this->valid_from ? date('Y-m-d H:i:s', strtotime($this->valid_from)) : null,
             'valid_until' => $this->valid_until ? date('Y-m-d H:i:s', strtotime($this->valid_until)) : null,
             'usage_limit' => $this->usage_limit ?: null,
-            'is_active' => $this->is_active,
+            'is_active' => (bool) ($this->is_active ?? true),
         ];
 
         if ($this->voucherCode) {
