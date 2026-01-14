@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\ActivityType;
 use App\Models\Location;
 use App\Models\MemberActivity;
+use App\Models\Setting;
 use App\Services\PointsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -112,6 +113,26 @@ class LocationQrCodeModal extends Component
                     return;
                 }
 
+                // Validate entry time gap for ENTRY activities
+                // Get dynamic time gap from settings (default: 3600 seconds = 1 hour)
+                $timeGapSeconds = (int) Setting::get('entry_time_gap', 3600);
+                $timeGapAgo = now()->subSeconds($timeGapSeconds);
+                
+                // Check if member has a recent entry at this location within the time gap
+                $recentEntry = MemberActivity::where('user_id', $user->id)
+                    ->where('location_id', $this->location->id)
+                    ->whereHas('activityType', function($query) {
+                        $query->where('name', 'ENTRY');
+                    })
+                    ->where('activity_time', '>=', $timeGapAgo)
+                    ->exists();
+                
+                if ($recentEntry) {
+                    $this->error = 'it requires 1 hour gap to scan again';
+                    $this->processing = false;
+                    return;
+                }
+
                 // Find or create activity type
                 $activityType = ActivityType::firstOrCreate(
                     ['name' => 'ENTRY'],
@@ -169,6 +190,9 @@ class LocationQrCodeModal extends Component
                     'location_name' => $this->location->name,
                     'points_awarded' => $pointsAwarded,
                 ]);
+                
+                // Dispatch event to update points header in real-time
+                $this->dispatch('points-updated');
                 
                 session()->flash('qr-scan-success', 'SUCCESS');
                 $this->processing = false;

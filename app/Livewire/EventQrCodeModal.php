@@ -193,6 +193,9 @@ class EventQrCodeModal extends Component
                 $this->success = true;
                 $this->successMessage = "SUCCESS";
                 
+                // Dispatch event to update points header in real-time
+                $this->dispatch('points-updated');
+                
                 session()->flash('event-attend-success', 'SUCCESS');
                 $this->processing = false;
             });

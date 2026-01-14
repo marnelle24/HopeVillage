@@ -54,6 +54,12 @@ class Form extends Component
             $this->points = $config->points;
             $this->description = $config->description;
             $this->is_active = $config->is_active;
+        } else {
+            // When creating new, check for location_id in request
+            $locationId = request()->query('location_id');
+            if ($locationId) {
+                $this->location_id = $locationId;
+            }
         }
     }
 

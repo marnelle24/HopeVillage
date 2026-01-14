@@ -145,37 +145,89 @@
 
                 <!-- Right Column - Quick Actions & Recent Events -->
                 <div class="space-y-6">
-                    @php
-                        $locationQrImage = app(\App\Services\QrCodeService::class)->generateQrCodeImage($location->location_code, 260);
-                    @endphp
-
                     <!-- Location QR Code Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
-                        <div class="flex flex-col items-center">
-                            <img
-                                id="location-qr-image"
-                                src="{{ $locationQrImage }}"
-                                alt="Location QR Code"
-                                class="w-64 h-64 object-contain border border-gray-200 rounded-lg bg-white"
-                            >
-                        </div>
-                        <div class="flex items-center justify-center mt-4">
-                            <div class="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onclick="shareLocationQrCode()"
-                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Location QR Code</h3>
+                        <div 
+                            x-data="{
+                                qrCodeImage: '{{ $qrCodeImage }}',
+                                locationCode: '{{ $location->location_code }}',
+                                async downloadQR() {
+                                    try {
+                                        const response = await fetch(this.qrCodeImage);
+                                        const blob = await response.blob();
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `location-qr-${this.locationCode}.png`;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                        document.body.removeChild(a);
+                                    } catch (error) {
+                                        console.error('Download failed:', error);
+                                        alert('Failed to download QR code. Please try again.');
+                                    }
+                                },
+                                async shareQR() {
+                                    try {
+                                        if (navigator.share) {
+                                            const response = await fetch(this.qrCodeImage);
+                                            const blob = await response.blob();
+                                            const file = new File([blob], `location-qr-${this.locationCode}.png`, { type: 'image/png' });
+                                            await navigator.share({
+                                                title: 'Location QR Code: {{ $location->name }}',
+                                                text: `Location Code: ${this.locationCode}`,
+                                                files: [file]
+                                            });
+                                        } else if (navigator.clipboard) {
+                                            await navigator.clipboard.writeText(this.locationCode);
+                                            alert('Location code copied to clipboard!');
+                                        } else {
+                                            // Fallback: copy location code to clipboard manually
+                                            const textArea = document.createElement('textarea');
+                                            textArea.value = this.locationCode;
+                                            document.body.appendChild(textArea);
+                                            textArea.select();
+                                            document.execCommand('copy');
+                                            document.body.removeChild(textArea);
+                                            alert('Location code copied to clipboard!');
+                                        }
+                                    } catch (error) {
+                                        console.error('Share failed:', error);
+                                        // Fallback to copy location code
+                                        try {
+                                            await navigator.clipboard.writeText(this.locationCode);
+                                            alert('Location code copied to clipboard!');
+                                        } catch (e) {
+                                            alert('Sharing not available. Location Code: ' + this.locationCode);
+                                        }
+                                    }
+                                }
+                            }"
+                        >
+                            <div class="flex items-center justify-center mb-4">
+                                <img :src="qrCodeImage" alt="Location QR Code" class="w-full max-w-md h-64 object-contain rounded-lg border border-gray-300" id="location-qr-image">
+                            </div>
+                            <div class="flex gap-3 justify-center">
+                                <button 
+                                    @click="downloadQR()"
+                                    class="flex items-center text-xs gap-1 px-3 py-1 bg-transparent hover:bg-gray-200 cursor-pointer text-gray-500 border border-gray-500 font-medium rounded-lg transition-colors duration-200"
                                 >
-                                    Share QR Code
-                                </button>
-                                <a
-                                    id="location-qr-download"
-                                    href="{{ $locationQrImage }}"
-                                    download="location-{{ $location->location_code }}.png"
-                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
-                                >
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                    </svg>
                                     Download
-                                </a>
+                                </button>
+                                <button 
+                                    @click="shareQR()"
+                                    class="flex items-center text-xs gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 cursor-pointer text-white border border-green-600 font-medium rounded-lg transition-colors duration-200"
+                                >
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                                    </svg>
+                                    Share
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -270,32 +322,6 @@
                             isScanning: false
                         };
 
-                        async function shareLocationQrCode() {
-                            const img = document.getElementById('location-qr-image');
-                            const downloadLink = document.getElementById('location-qr-download');
-                            if (!img || !downloadLink) return;
-
-                            const dataUrl = img.src;
-                            const filename = downloadLink.getAttribute('download') || 'location-qr.png';
-                            const title = 'Location QR Code';
-                            const text = 'Scan this QR code to get the location code.';
-
-                            try {
-                                const response = await fetch(dataUrl);
-                                const blob = await response.blob();
-                                const file = new File([blob], filename, { type: blob.type || 'image/png' });
-
-                                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                                    await navigator.share({ title, text, files: [file] });
-                                } else {
-                                    // Fallback: trigger download
-                                    downloadLink.click();
-                                }
-                            } catch (e) {
-                                // Fallback: trigger download
-                                downloadLink.click();
-                            }
-                        }
 
                         function openQrScanner() {
                             const modal = document.getElementById('qr-scanner-modal');
@@ -550,6 +576,11 @@
                                     
                                     showToast('success', message);
                                     showScanResponse('success', message);
+                                    
+                                    // Dispatch event to update points header in real-time
+                                    if (data.data?.points_awarded) {
+                                        window.dispatchEvent(new CustomEvent('points-updated'));
+                                    }
                                     
                                     // Resume scanning after showing response (only restart detection, keep camera)
                                     setTimeout(() => {

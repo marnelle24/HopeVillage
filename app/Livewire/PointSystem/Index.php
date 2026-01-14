@@ -3,7 +3,6 @@
 namespace App\Livewire\PointSystem;
 
 use App\Models\ActivityType;
-use App\Models\Location;
 use App\Models\PointSystemConfig;
 use App\Models\Setting;
 use Livewire\Component;
@@ -16,7 +15,6 @@ class Index extends Component
     public $search = '';
     public $statusFilter = 'all';
     public $activityTypeFilter = '';
-    public $locationFilter = '';
     public $showMessage = false;
     public $pointSystemEnabled = true;
 
@@ -47,11 +45,6 @@ class Index extends Component
     }
 
     public function updatingActivityTypeFilter()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingLocationFilter()
     {
         $this->resetPage();
     }
@@ -94,18 +87,12 @@ class Index extends Component
             $query->where('activity_type_id', $this->activityTypeFilter);
         }
 
-        if ($this->locationFilter) {
-            $query->where('location_id', $this->locationFilter);
-        }
-
         $configs = $query->orderBy('created_at', 'desc')->paginate(5);
         $activityTypes = ActivityType::orderBy('name')->get();
-        $locations = Location::orderBy('name')->get();
 
         return view('livewire.point-system.index', [
             'configs' => $configs,
             'activityTypes' => $activityTypes,
-            'locations' => $locations,
         ])->layout('components.layouts.app');
     }
 }

@@ -1,12 +1,22 @@
 <div>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ $configId ? __('Edit Point System Configuration') : __('Create Point System Configuration') }}
-            </h2>
-            <a href="{{ route('admin.point-system.index') }}" class="text-gray-600 hover:text-gray-900">
-                ← Back to Point System
-            </a>
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ $configId ? __('Edit Point System Configuration') : __('Create Point System Configuration') }}
+                </h2>
+                <a href="{{ route('admin.point-system.index') }}" class="md:flex hidden md:items-center gap-1 text-gray-600 hover:text-gray-900 hover:bg-orange-500/20 transition-all duration-300">
+                    <svg class="w-4 h-4 md:stroke-orange-500 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
+                    </svg>
+                    <span class="text-sm md:text-base hidden md:block text-orange-500 text-right">Back to Point System</span>
+                </a>
+                <a href="{{ route('admin.point-system.index') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                    <svg class="w-4 h-4 md:stroke-orange-500 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
+                    </svg>
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -52,7 +62,7 @@
             @endif
 
             <form wire:submit="save">
-                <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
+                <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 mx-4">
                     <!-- Activity Type -->
                     <div class="mb-4">
                         <div class="flex justify-between items-center mb-4">
@@ -60,7 +70,7 @@
                             <button 
                                 type="button"
                                 wire:click="openActivityTypeModal"
-                                class="text-xs text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1"
+                                class="text-xs text-orange-600 hover:text-orange-700 border border-orange-500 hover:border-orange-600 hover:-translate-y-0.5 duration-300 transition-all cursor-pointer bg-orange-100 px-2 py-1 rounded-full font-medium flex items-center gap-1"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -71,7 +81,7 @@
                         <select 
                             id="activity_type_id"
                             wire:model.blur="activity_type_id" 
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('activity_type_id') border-red-500 @enderror"
+                            class="w-full mt-4 px-4 py-2 border rounded-full focus:ring-2 text-gray-600 focus:ring-orange-500 focus:border-orange-500 @error('activity_type_id') border-red-500 @enderror"
                         >
                             <option value="">Select an Activity Type</option>
                             @foreach($activityTypes as $activityType)
@@ -84,39 +94,40 @@
                         @endif
                     </div>
 
-                    <!-- Location -->
-                    <div class="mb-4">
-                        <label for="location_id" class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                        <select 
-                            id="location_id"
-                            wire:model.live="location_id" 
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('location_id') border-red-500 @enderror"
-                        >
-                            <option value="">No specific location (Global)</option>
-                            @foreach($locations as $location)
-                                <option value="{{ $location->id }}">{{ $location->name }}</option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Leave empty for global configuration</p>
-                        @error('location_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <!-- Amenity -->
-                    <div class="mb-4">
-                        <label for="amenity_id" class="block text-sm font-medium text-gray-700 mb-2">Amenity</label>
-                        <select 
-                            id="amenity_id"
-                            wire:model.blur="amenity_id" 
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('amenity_id') border-red-500 @enderror"
-                            @if(!$location_id) disabled @endif
-                        >
-                            <option value="">No specific amenity</option>
-                            @foreach($amenities as $amenity)
-                                <option value="{{ $amenity->id }}">{{ $amenity->name }}</option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Select a location first to filter amenities</p>
-                        @error('amenity_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <!-- Location -->
+                        <div class="col-span-2">
+                            <label for="location_id" class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                            <select 
+                                id="location_id"
+                                wire:model.live="location_id" 
+                                class="w-full px-4 py-2 border rounded-full focus:ring-2 text-gray-600 focus:ring-orange-500 focus:border-orange-500 @error('location_id') border-red-500 @enderror"
+                            >
+                                <option value="">No specific location (Global)</option>
+                                @foreach($locations as $location)
+                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Leave empty for global configuration</p>
+                            @error('location_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+    
+                        <!-- Amenity -->
+                        <div class="col-span-1">
+                            <label for="amenity_id" class="block text-sm font-medium text-gray-700 mb-2">Amenity</label>
+                            <select 
+                                id="amenity_id"
+                                wire:model.blur="amenity_id" 
+                                class="w-full px-4 py-2 border rounded-full focus:ring-2 text-gray-600 focus:ring-orange-500 focus:border-orange-500 @error('amenity_id') border-red-500 @enderror"
+                                @if(!$location_id) disabled @endif
+                            >
+                                <option value="">No specific amenity</option>
+                                @foreach($amenities as $amenity)
+                                    <option value="{{ $amenity->id }}">{{ $amenity->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('amenity_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
                     <!-- Points -->
@@ -129,7 +140,7 @@
                             wire:model.blur="points" 
                             min="0"
                             step="1"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('points') border-red-500 @enderror"
+                            class="w-full px-4 py-2 border rounded-full focus:ring-2 text-gray-600 focus:ring-orange-500 focus:border-orange-500 @error('points') border-red-500 @enderror"
                         >
                         <p class="text-xs text-gray-500 mt-1">Number of points to award for this activity</p>
                         @error('points') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -143,7 +154,7 @@
                             id="description"
                             wire:model.blur="description" 
                             rows="4"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('description') border-red-500 @enderror"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-600 focus:ring-orange-500 focus:border-orange-500 @error('description') border-red-500 @enderror"
                         ></textarea>
                         @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
@@ -154,7 +165,7 @@
                             <input 
                                 type="checkbox" 
                                 wire:model.blur="is_active" 
-                                class="w-6 h-6 rounded-none border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                class="w-4 h-4 rounded-full p-3 text-orange-600 focus:border-orange-500 focus:ring focus:ring-orange-200 focus:ring-opacity-50"
                             >
                             <span class="ml-2 text-md text-gray-700">Active</span>
                         </label>

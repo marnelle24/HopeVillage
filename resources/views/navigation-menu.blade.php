@@ -86,6 +86,10 @@
                                 {{ __('Profile') }}
                             </x-dropdown-link>
 
+                            <x-dropdown-link href="{{ route('admin.settings.index') }}">
+                                {{ __('Settings') }}
+                            </x-dropdown-link>
+
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -163,6 +167,10 @@
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link href="{{ route('profile.show') }}">
                         {{ __('Profile') }}
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link href="{{ route('admin.settings.index') }}">
+                        {{ __('Settings') }}
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->

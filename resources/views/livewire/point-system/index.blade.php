@@ -12,7 +12,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 @if(!$pointSystemEnabled) opacity-90 pointer-events-none relative @endif" wire:key="point-system-content-{{ $pointSystemEnabled }}">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 @if(!$pointSystemEnabled) opacity-90 pointer-events-none relative @endif" wire:key="point-system-content-{{ $pointSystemEnabled }}">
             @if(!$pointSystemEnabled)
                 <div class="absolute inset-0 z-50 flex items-center justify-center bg-gray-100/70 rounded-lg">
                     <div class="bg-white border-2 border-gray-300 rounded-lg px-6 py-4 shadow-lg">
@@ -99,27 +99,15 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <select 
-                            wire:model.live="locationFilter" 
-                            @if(!$pointSystemEnabled) disabled @endif
-                            class="w-full px-4 py-2 border text-gray-800 border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @if(!$pointSystemEnabled) cursor-not-allowed bg-gray-100 @endif"
-                        >
-                            <option value="">All Locations</option>
-                            @foreach($locations as $location)
-                                <option value="{{ $location->id }}">{{ $location->name }}</option>
-                            @endforeach
-                        </select>
-                        <div>
-                            <a href="{{ route('admin.point-system.create') }}" class="flex items-center justify-center gap-1 bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg text-center text-sm transition-colors">
-                                <span class="flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                </span>
-                                New Config
-                            </a>
-                        </div>
+                    <div>
+                        <a href="{{ route('admin.point-system.create') }}" class="flex items-center justify-center gap-1 bg-orange-400 hover:bg-orange-500 text-white py-3 px-4 rounded-full text-center text-sm transition-colors">
+                            <span class="flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                            </span>
+                            New Config
+                        </a>
                     </div>
 
                 </div>

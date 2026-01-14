@@ -5,6 +5,7 @@ use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\PointsActionsController;
 use App\Http\Controllers\VerificationCodeController;
 use App\Http\Controllers\WhatsAppValidationController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,6 +34,14 @@ Route::middleware([
     
     // QR Code route - Available to all authenticated users (admin, merchant_user, member)
     Route::get('/qr-code/full', [QrCodeController::class, 'fullSize'])->name('qr-code.full');
+    
+    // User points endpoint for real-time updates
+    Route::get('/api/user/points', function (Request $request) {
+        $user = $request->user();
+        return response()->json([
+            'total_points' => $user->total_points ?? 0,
+        ]);
+    })->name('api.user.points');
 });
 
 // Admin Dashboard - Only accessible by admin users
@@ -91,6 +100,11 @@ Route::middleware([
     Route::get('/admin/point-system', \App\Livewire\PointSystem\Index::class)->name('admin.point-system.index');
     Route::get('/admin/point-system/create', \App\Livewire\PointSystem\Form::class)->name('admin.point-system.create');
     Route::get('/admin/point-system/{id}/edit', \App\Livewire\PointSystem\Form::class)->name('admin.point-system.edit');
+
+    // Settings CRUD Routes
+    Route::get('/admin/settings', \App\Livewire\Settings\Index::class)->name('admin.settings.index');
+    Route::get('/admin/settings/create', \App\Livewire\Settings\Form::class)->name('admin.settings.create');
+    Route::get('/admin/settings/{id}/edit', \App\Livewire\Settings\Form::class)->name('admin.settings.edit');
 
     // Raffle / Roulette
     Route::get('/admin/raffle-v1', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle.v1');

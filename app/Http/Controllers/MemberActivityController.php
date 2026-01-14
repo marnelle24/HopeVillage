@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityType;
 use App\Models\Location;
 use App\Models\MemberActivity;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\PointsService;
 use Illuminate\Http\JsonResponse;
@@ -76,6 +77,29 @@ class MemberActivityController extends Controller
                         'message' => 'Location is not active',
                         'error' => "Location '{$location->name}' (code: {$validated['location_code']}) is not active",
                     ], 422);
+                }
+
+                // Validate entry time gap for ENTRY activities
+                if (strtoupper($validated['type_of_activity']) === 'ENTRY') {
+                    // Get dynamic time gap from settings (default: 3600 seconds = 1 hour)
+                    $timeGapSeconds = (int) Setting::get('entry_time_gap', 3600);
+                    $timeGapAgo = now()->subSeconds($timeGapSeconds);
+                    
+                    // Check if member has a recent entry at this location within the time gap
+                    $recentEntry = MemberActivity::where('user_id', $member->id)
+                        ->where('location_id', $location->id)
+                        ->whereHas('activityType', function($query) {
+                            $query->where('name', 'ENTRY');
+                        })
+                        ->where('activity_time', '>=', $timeGapAgo)
+                        ->exists();
+                    
+                    if ($recentEntry) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'it requires 1 hour gap to scan again',
+                        ], 422);
+                    }
                 }
 
                 // Find or create activity type
