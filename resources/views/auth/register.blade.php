@@ -6,28 +6,44 @@
 
         <x-validation-errors class="mb-4" />
 
+        @php
+            $lang = request()->get('lang', 'en');
+        @endphp
+
         <form method="POST" action="{{ route('register') }}" x-data="{ submitting: false }" @submit="submitting = true">
             @csrf
 
             <div class="mt-4">
                 <div class="flex items-center">
                     <x-label class="tracking-wider" for="name" value="{{ 
-                        request()->get('lang') === 'bang' ? 'নাম' : 
-                        (request()->get('lang') === 'zh' ? '姓名' : 'Name')
+                        match($lang) {
+                            'bang' => 'নাম',
+                            'zh' => '姓名',
+                            'ta' => 'பெயர்',
+                            default => 'Name',
+                        }
                     }}" />
                     <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
                 <input id="name" placeholder="{{ 
-                    request()->get('lang') === 'bang' ? 'নাম' : 
-                    (request()->get('lang') === 'zh' ? '姓名' : 'Name')
+                    match($lang) {
+                        'bang' => 'নাম',
+                        'zh' => '姓名',
+                        'ta' => 'பெயர்',
+                        default => 'Name',
+                    }
                 }}" class="mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" />
             </div>
 
             <div class="mt-4">
                 <div class="flex items-center">
                     <x-label for="whatsapp_number" value="{{ 
-                        request()->get('lang') === 'bang' ? 'যোগাযোগ নম্বর' : 
-                        (request()->get('lang') === 'zh' ? '联系电话' : 'Mobile Number')
+                        match($lang) {
+                            'bang' => 'যোগাযোগ নম্বর',
+                            'zh' => '联系电话',
+                            'ta' => 'மொபைல் எண்',
+                            default => 'Mobile Number',
+                        }
                     }}" />
                 </div>
                 <div class="relative">
@@ -37,14 +53,18 @@
                            name="whatsapp_number" 
                            value="{{ old('whatsapp_number') }}" 
                            required
-                           autocomplete="tel"
+                           maxlength="9"
+                           {{-- autocomplete="tel" --}}
                            placeholder="{{ 
-                               request()->get('lang') === 'bang' ? 'যোগাযোগ নম্বর' : 
-                               (request()->get('lang') === 'zh' ? '联系电话' : 'Mobile Number')
+                               match($lang) {
+                                   'bang' => 'যোগাযোগ নম্বর',
+                                   'zh' => '联系电话',
+                                   'ta' => 'மொபைல் எண்',
+                                   default => 'Mobile Number',
+                               }
                            }}" />
                     <input type="hidden" name="country_code" id="country_code" value="{{ old('country_code', '+65') }}" />
                 </div>
-                <p id="whatsapp-validation-message" class="mt-1 text-xs hidden"></p>
                 @error('whatsapp_number')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -53,24 +73,46 @@
             <div class="mt-4">
                 <div class="flex items-center">
                     <x-label for="email" value="{{ 
-                        request()->get('lang') === 'bang' ? 'ইমেল (ঐচ্ছিক)' : 
-                        (request()->get('lang') === 'zh' ? '电子邮箱（可选）' : 'Email (Optional)')
+                        match($lang) {
+                            'bang' => 'ইমেল (ঐচ্ছিক)',
+                            'zh' => '电子邮箱（可选）',
+                            'ta' => 'மின்னஞ்சல் (விரும்பினால்)',
+                            default => 'Email (Optional)',
+                        }
                     }}" />
                 </div>
                 <input id="email" placeholder="{{ 
-                    request()->get('lang') === 'bang' ? 'ইমেল (ঐচ্ছিক)' : 
-                    (request()->get('lang') === 'zh' ? '电子邮箱（可选）' : 'Email Address (Optional)')
+                    match($lang) {
+                        'bang' => 'ইমেল (ঐচ্ছিক)',
+                        'zh' => '电子邮箱（可选）',
+                        'ta' => 'மின்னஞ்சல் (விரும்பினால்)',
+                        default => 'Email Address (Optional)',
+                    }
                 }}" class="block mt-1 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="email" name="email" value="{{ old('email') }}" autocomplete="username" />
             </div>
 
             <div class="mt-4">
                 <div class="flex items-start">
-                    <x-label for="fin" value="{{ __('FIN/NRIC') }}" />
+                    <x-label for="fin" value="{{ 
+                        match($lang) {
+                            'bang' => 'FIN/NRIC',
+                            'zh' => 'FIN/NRIC',
+                            'ta' => 'FIN/NRIC',
+                            default => 'FIN/NRIC',
+                        }
+                    }}" />
                     <span class="ml-1 text-red-500 text-xl">*</span>
                 </div>
                 <div class="relative">
                     <input id="fin" class="block w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" type="text" name="fin" maxlength="4" value="{{ old('fin') }}" required autocomplete="off" 
-                        placeholder="{{ request()->get('lang') === 'bang' ? 'শেষ ৪-অক্ষরর মাত্র (e.g. 124X)' : (request()->get('lang') === 'zh' ? '最后4个字符 (e.g. 124X)' : 'Last 4-characters (e.g. 124X)')}}" 
+                        placeholder="{{ 
+                            match($lang) {
+                                'bang' => 'শেষ ৪-অক্ষরর মাত্র (e.g. 124X)',
+                                'zh' => '最后4个字符 (e.g. 124X)',
+                                'ta' => 'கடைசி 4 எழுத்துகள் (எ.கா. 124X)',
+                                default => 'Last 4-characters (e.g. 124X)',
+                            }
+                        }}" 
                     />
                 </div>
             </div>
@@ -78,8 +120,12 @@
             <div class="mt-4" x-data="{ typeOfWork: '{{ old('type_of_work', 'Migrant worker') }}' }">
                 <div class="flex items-center">
                     <x-label for="type_of_work" value="{{ 
-                        request()->get('lang') === 'bang' ? 'প্রকল্পের ধরণ' : 
-                        (request()->get('lang') === 'zh' ? '工作类型' : 'Type of Work')
+                        match($lang) {
+                            'bang' => 'প্রকল্পের ধরণ',
+                            'zh' => '工作类型',
+                            'ta' => 'வேலை வகை',
+                            default => 'Type of Work',
+                        }
                     }}" />
                 </div>
                 <select 
@@ -88,18 +134,36 @@
                     x-model="typeOfWork"
                     class="block mt-2 w-full rounded-full px-4 py-2 border border-orange-400 focus:border-orange-500 focus:ring-orange-500"
                 >
-                    <option value="Migrant worker" {{ old('type_of_work', 'Migrant worker') === 'Migrant worker' ? 'selected' : '' }}>{{ 
-                        request()->get('lang') === 'bang' ? 'মিরাজ শ্রমিক' : 
-                        (request()->get('lang') === 'zh' ? '外劳' : 'Migrant worker')
-                    }}</option>
-                    <option value="Migrant domestic worker" {{ old('type_of_work') === 'Migrant domestic worker' ? 'selected' : '' }}>{{ 
-                        request()->get('lang') === 'bang' ? 'মিরাজ অভিবাসী শ্রমিক' : 
-                        (request()->get('lang') === 'zh' ? '外劳' : 'Migrant domestic worker')
-                    }}</option>
-                    <option value="Others" {{ old('type_of_work') === 'Others' ? 'selected' : '' }}>{{ 
-                        request()->get('lang') === 'bang' ? 'অন্যান্য' : 
-                        (request()->get('lang') === 'zh' ? '其他' : 'Others')
-                    }}</option>
+                    <option value="Migrant worker" {{ old('type_of_work', 'Migrant worker') === 'Migrant worker' ? 'selected' : '' }}>
+                        {{ 
+                            match($lang) {
+                                'bang' => 'মিরাজ শ্রমিক',
+                                'zh' => '外劳',
+                                'ta' => 'புலம்பெயர்ந்த தொழிலாளி',
+                                default => 'Migrant worker',
+                            }
+                        }}
+                    </option>
+                    <option value="Migrant domestic worker" {{ old('type_of_work') === 'Migrant domestic worker' ? 'selected' : '' }}>
+                        {{ 
+                            match($lang) {
+                                'bang' => 'মিরাজ অভিবাসী শ্রমিক',
+                                'zh' => '外劳',
+                                'ta' => 'புலம்பெயர்ந்த வீட்டுப் பணியாளர்',
+                                default => 'Migrant domestic worker',
+                            }
+                        }}
+                    </option>
+                    <option value="Others" {{ old('type_of_work') === 'Others' ? 'selected' : '' }}>
+                        {{ 
+                            match($lang) {
+                                'bang' => 'অন্যান্য',
+                                'zh' => '其他',
+                                'ta' => 'மற்றவர்கள்',
+                                default => 'Others',
+                            }
+                        }}
+                    </option>
                 </select>
                 
                 <div x-show="typeOfWork === 'Others'" x-cloak x-transition class="mt-2">
@@ -109,7 +173,14 @@
                         type="text" 
                         name="type_of_work_custom" 
                         value="{{ old('type_of_work_custom') }}" 
-                        placeholder="{{ request()->get('lang') === 'bang' ? 'আপনার কাজের ধরণ বর্ণনা করুন' : (request()->get('lang') === 'zh' ? '请描述您的工作类型' : 'Specify your type of work') }}"
+                        placeholder="{{ 
+                            match($lang) {
+                                'bang' => 'আপনার কাজের ধরণ বর্ণনা করুন',
+                                'zh' => '请描述您的工作类型',
+                                'ta' => 'உங்கள் வேலை வகையை விவரிக்கவும்',
+                                default => 'Specify your type of work',
+                            }
+                        }}"
                         x-bind:required="typeOfWork === 'Others'"
                     />
                     @error('type_of_work_custom')
@@ -120,15 +191,23 @@
 
             <div class="mt-10">
                 <x-label for="password" value="{{ 
-                    request()->get('lang') === 'bang' ? 'নিশ্চিত করুন' : 
-                    (request()->get('lang') === 'zh' ? '密码' : 'Password')
+                    match($lang) {
+                        'bang' => 'নিশ্চিত করুন',
+                        'zh' => '密码',
+                        'ta' => 'கடவுச்சொல்',
+                        default => 'Password',
+                    }
                 }}" />
                 <div class="relative">
                     <input 
                         id="password" 
                         placeholder="{{ 
-                            request()->get('lang') === 'bang' ? 'নিশ্চিত করুন' : 
-                            (request()->get('lang') === 'zh' ? '密码' : 'Password')
+                            match($lang) {
+                                'bang' => 'নিশ্চিত করুন',
+                                'zh' => '密码',
+                                'ta' => 'கடவுச்சொல்',
+                                default => 'Password',
+                            }
                         }}" 
                         class="block mt-1 w-full rounded-full px-4 py-2 pr-12 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" 
                         type="password" 
@@ -159,15 +238,23 @@
 
             <div class="mt-4">
                 <x-label for="password_confirmation" value="{{ 
-                    request()->get('lang') === 'bang' ? 'পাসওয়ার্ড পাসওয়ার্ড' : 
-                    (request()->get('lang') === 'zh' ? '确认密码' : 'Confirm Password')
+                    match($lang) {
+                        'bang' => 'পাসওয়ার্ড পাসওয়ার্ড',
+                        'zh' => '确认密码',
+                        'ta' => 'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
+                        default => 'Confirm Password',
+                    }
                 }}" />
                 <div class="relative">
                     <input 
                         id="password_confirmation" 
                         placeholder="{{ 
-                            request()->get('lang') === 'bang' ? 'পাসওয়ার্ড পাসওয়ার্ড' : 
-                            (request()->get('lang') === 'zh' ? '确认密码' : 'Confirm Password')
+                            match($lang) {
+                                'bang' => 'পাসওয়ার্ড পাসওয়ার্ড',
+                                'zh' => '确认密码',
+                                'ta' => 'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
+                                default => 'Confirm Password',
+                            }
                         }}" 
                         class="block mt-1 w-full rounded-full px-4 py-2 pr-12 border border-orange-400 focus:border-orange-500 focus:ring-orange-500" 
                         type="password" 
@@ -195,35 +282,71 @@
 
             <div class="mt-4 mb-8 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <p class="text-xs font-semibold text-gray-700 mb-1"></p>
-                    {{ request()->get('lang') === 'bang' ? 'পাসওয়ার্ডের প্রয়োজনীয়তা:' : 
-                       (request()->get('lang') === 'zh' ? '密码要求：' : 'Password Requirements:') }}
+                    {{ match($lang) {
+                        'bang' => 'পাসওয়ার্ডের প্রয়োজনীয়তা:',
+                        'zh' => '密码要求：',
+                        'ta' => 'கடவுச்சொல் தேவை:',
+                        default => 'Password Requirements:',
+                    } }}
                 </p>
                 <ul class="text-xs text-gray-600 space-y-0.5 list-disc list-inside">
                     <li>
-                        {{ request()->get('lang') === 'bang' ? 'সর্বনিম্ন ৮টি অক্ষর' : 
-                           (request()->get('lang') === 'zh' ? '至少 8 个字符' : 'Minimum 8 characters') }}
+                        {{ match($lang) {
+                            'bang' => 'সর্বনিম্ন ৮টি অক্ষর',
+                            'zh' => '至少 8 个字符',
+                            'ta' => 'குறைந்தபட்ச 8 எழுத்துகள்',
+                            default => 'Minimum 8 characters',
+                        } }}
                     </li>
                     <li>
-                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি বড় হাতের অক্ষর (A-Z)' : 
-                           (request()->get('lang') === 'zh' ? '至少 1 个大写字母 (A-Z)' : 'At least 1 uppercase letter (A-Z)') }}
+                        {{ match($lang) {
+                            'bang' => 'অন্তত ১টি বড় হাতের অক্ষর (A-Z)',
+                            'zh' => '至少 1 个大写字母 (A-Z)',
+                            'ta' => 'குறைந்தபட்ச 1 பொருள் மீதி எழுத்து (A-Z)',
+                            default => 'At least 1 uppercase letter (A-Z)',
+                        } }}
                     </li>
                     <li>
-                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি ছোট হাতের অক্ষর (a-z)' : 
-                           (request()->get('lang') === 'zh' ? '至少 1 个小写字母 (a-z)' : 'At least 1 lowercase letter (a-z)') }}
+                        {{ 
+                            match($lang) {
+                                'bang' => 'অন্তত ১টি ছোট হাতের অক্ষর (a-z)',
+                                'zh' => '至少 1 个小写字母 (a-z)',
+                                'ta' => 'குறைந்தபட்ச 1 சிறிய எழுத்து (a-z)',
+                                default => 'At least 1 lowercase letter (a-z)',
+                            } 
+                        }}
                     </li>
                     <li>
-                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি সংখ্যা (0-9)' : 
-                           (request()->get('lang') === 'zh' ? '至少 1 个数字 (0-9)' : 'At least 1 number (0-9)') }}
+                        {{ 
+                            match($lang) {
+                                'bang' => 'অন্তত ১টি সংখ্যা (0-9)',
+                                'zh' => '至少 1 个数字 (0-9)',
+                                'ta' => 'குறைந்தபட்ச 1 எண் (0-9)',
+                                default => 'At least 1 number (0-9)',
+                            } 
+                        }}
                     </li>
                     <li>
-                        {{ request()->get('lang') === 'bang' ? 'অন্তত ১টি বিশেষ অক্ষর (!@#$%^&*...)' : 
-                           (request()->get('lang') === 'zh' ? '至少 1 个特殊字符 (!@#$%^&*...)' : 'At least 1 special character (!@#$%^&*...)') }}
+                        {{ 
+                            match($lang) {
+                                'bang' => 'অন্তত ১টি বিশেষ অক্ষর (!@#$%^&*...)',
+                                'zh' => '至少 1 个特殊字符 (!@#$%^&*...)',
+                                'ta' => 'குறைந்தபட்ச 1 பயன்பாட்டு எழுத்து (!@#$%^&*...)',
+                                default => 'At least 1 special character (!@#$%^&*...)',
+                            } 
+                        }}
                     </li>
                 </ul>
                 <p class="text-xs text-gray-600 mt-2">
                     <span class="font-semibold">
-                        {{ request()->get('lang') === 'bang' ? 'উদাহরণ:' : 
-                           (request()->get('lang') === 'zh' ? '示例：' : 'Example:') }}
+                        {{ 
+                            match($lang) {
+                                'bang' => 'উদাহরণ:',
+                                'zh' => '示例：',
+                                'ta' => 'எடுத்துக்காட்டு:',
+                                default => 'Example:',
+                            } 
+                        }}
                     </span> 
                     <span class="font-mono text-gray-700">MyP@ssw0rd</span>
                 </p>
@@ -241,19 +364,14 @@
                             />
 
                             <div class="ms-2">
-                                @if(request()->get('lang') === 'en' || request()->get('lang') === '' || !request()->get('lang'))
-                                    {!! __('By selecting this option, your data can be stored for future forms. You can learn more about how we handle your personal information and your rights by reviewing our :privacy_policy', [
-                                        'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
-                                    ]) !!}
-                                @elseif(request()->get('lang') === 'bang')
-                                    {!! __('এই বিকল্প বাছাই করলে, আপনার তথ্য ভবিষ্যতের ফর্মের জন্য সংরক্ষণ করা যাবে। আপনি আমাদের আপনার ব্যক্তিগত তথ্য এবং আপনার অধিকার সম্পর্কে আরও জানতে আমাদের গোপনীয়তা নীতি দেখুন :privacy_policy', [
-                                        'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('গোপনীয়তা নীতি').'</a>',
-                                    ]) !!}
-                                @elseif(request()->get('lang') === 'zh')
-                                    {!! __('通过选择此选项，您的数据可以存储在未来表单中。您可以通过查看我们的隐私政策了解更多关于我们如何处理您的个人信息和您的权利。:privacy_policy', [
-                                        'privacy_policy' => '<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">'.__('隐私政策').'</a>',
-                                    ]) !!}
-                                @endif
+                                {!! 
+                                    match($lang) {
+                                        'bang' => 'এই বিকল্প বাছাই করলে, আপনার তথ্য ভবিষ্যতের ফর্মের জন্য সংরক্ষণ করা যাবে। আপনি আমাদের আপনার ব্যক্তিগত তথ্য এবং আপনার অধিকার সম্পর্কে আরও জানতে আমাদের গোপনীয়তা নীতি দেখুন <a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">গোপনীয়তা নীতি</a>',
+                                        'zh' => '通过选择此选项，您的数据可以存储在未来表单中。您可以通过查看我们的隐私政策了解更多关于我们如何处理您的个人信息和您的权利。<a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">隐私政策</a>',
+                                        'ta' => 'இந்த விருப்பத்தை தேர்ந்தெடுத்தால், உங்கள் தரவு எதிர்காலத்தில் படிப்படியாக சேமிக்கப்படும். நாங்கள் உங்கள் தனியுரிமை தகவல்களை எவ்வாறு நாங்கள் செயல்படுத்துகிறோம் மற்றும் உங்கள் அதிகாரங்களை எவ்வாறு நாங்கள் செயல்படுத்துகிறோம் என்பதை எங்களின் தனியுரிமை தன்மை நீதியை பார்க்கவும் <a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">தனியுரிமை நீதி</a>',
+                                        default => 'By selecting this option, your data can be stored for future forms. You can learn more about how we handle your personal information and your rights by reviewing our <a target="_blank" href="https://www.hia.sg/privacy-policy" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-indigo-500">Privacy Policy</a>',
+                                    }
+                                !!}
                             </div>
                         </div>
                     </x-label>
@@ -277,14 +395,26 @@
                     :class="submitting ? 'opacity-80 cursor-not-allowed bg-gray-400 hover:bg-gray-400 active:bg-gray-400 focus:bg-gray-400 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:active:bg-gray-400 disabled:focus:bg-gray-400 disabled:opacity-80 disabled:cursor-not-allowed' : ''"
                     class="cursor-pointer ms-4 w-3/4 flex justify-center py-4 text-white bg-orange-500 hover:bg-orange-600 duration-300 transition-all rounded-full"
                 >
-                    <span x-show="!submitting">{{ 
-                        request()->get('lang') === 'bang' ? 'নিবন্ধন করুন' : 
-                        (request()->get('lang') === 'zh' ? '注册' : 'Register')
-                    }}</span>
-                    <span x-show="submitting" x-cloak>{{ 
-                        request()->get('lang') === 'bang' ? 'নিবন্ধন করছে...' : 
-                        (request()->get('lang') === 'zh' ? '注册中...' : 'Registering...')
-                    }}</span>
+                    <span x-show="!submitting">
+                        {{ 
+                            match($lang) {
+                                'bang' => 'নিবন্ধন করুন',
+                                'zh' => '注册',
+                                'ta' => 'பதிவுசெய்யவும்',
+                                default => 'Register',
+                            }
+                        }}
+                    </span>
+                    <span x-show="submitting" x-cloak>
+                        {{ 
+                            match($lang) {
+                                'bang' => 'নিবন্ধন করছে...',
+                                'zh' => '注册中...',
+                                'ta' => 'பதிவுசெய்யப்படுகிறது...',
+                                default => 'Registering...',
+                            }
+                        }}
+                    </span>
                 </button>
             </div>
         </form>
@@ -431,55 +561,6 @@
                 }
             });
 
-            // Validate WhatsApp on blur (optional - async check)
-            input.addEventListener('blur', async function() {
-                const fullNumber = iti.getNumber();
-                const validationMsg = document.getElementById('whatsapp-validation-message');
-                
-                if (fullNumber && iti.isValidNumber()) {
-                    validationMsg.classList.remove('hidden');
-                    validationMsg.textContent = 'Checking Mobile Number formats...';
-                    validationMsg.classList.remove('text-red-500', 'text-green-500', 'text-yellow-500');
-                    
-                    try {
-                        const response = await fetch('{{ route("api.check-whatsapp") }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                            },
-                            body: JSON.stringify({ phone: fullNumber })
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        
-                        const data = await response.json();
-                        
-                        // If service is not enabled (null response), hide the message
-                        if (data.is_whatsapp === null) {
-                            validationMsg.textContent = '';
-                            validationMsg.classList.add('hidden');
-                        } else if (data.is_whatsapp === true) {
-                            validationMsg.textContent = '✓ Mobile Number format is valid.';
-                            validationMsg.classList.add('text-green-600');
-                            validationMsg.classList.remove('text-yellow-500', 'text-red-500', 'hidden');
-                        } else {
-                            validationMsg.textContent = '⚠ Mobile Number format is invalid.';
-                            validationMsg.classList.add('text-yellow-500');
-                            validationMsg.classList.remove('text-green-600', 'text-red-500', 'hidden');
-                        }
-                    } catch (error) {
-                        // Silently fail - validation will happen on server side
-                        validationMsg.textContent = '';
-                        validationMsg.classList.add('hidden');
-                    }
-                } else {
-                    validationMsg.textContent = '';
-                    validationMsg.classList.add('hidden');
-                }
-            });
 
             // Before form submit, ensure the full number with country code is set
             const form = input.closest('form');

@@ -28,7 +28,7 @@
         @livewireStyles
         @stack('styles')
     </head>
-    <body class="bg-[#FAF7F4]">
+    <body class="bg-orange-100">
         <div class="font-sans text-gray-900 bg-orange-100 antialiased px-4">
             {{ $slot }}
         </div>

@@ -5,9 +5,7 @@ namespace App\Actions\Fortify;
 use App\Models\Team;
 use App\Models\User;
 use App\Rules\ValidRecaptcha;
-use App\Rules\ValidWhatsAppNumber;
 use App\Services\PointsService;
-use App\Services\TwilioWhatsAppService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -20,29 +18,15 @@ class CreateNewUser implements CreatesNewUsers
     use PasswordValidationRules;
 
     /**
-     * Generate a dummy email from WhatsApp number
+     * Generate a random email for the user
      */
-    protected function generateEmailFromWhatsApp(string $whatsappNumber): string
+    protected function generateUserRandomEmail(): string
     {
-        // Remove all non-numeric characters except +
-        $cleaned = preg_replace('/[^+\d]/', '', $whatsappNumber);
-        
-        // If starts with +, keep it, otherwise add + if it doesn't start with it
-        if (!str_starts_with($cleaned, '+')) {
-            $cleaned = '+' . $cleaned;
-        }
-        
-        // Generate email: +65321123@hopevillage-user.sg
-        $email = $cleaned . '@hopevillage-user.sg';
-        
-        // Ensure uniqueness by appending a suffix if needed
-        $baseEmail = $email;
-        $counter = 1;
-        
-        while (User::where('email', $email)->exists()) {
-            $email = $baseEmail . '.' . $counter;
-            $counter++;
-        }
+        // Generate email: user-uuid@hopevillage.sg
+        do {
+            $uuid = Str::uuid()->toString();
+            $email = 'user-' . $uuid . '@hopevillage.sg';
+        } while (User::where('email', $email)->exists());
         
         return $email;
     }
@@ -71,9 +55,8 @@ class CreateNewUser implements CreatesNewUsers
             'whatsapp_number' => [
                 'required',
                 'string',
-                'max:20',
+                'max:12',
                 'unique:users,whatsapp_number',
-                new ValidWhatsAppNumber(app(TwilioWhatsAppService::class))
             ],
             'fin' => ['required', 'string', 'size:4', 'regex:/^\d{3}[A-Z]$/i'],
             'age' => ['nullable', 'integer', 'min:0', 'max:120'],
@@ -86,6 +69,7 @@ class CreateNewUser implements CreatesNewUsers
         ], [
             'whatsapp_number.unique' => 'This mobile number is already registered.',
             'whatsapp_number.required' => 'This mobile number is required.',
+            'whatsapp_number.max' => 'The mobile number must be 8 digits long.',
             'fin.required' => 'The FIN/NIRC is required.',
             'fin.regex' => 'The FIN/NIRC is invalid. Example: 123W',
             'fin.size' => 'It must be the last 4 characters only. (e.g. 124X)',
@@ -94,7 +78,7 @@ class CreateNewUser implements CreatesNewUsers
         return DB::transaction(function () use ($input, $email) {
             // Generate email from WhatsApp if not provided
             if (empty($email)) {
-                $email = $this->generateEmailFromWhatsApp($input['whatsapp_number']);
+                $email = $this->generateUserRandomEmail();
             }
 
             // Determine type_of_work value

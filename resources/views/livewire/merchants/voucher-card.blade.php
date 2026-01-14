@@ -46,14 +46,14 @@
 
     <div class="relative w-full bg-white overflow-hidden border-2 {{ $borderColor }} rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-br {{ $overlayGradient }} opacity-50 group-hover:opacity-70 transition-opacity duration-300 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-linear-to-br {{ $overlayGradient }} opacity-50 group-hover:opacity-70 transition-opacity duration-300 pointer-events-none"></div>
         
         <!-- Content -->
         <a href="{{ $route }}" class="relative block p-4">
             <div class="flex items-start gap-4">
                 {{-- QR Code on the left --}}
                 @if($qrCodeImage)
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <img src="{{ $qrCodeImage }}" alt="Voucher QR Code" class="w-20 h-20 object-contain border border-gray-300 rounded-lg bg-white">
                     </div>
                 @endif
@@ -83,7 +83,7 @@
                                         <span class="text-sm text-yellow-600 font-semibold">
                                             Within the day only
                                         </span>
-                                        @else
+                                        @else   
                                             <span class="text-sm text-gray-700 font-semibold">
                                                 {{ $validDays }} days
                                             </span>

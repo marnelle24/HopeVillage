@@ -2,14 +2,16 @@
     currentLang: '{{ request()->get('lang', 'en') }}',
     languages: [
         { code: 'en', name: 'English', flag: '🇬🇧' },
-        { code: 'bang', name: 'Bangla', flag: '🇧🇩' },
+        { code: 'bang', name: 'Bengali', flag: '🇧🇩' },
+        { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
         { code: 'zh', name: 'Chinese', flag: '🇨🇳' }
     ],
+
     open: false,
     init() {
         // Set current language from URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const langParam = urlParams.get('lang');
+        var urlParams = new URLSearchParams(window.location.search);
+        var langParam = urlParams.get('lang');
         if (langParam) {
             this.currentLang = langParam;
         } else {
@@ -21,7 +23,7 @@
     },
     changeLanguage(langCode) {
         this.currentLang = langCode;
-        const url = new URL(window.location.href);
+        var url = new URL(window.location.href);
         
         // Remove lang parameter if English (default)
         if (langCode === 'en') {
