@@ -90,6 +90,10 @@
                                 {{ __('Settings') }}
                             </x-dropdown-link>
 
+                            <x-dropdown-link href="{{ route('admin.api-documentation.index') }}">
+                                {{ __('API Documentation') }}
+                            </x-dropdown-link>
+
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -171,6 +175,10 @@
 
                     <x-responsive-nav-link href="{{ route('admin.settings.index') }}">
                         {{ __('Settings') }}
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link href="{{ route('admin.api-documentation.index') }}">
+                        {{ __('API Documentation') }}
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->

@@ -104,6 +104,9 @@ Route::middleware([
     // Settings CRUD Routes
     Route::get('/admin/settings', \App\Livewire\Settings\Index::class)->name('admin.settings.index');
 
+    // API Documentation
+    Route::get('/admin/api-documentation', \App\Livewire\ApiDocumentation\Index::class)->name('admin.api-documentation.index');
+
     // Raffle / Roulette
     Route::get('/admin/raffle-v1', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle.v1');
     Route::get('/admin/raffle', \App\Livewire\Raffle\RouletteV2::class)->name('admin.raffle');
