@@ -17,6 +17,7 @@ class Index extends Component
 
     public string $search = '';
     public string $verifiedFilter = 'all'; // all | verified | unverified
+    public string $userTypeFilter = 'all'; // all | member | merchant_user | admin
     public string $dateSort = 'desc'; // desc | asc
     public bool $showMessage = false;
     
@@ -52,6 +53,11 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingUserTypeFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function sortByDate(): void
     {
         // Toggle between desc and asc
@@ -69,9 +75,7 @@ class Index extends Component
             return;
         }
 
-        $member = User::where('id', $userId)
-            ->where('user_type', 'member')
-            ->firstOrFail();
+        $member = User::where('id', $userId)->firstOrFail();
 
         // Capture member details before deletion
         $memberDetails = [
@@ -147,9 +151,7 @@ class Index extends Component
         ])->validate();
 
         // Find the user
-        $user = User::where('id', $this->selectedUserId)
-            ->where('user_type', 'member')
-            ->firstOrFail();
+        $user = User::where('id', $this->selectedUserId)->firstOrFail();
 
         // Update password
         $user->forceFill([
@@ -190,7 +192,12 @@ class Index extends Component
 
     public function render()
     {
-        $query = User::query()->where('user_type', 'member');
+        $query = User::query();
+
+        // Apply user type filter
+        if ($this->userTypeFilter !== 'all') {
+            $query->where('user_type', $this->userTypeFilter);
+        }
 
         if ($this->search !== '') {
             $s = '%' . $this->search . '%';
@@ -215,13 +222,11 @@ class Index extends Component
             $query->orderByDesc('created_at');
         }
 
-        $members = $query->paginate(6);
+        $members = $query->paginate(10);
 
         $selectedUser = null;
         if ($this->showPasswordReset && $this->selectedUserId) {
-            $selectedUser = User::where('id', $this->selectedUserId)
-                ->where('user_type', 'member')
-                ->first();
+            $selectedUser = User::where('id', $this->selectedUserId)->first();
         }
 
         return view('livewire.members.index', [

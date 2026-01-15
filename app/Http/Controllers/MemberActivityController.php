@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityType;
 use App\Models\Location;
 use App\Models\MemberActivity;
+use App\Models\PointSystemConfig;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\PointsService;
@@ -132,14 +133,33 @@ class MemberActivityController extends Controller
                     ],
                 ]);
 
-                // Award points if this is an ENTRY activity
+                // Check if this activity type has points configured and award them
                 $pointsBefore = $member->total_points;
                 $pointsAwarded = 0;
-                if (strtoupper($validated['type_of_activity']) === 'ENTRY') {
+                
+                // Check for location-specific config first, then global config
+                $pointConfig = PointSystemConfig::where('activity_type_id', $activityType->id)
+                    ->where('is_active', true)
+                    ->where(function($query) use ($location) {
+                        $query->where('location_id', $location->id)
+                              ->orWhereNull('location_id');
+                    })
+                    ->whereNull('amenity_id')
+                    ->orderByRaw('CASE WHEN location_id IS NOT NULL THEN 0 ELSE 1 END')
+                    ->first();
+                
+                // If config exists and has points > 0, award them
+                if ($pointConfig && $pointConfig->points > 0) {
+                    // For ENTRY, use the PointsService constant for backward compatibility
+                    // For other activities, use the activity type name directly
+                    $activityName = strtoupper($validated['type_of_activity']) === 'ENTRY' 
+                        ? PointsService::ACTIVITY_LOCATION_ENTRY 
+                        : $validated['type_of_activity'];
+                    
                     app(PointsService::class)->award(
                         user: $member,
-                        activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
-                        description: 'Member entry to location',
+                        activityName: $activityName,
+                        description: "Member {$validated['type_of_activity']} at {$location->name}",
                         locationId: $location->id,
                         memberActivityId: $memberActivity->id,
                     );
@@ -149,6 +169,7 @@ class MemberActivityController extends Controller
 
                 Log::info('Member activity scanned', [
                     'member_fin' => $member->fin,
+                    'qr_code' => $member->qr_code,
                     'location_code' => $location->location_code,
                     'activity_type' => $validated['type_of_activity'],
                     'points_awarded' => $pointsAwarded,
@@ -160,6 +181,7 @@ class MemberActivityController extends Controller
                     'data' => [
                         'member' => [
                             'fin' => $member->fin,
+                            'qr_code' => $member->qr_code,
                             'name' => $member->name,
                             'total_points' => $member->total_points,
                         ],
