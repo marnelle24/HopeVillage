@@ -24,7 +24,7 @@ class CreateNewUser implements CreatesNewUsers
     {
         // Generate email: user-uuid@hopevillage.sg
         do {
-            $uuid = Str::uuid()->toString();
+            $uuid = explode('-', Str::uuid()->toString())[0];
             $email = 'user-' . $uuid . '@hopevillage.sg';
         } while (User::where('email', $email)->exists());
         

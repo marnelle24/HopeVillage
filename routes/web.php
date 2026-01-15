@@ -103,8 +103,6 @@ Route::middleware([
 
     // Settings CRUD Routes
     Route::get('/admin/settings', \App\Livewire\Settings\Index::class)->name('admin.settings.index');
-    Route::get('/admin/settings/create', \App\Livewire\Settings\Form::class)->name('admin.settings.create');
-    Route::get('/admin/settings/{id}/edit', \App\Livewire\Settings\Form::class)->name('admin.settings.edit');
 
     // Raffle / Roulette
     Route::get('/admin/raffle-v1', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle.v1');

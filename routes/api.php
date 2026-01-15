@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityTypeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MemberActivityController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,3 +29,8 @@ Route::get('/locations', [LocationController::class, 'index'])
 // create a api to get all the active events
 Route::get('/events', [EventController::class, 'getEvents'])
     ->name('api.events.index');
+
+// API to get settings records
+// Optional query parameter "key" - if empty, fetch all; if specified, return matching setting
+Route::get('/settings', [SettingsController::class, 'index'])
+    ->name('api.settings.index');

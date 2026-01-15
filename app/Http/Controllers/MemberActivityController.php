@@ -30,7 +30,8 @@ class MemberActivityController extends Controller
     {
         // Validate request
         $validated = $request->validate([
-            'member_fin' => ['required', 'string', 'exists:users,fin'],
+            'qr_code' => ['required', 'string', 'max:255'],
+            'member_fin' => ['nullable', 'string', 'exists:users,fin'],
             'location_code' => ['required', 'string', 'exists:locations,location_code'],
             'type_of_activity' => ['required', 'string', 'max:255'],
         ]);
@@ -38,13 +39,13 @@ class MemberActivityController extends Controller
         try {
             return DB::transaction(function () use ($validated, $request) {
                 // Find member by FIN - first check if user exists
-                $user = User::where('fin', $validated['member_fin'])->first();
+                $user = User::where('qr_code', $validated['qr_code'])->first();
                 
                 if (!$user) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Member not found',
-                        'error' => "No member found with FIN: {$validated['member_fin']}",
+                        'error' => "No member found with qr code: {$validated['qr_code']}",
                     ], 404);
                 }
 
@@ -53,7 +54,7 @@ class MemberActivityController extends Controller
                     return response()->json([
                         'success' => false,
                         'message' => 'User is not a member',
-                        'error' => "User with FIN {$validated['member_fin']} is not a member (user_type: {$user->user_type})",
+                        'error' => "User with qr code {$validated['qr_code']} is not a member (user_type: {$user->user_type})",
                     ], 422);
                 }
 
@@ -80,7 +81,8 @@ class MemberActivityController extends Controller
                 }
 
                 // Validate entry time gap for ENTRY activities
-                if (strtoupper($validated['type_of_activity']) === 'ENTRY') {
+                if (strtoupper($validated['type_of_activity']) === 'ENTRY') 
+                {
                     // Get dynamic time gap from settings (default: 3600 seconds = 1 hour)
                     $timeGapSeconds = (int) Setting::get('entry_time_gap', 3600);
                     $timeGapAgo = now()->subSeconds($timeGapSeconds);
@@ -97,7 +99,8 @@ class MemberActivityController extends Controller
                     if ($recentEntry) {
                         return response()->json([
                             'success' => false,
-                            'message' => 'it requires 1 hour gap to scan again',
+                            'message' => 'it requires a ' . $timeGapSeconds . ' second(s) gap to scan again.',
+                            'error' => "Member has a recent entry at this location within the time gap",
                         ], 422);
                     }
                 }
@@ -123,6 +126,7 @@ class MemberActivityController extends Controller
                         'scanned_at' => now()->toIso8601String(),
                         'location_code' => $location->location_code,
                         'member_fin' => $member->fin,
+                        'qr_code' => $member->qr_code,
                         'device_info' => $request->header('User-Agent'),
                         'ip_address' => $request->ip(),
                     ],
