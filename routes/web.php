@@ -160,6 +160,10 @@ Route::middleware([
     Route::get('/member/event/{event_code}', \App\Livewire\Member\Events\Profile::class)
         ->name('member.events.profile');
     
+    // Referral System
+    Route::get('/member/referral-system', \App\Livewire\Member\ReferralSystem::class)
+        ->name('member.referral-system');
+    
     // QR Code routes
     Route::get('/member/qr-code', [QrCodeController::class, 'show'])->name('member.qr-code');
 });

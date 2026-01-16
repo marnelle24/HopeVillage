@@ -170,6 +170,12 @@
                 </svg>
                 My Profile
             </a>
+            <a href="{{ route('member.referral-system') }}" class="flex items-center gap-1 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 {{ request()->routeIs('member.referral-system') ? 'bg-orange-50 text-orange-700' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Referral System
+            </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="w-full flex gap-1 items-center text-left px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50">

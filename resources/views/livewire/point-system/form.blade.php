@@ -85,7 +85,7 @@
                         >
                             <option value="">Select an Activity Type</option>
                             @foreach($activityTypes as $activityType)
-                                <option value="{{ $activityType->id }}">{{ $activityType->name }} - {{ $activityType->description }}</option>
+                                <option value="{{ $activityType->id }}">{{ $activityType->description }}</option>
                             @endforeach
                         </select>
                         @error('activity_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -207,7 +207,7 @@
         @keydown.escape.window="$wire.closeActivityTypeModal()"
     >
         <!-- Backdrop -->
-        <div class="fixed inset-0 bg-black bg-opacity-50" wire:click="closeActivityTypeModal"></div>
+        <div class="fixed inset-0 bg-black/70" wire:click="closeActivityTypeModal"></div>
 
         <!-- Modal -->
         <div class="flex min-h-full items-center justify-center p-4">
@@ -241,7 +241,7 @@
                             id="newActivityTypeName"
                             wire:model.blur="newActivityTypeName"
                             placeholder="e.g., account_verification"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('newActivityTypeName') border-red-500 @enderror"
+                            class="w-full px-4 py-2 border rounded-full focus:ring-2 text-gray-600 focus:ring-orange-500 focus:border-orange-500 @error('newActivityTypeName') border-red-500 @enderror"
                         >
                         @error('newActivityTypeName') 
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
@@ -258,7 +258,7 @@
                             wire:model.blur="newActivityTypeDescription"
                             rows="3"
                             placeholder="Description of this activity type"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('newActivityTypeDescription') border-red-500 @enderror"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 text-gray-600 focus:ring-orange-500 focus:border-orange-500 @error('newActivityTypeDescription') border-red-500 @enderror"
                         ></textarea>
                         @error('newActivityTypeDescription') 
                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 

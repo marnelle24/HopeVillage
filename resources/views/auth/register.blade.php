@@ -13,6 +13,11 @@
         <form method="POST" action="{{ route('register') }}" x-data="{ submitting: false }" @submit="submitting = true">
             @csrf
 
+            {{-- Preserve referral code if present in URL --}}
+            @if(request()->has('ref'))
+                <input type="hidden" name="ref" value="{{ request()->get('ref') }}">
+            @endif
+
             <div class="mt-4">
                 <div class="flex items-center">
                     <x-label class="tracking-wider" for="name" value="{{ 
@@ -521,6 +526,7 @@
             // Update hidden country code field and form field on change
             function updateCountryCode() {
                 const countryData = iti.getSelectedCountryData();
+                
                 if (countryData) {
                     const dialCode = '+' + countryData.dialCode;
                     document.getElementById('country_code').value = dialCode;
@@ -536,6 +542,9 @@
                     const currentValue = input.value.replace(/^\+?\d+\s*/, ''); // Remove any existing country code
                     if (currentValue) {
                         const fullNumber = iti.getNumber();
+
+                        console.log(fullNumber);
+
                         if (fullNumber) {
                             input.value = fullNumber;
                         }

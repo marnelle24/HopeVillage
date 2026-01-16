@@ -46,6 +46,7 @@ class User extends Authenticatable
         'is_verified',
         'total_points',
         'current_merchant_id',
+        'referred_by_user_id',
     ];
 
     /**
@@ -206,5 +207,33 @@ class User extends Authenticatable
     public function createdPrograms(): HasMany
     {
         return $this->hasMany(Program::class, 'created_by');
+    }
+
+    /**
+     * Get the user who referred this member
+     */
+    public function referredBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by_user_id');
+    }
+
+    /**
+     * Get all members referred by this user
+     */
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by_user_id');
+    }
+
+    /**
+     * Get the referral link for this member
+     */
+    public function getReferralLinkAttribute(): string
+    {
+        if (!$this->qr_code) {
+            return '';
+        }
+        
+        return url('/register?ref=' . $this->qr_code);
     }
 }

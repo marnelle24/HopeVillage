@@ -22,6 +22,7 @@ class PointsService
     public const ACTIVITY_VOUCHER_CLAIM = 'member_claim_voucher';
     public const ACTIVITY_VOUCHER_REDEEM = 'member_redeem_voucher';
     public const ACTIVITY_ADMIN_VOUCHER_CLAIM = 'member_claim_admin_voucher';
+    public const ACTIVITY_REFERRAL = 'member_referral';
 
     // Fallback points (used only if no admin configuration exists)
     private const FALLBACK_POINTS_ACCOUNT_VERIFICATION = 10;
@@ -31,6 +32,7 @@ class PointsService
     private const FALLBACK_POINTS_EVENT_ATTEND = 20;
     private const FALLBACK_POINTS_VOUCHER_CLAIM = 10;
     private const FALLBACK_POINTS_VOUCHER_REDEEM = 5;
+    private const FALLBACK_POINTS_REFERRAL = 5;
 
     public function awardAccountVerification(User $user): void
     {
@@ -102,6 +104,16 @@ class PointsService
         );
     }
 
+    public function awardReferral(User $referrer, User $referredUser): void
+    {
+        $this->award(
+            user: $referrer,
+            activityName: self::ACTIVITY_REFERRAL,
+            description: 'Referred new member: ' . $referredUser->name . ' (' . $referredUser->qr_code . ')',
+            locationId: null,
+        );
+    }
+
     /**
      * Get fallback points based on activity name
      */
@@ -115,6 +127,7 @@ class PointsService
             self::ACTIVITY_EVENT_ATTEND => self::FALLBACK_POINTS_EVENT_ATTEND,
             self::ACTIVITY_VOUCHER_CLAIM => self::FALLBACK_POINTS_VOUCHER_CLAIM,
             self::ACTIVITY_VOUCHER_REDEEM => self::FALLBACK_POINTS_VOUCHER_REDEEM,
+            self::ACTIVITY_REFERRAL => self::FALLBACK_POINTS_REFERRAL,
             default => 0,
         };
     }

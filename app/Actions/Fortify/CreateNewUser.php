@@ -114,6 +114,28 @@ class CreateNewUser implements CreatesNewUsers
                 $userData['qr_code'] = $qrCode;
             }
 
+            // Handle referral code (non-blocking validation)
+            $referrer = null;
+            $referralCode = trim($input['ref'] ?? '');
+            
+            if (!empty($referralCode)) {
+                // Attempt to find referrer by QR code
+                // Non-blocking: if invalid, silently continue without referral
+                $referrer = User::where('qr_code', strtoupper($referralCode))
+                    ->where('user_type', 'member')
+                    ->whereNull('deleted_at') // Exclude soft-deleted users
+                    ->first();
+                
+                // Prevent self-referral (though unlikely at registration, check anyway)
+                // We'll check this after user creation since we need the new user's QR code
+            }
+            
+            // Set referred_by_user_id if referrer is valid
+            // We'll validate self-referral after user creation
+            if ($referrer) {
+                $userData['referred_by_user_id'] = $referrer->id;
+            }
+
             // OLD CODE - Auto-generation of FIN (commented out)
             // if (($userData['user_type'] ?? 'member') === 'member') {
             //     // Generate a unique 9-character UID
@@ -127,7 +149,7 @@ class CreateNewUser implements CreatesNewUsers
             //     $userData['qr_code'] = $userData['fin'];
             // }
 
-            return tap(User::create($userData), function (User $user) {
+            return tap(User::create($userData), function (User $user) use ($referrer) {
                 if (Jetstream::userHasTeamFeatures($user)) {
                     $this->createTeam($user);
                 }
@@ -135,6 +157,22 @@ class CreateNewUser implements CreatesNewUsers
                 // Award 10 points for registration (only for members)
                 if ($user->isMember()) {
                     app(PointsService::class)->awardRegistration($user);
+                }
+                
+                // Award referral points if valid referral exists
+                // Check self-referral prevention: if user's QR code matches referrer's QR code, invalidate
+                if ($referrer && $user->isMember() && $user->qr_code !== $referrer->qr_code) {
+                    // Ensure referrer is still valid (not deleted, still a member)
+                    $referrer->refresh();
+                    if ($referrer->user_type === 'member' && !$referrer->trashed()) {
+                        app(PointsService::class)->awardReferral($referrer, $user);
+                    } else {
+                        // Referrer became invalid, remove referral link
+                        $user->update(['referred_by_user_id' => null]);
+                    }
+                } elseif ($referrer && $user->qr_code === $referrer->qr_code) {
+                    // Self-referral detected, remove referral link
+                    $user->update(['referred_by_user_id' => null]);
                 }
             });
         });
