@@ -1,21 +1,21 @@
 <div>
     <x-slot name="header">
-        <div class="flex md:flex-row flex-col md:gap-0 gap-4 justify-between items-center">
-            <div class="flex items-center gap-4">
-                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
-                    {{ $event->title }} - Profile
-                </h2>
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex md:flex-row flex-col md:gap-0 gap-4 justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
+                        {{ $event->title }} - Profile
+                    </h2>
+                </div>
+                <a href="{{ route('admin.events.index') }}" class="text-orange-600 md:text-base text-md hover:text-orange-700 font-normal py-2 px-4 rounded-full">
+                    ← Back to Events
+                </a>
             </div>
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-            <a href="{{ route('admin.events.index') }}" class="text-gray-600 hover:text-gray-900 md:mx-0 mx-4">
-                ← Back to Events
-            </a>
-            
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">            
             <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 md:mx-0 mx-4">
                 <!-- Left Column - Event Details -->
                 <div class="lg:col-span-2 space-y-6">
@@ -72,7 +72,9 @@
                                     </p>
                                 </div>
                             </div>
-                            @if($event->venue)
+
+
+                            {{-- @if($event->venue)
                             <div class="flex items-start gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
@@ -82,7 +84,7 @@
                                     <p class="text-gray-900">{{ $event->venue }}</p>
                                 </div>
                             </div>
-                            @endif
+                            @endif --}}
                         </div>
                     </div>
 
@@ -144,100 +146,93 @@
                         </div>
                     </div>
 
-                    <!-- Member Registrants Card -->
-                    <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
-                        <div class="flex justify-between items-center mb-4 border-b pb-2">
-                            <h3 class="text-lg font-semibold text-gray-800">Member Registrants</h3>
-                            <span class="text-sm text-gray-500">
-                                {{ $event->registrations->count() }} 
-                                @if($event->max_participants)
-                                    / {{ $event->max_participants }}
-                                @endif
-                            </span>
-                        </div>
-                        
-                        @if($event->registrations->count() > 0)
-                            <div class="space-y-3 max-h-96 overflow-y-auto">
-                                @foreach($event->registrations as $registration)
-                                    @php
-                                        $statusClass = match($registration->status) {
-                                            'attended' => 'bg-green-100 text-green-800',
-                                            'cancelled' => 'bg-red-100 text-red-800',
-                                            'no_show' => 'bg-gray-100 text-gray-800',
-                                            default => 'bg-blue-100 text-blue-800',
-                                        };
-                                    @endphp
-                                    <div class="border-l-4 border-indigo-500 pl-3 py-2 hover:bg-gray-50 transition-colors duration-200">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex-1">
-                                                <p class="text-sm font-semibold text-gray-900">
-                                                    {{ $registration->user->name ?? 'N/A' }}
-                                                </p>
-                                                <p class="text-xs text-gray-500 mt-1">
-                                                    Registered: {{ $registration->registered_at ? $registration->registered_at->format('M d, Y g:i A') : $registration->created_at->format('M d, Y g:i A') }}
-                                                </p>
-                                                @if($registration->attended_at)
-                                                <p class="text-xs text-green-600 mt-1">
-                                                    Attended: {{ $registration->attended_at->format('M d, Y g:i A') }}
-                                                </p>
-                                                @endif
-                                            </div>
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                                                {{ ucfirst(str_replace('_', ' ', $registration->status)) }}
-                                            </span>
-                                        </div>
-                                        @if($registration->notes)
-                                        <p class="text-xs text-gray-600 mt-2 italic">
-                                            {{ $registration->notes }}
-                                        </p>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-sm text-gray-500 flex items-center justify-center gap-2 py-8">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                                </svg>
-                                <span>No registrations yet</span>
-                            </p>
-                        @endif
-                    </div>
                 </div>
 
                 <!-- Right Column - Quick Actions & Registrations -->
                 <div class="space-y-6">
-                    @php
-                        $eventQrImage = app(\App\Services\QrCodeService::class)->generateQrCodeImage($event->event_code, 260);
-                    @endphp
-
                     <!-- Event QR Code Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
-                        <div class="flex flex-col items-center">
-                            <img
-                                id="event-qr-image"
-                                src="{{ $eventQrImage }}"
-                                alt="Event QR Code"
-                                class="w-64 h-64 object-contain border border-gray-200 rounded-lg bg-white"
-                            >
-                        </div>
-                        <div class="flex items-center justify-center mt-4">
-                            <div class="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onclick="shareEventQrCode()"
-                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Event QR Code</h3>
+                        <div 
+                            x-data="{
+                                qrCodeImage: '{{ $qrCodeImage }}',
+                                eventCode: '{{ $event->event_code }}',
+                                async downloadQR() {
+                                    try {
+                                        const response = await fetch(this.qrCodeImage);
+                                        const blob = await response.blob();
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = `event-qr-${this.eventCode}.png`;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                        document.body.removeChild(a);
+                                    } catch (error) {
+                                        console.error('Download failed:', error);
+                                        alert('Failed to download QR code. Please try again.');
+                                    }
+                                },
+                                async shareQR() {
+                                    try {
+                                        if (navigator.share) {
+                                            const response = await fetch(this.qrCodeImage);
+                                            const blob = await response.blob();
+                                            const file = new File([blob], `event-qr-${this.eventCode}.png`, { type: 'image/png' });
+                                            await navigator.share({
+                                                title: 'Event QR Code: {{ $event->title }}',
+                                                text: `Event Code: ${this.eventCode}`,
+                                                files: [file]
+                                            });
+                                        } else if (navigator.clipboard) {
+                                            await navigator.clipboard.writeText(this.eventCode);
+                                            alert('Event code copied to clipboard!');
+                                        } else {
+                                            // Fallback: copy event code to clipboard manually
+                                            const textArea = document.createElement('textarea');
+                                            textArea.value = this.eventCode;
+                                            document.body.appendChild(textArea);
+                                            textArea.select();
+                                            document.execCommand('copy');
+                                            document.body.removeChild(textArea);
+                                            alert('Event code copied to clipboard!');
+                                        }
+                                    } catch (error) {
+                                        console.error('Share failed:', error);
+                                        // Fallback to copy event code
+                                        try {
+                                            await navigator.clipboard.writeText(this.eventCode);
+                                            alert('Event code copied to clipboard!');
+                                        } catch (e) {
+                                            alert('Sharing not available. Event Code: ' + this.eventCode);
+                                        }
+                                    }
+                                }
+                            }"
+                        >
+                            <div class="flex items-center justify-center mb-4">
+                                <img :src="qrCodeImage" alt="Event QR Code" class="w-full max-w-md h-64 object-contain rounded-lg border border-gray-300" id="event-qr-image">
+                            </div>
+                            <div class="flex gap-3 justify-center">
+                                <button 
+                                    @click="downloadQR()"
+                                    class="flex items-center text-xs gap-1 px-3 py-1 bg-transparent hover:bg-gray-200 cursor-pointer text-gray-500 border border-gray-500 font-medium rounded-lg transition-colors duration-200"
                                 >
-                                    Share QR Code
-                                </button>
-                                <a
-                                    id="event-qr-download"
-                                    href="{{ $eventQrImage }}"
-                                    download="event-{{ $event->event_code }}.png"
-                                    class="hover:bg-gray-200 border border-gray-400 bg-transparent text-xs hover:-translate-y-0.5 duration-300 text-gray-600 font-semibold py-2 px-4 rounded-lg transition-all"
-                                >
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                    </svg>
                                     Download
-                                </a>
+                                </button>
+                                <button 
+                                    @click="shareQR()"
+                                    class="flex items-center text-xs gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 cursor-pointer text-white border border-green-600 font-medium rounded-lg transition-colors duration-200"
+                                >
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                                    </svg>
+                                    Share
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -247,18 +242,18 @@
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Quick Actions</h3>
                         
                         <div class="space-y-3">
-                            <a href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" class="flex items-center justify-center gap-2 w-full bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200">
+                            {{-- <a href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" class="flex items-center justify-center gap-2 w-full bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 stroke-white group-hover:stroke-blue-700">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
                                 </svg>
                                 Scan QR Code
-                            </a>
+                            </a> --}}
                             <a href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" class="flex items-center justify-center gap-2 w-full bg-yellow-600 hover:bg-yellow-700 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                 </svg>
-                                Edit Event
+                                Update Event
                             </a>
                             <a href="{{ route('admin.locations.profile', $event->location->location_code) }}" class="flex items-center justify-center gap-2 w-full bg-gray-600 hover:bg-gray-700 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
@@ -274,34 +269,6 @@
                         </div>
                     </div>
 
-                    <script>
-                        async function shareEventQrCode() {
-                            const img = document.getElementById('event-qr-image');
-                            const downloadLink = document.getElementById('event-qr-download');
-                            if (!img || !downloadLink) return;
-
-                            const dataUrl = img.src;
-                            const filename = downloadLink.getAttribute('download') || 'event-qr.png';
-                            const title = 'Event QR Code';
-                            const text = 'Scan this QR code to get the event code.';
-
-                            try {
-                                const response = await fetch(dataUrl);
-                                const blob = await response.blob();
-                                const file = new File([blob], filename, { type: blob.type || 'image/png' });
-
-                                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                                    await navigator.share({ title, text, files: [file] });
-                                } else {
-                                    // Fallback: trigger download
-                                    downloadLink.click();
-                                }
-                            } catch (e) {
-                                // Fallback: trigger download
-                                downloadLink.click();
-                            }
-                        }
-                    </script>
 
                     <!-- Event Statistics Card -->
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
@@ -337,15 +304,19 @@
                                 <label class="text-sm font-medium text-gray-500">Status</label>
                                 <p>
                                     @php
-                                        $statusClass = match($event->status) {
-                                            'published' => 'bg-green-100 text-green-800 border border-green-500',
-                                            'cancelled' => 'bg-red-100 text-red-800 border border-red-500',
-                                            'completed' => 'bg-gray-100 text-gray-800 border border-gray-500',
-                                            default => 'bg-yellow-100 text-yellow-800 border border-yellow-500',
-                                        };
+                                        $isEventFinished = $event->end_date->isPast();
+                                        $displayStatus = $isEventFinished ? 'Finished' : ($event->status ?: 'Finished');
+                                        $statusClass = $isEventFinished 
+                                            ? 'bg-gray-100 text-gray-800 border border-gray-500'
+                                            : match($event->status) {
+                                                'published' => 'bg-green-100 text-green-800 border border-green-500',
+                                                'cancelled' => 'bg-red-100 text-red-800 border border-red-500',
+                                                'completed' => 'bg-gray-100 text-gray-800 border border-gray-500',
+                                                default => 'bg-yellow-100 text-yellow-800 border border-yellow-500',
+                                            };
                                     @endphp
                                     <span class="px-3 py-1 inline-flex text-md leading-5 font-semibold rounded-full {{ $statusClass }}">
-                                        {{ ucfirst($event->status) }}
+                                        {{ ucfirst($displayStatus) }}
                                     </span>
                                 </p>
                             </div>
@@ -357,6 +328,9 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Member Registrants Card -->
+            @livewire('events.participants', ['event_code' => $event->event_code])
         </div>
     </div>
 </div>

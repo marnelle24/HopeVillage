@@ -1,29 +1,21 @@
 <div>
     <x-slot name="header">
-        <div class="flex md:flex-row flex-col md:gap-0 gap-4 justify-between items-center">
-            <div class="flex items-center gap-4">
-                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex md:flex-row flex-col md:gap-0 gap-4 md:justify-between justify-center items-center">
+                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight text-center md:text-left">
                     {{ $location->name }} - Profile
                 </h2>
-            </div>
-            <div class="flex gap-2">
-                <a href="{{ route('admin.locations.edit', $location->location_code) }}" class="bg-slate-600 md:text-base text-xs hover:bg-slate-700 text-white font-normal py-2 px-4 rounded-lg">
-                    Edit Location
-                </a>
-                <a href="{{ route('admin.locations.events.index', $location->location_code) }}" class="bg-indigo-600 md:text-base text-xs hover:bg-indigo-700 text-white font-normal py-2 px-4 rounded-lg">
-                    Manage Events
-                </a>
+                <div class="flex gap-2">
+                    <a href="{{ route('admin.locations.index') }}" class="text-orange-600 md:text-base text-sm hover:text-orange-700 font-normal py-2 px-4 rounded-full">
+                        ← Back to Locations
+                    </a>
+                </div>
             </div>
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-            <a href="{{ route('admin.locations.index') }}" class="text-gray-600 hover:text-gray-900 md:mx-0 mx-4">
-                ← Back to Locations
-            </a>
-            
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 md:mx-0 mx-4">
                 <!-- Left Column - Location Details -->
                 <div class="lg:col-span-2 space-y-6">
@@ -141,6 +133,62 @@
                         </div>
                     </div>
                     
+
+                    <!-- Recent Events Card -->
+                    <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Recent Events</h3>
+                            <a href="{{ route('admin.locations.events.index', $location->location_code) }}" class="text-sm text-orange-600 hover:text-orange-800">
+                                View All
+                            </a>
+                        </div>
+                        
+                        @if($location->events->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($location->events as $event)
+                                    <div class="border-l-4 border-orange-500 pl-3 py-4 group bg-gray-50 hover:bg-orange-50 hover:-translate-y-0.5 shadow-sm hover:shadow-md transition-all duration-300">
+                                        <a href="{{ route('admin.events.profile', $event->event_code) }}" class="group-hover:text-orange-600 text-xl font-semibold text-orange-400 hover:text-orange-600 transition-colors duration-300">
+                                            {{ $event->title }}
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                {{ $event->start_date->format('d M Y') }}
+                                                @if($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d'))
+                                                    {{ $event->start_date->format('g:i A') }} - {{ $event->end_date->format('g:i A') }}
+                                                @else
+                                                    - {{ $event->end_date->format('d M Y g:i A') }}
+                                                @endif
+                                            </p>
+                                            @php
+                                                $statusClass = match($event->status) {
+                                                    'published' => 'bg-green-100 border border-green-500 text-green-800 group-hover:bg-green-200 transition-colors duration-300',
+                                                    'cancelled' => 'bg-red-100 border border-red-500 text-red-800 group-hover:bg-red-200 trasition-colors duration-300',
+                                                    'completed' => 'bg-gray-100 border border-gray-500 text-gray-800 group-hover:bg-gray-200 trasition-colors duration-300',
+                                                    default => 'bg-yellow-100 border border-yellow-500 text-yellow-800 group-hover:bg-yellow-200 trasition-colors duration-300',
+                                                };
+                                            @endphp
+                                            
+                                            <div class="mt-2">
+                                                <span class="inline-flex text-xs leading-5 font-semibold rounded-full mt-1 px-2.5 py-1 {{ $statusClass }}">
+                                                    {{ ucfirst($event->status) }}
+                                                </span>
+                                                
+                                                @if($event->end_date > now())
+                                                <span class="inline-flex text-xs leading-5 font-semibold rounded-full mt-1 px-2.5 py-1 border border-yellow-600 bg-yellow-100 text-yellow-800">
+                                                    Still Accepting Registrations
+                                                </span>
+                                                @endif
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 flex items-center justify-center gap-2 py-4">
+                                <svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 9H21M7 3V5M17 3V5M6 12H8M11 12H13M16 12H18M6 15H8M11 15H13M16 15H18M6 18H8M11 18H13M16 18H18M6.2 21H17.8C18.9201 21 19.4802 21 19.908 20.782C20.2843 20.5903 20.5903 20.2843 20.782 19.908C21 19.4802 21 18.9201 21 17.8V8.2C21 7.07989 21 6.51984 20.782 6.09202C20.5903 5.71569 20.2843 5.40973 19.908 5.21799C19.4802 5 18.9201 5 17.8 5H6.2C5.0799 5 4.51984 5 4.09202 5.21799C3.71569 5.40973 3.40973 5.71569 3.21799 6.09202C3 6.51984 3 7.07989 3 8.2V17.8C3 18.9201 3 19.4802 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.07989 21 6.2 21Z" stroke="#cfcfcf" stroke-width="2" stroke-linecap="round"></path> </g></svg>
+                                <span class="text-gray-500 text-sm">No events yet</span>
+                            </p>
+                        @endif
+                    </div>
+
                 </div>
 
                 <!-- Right Column - Quick Actions & Recent Events -->
@@ -682,61 +730,6 @@
                             stopQrScanner();
                         });
                     </script>
-
-                    <!-- Recent Events Card -->
-                    <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
-                        <div class="flex justify-between items-center mb-4 border-b pb-2">
-                            <h3 class="text-lg font-semibold text-gray-800">Recent Events</h3>
-                            <a href="{{ route('admin.locations.events.index', $location->location_code) }}" class="text-sm text-indigo-600 hover:text-indigo-800">
-                                View All
-                            </a>
-                        </div>
-                        
-                        @if($location->events->count() > 0)
-                            <div class="space-y-3">
-                                @foreach($location->events as $event)
-                                    <div class="border-l-4 border-indigo-500 pl-3 py-2 group hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
-                                        <a href="{{ route('admin.events.profile', $event->event_code) }}" class="group-hover:text-indigo-600 text-md font-semibold text-indigo-400 hover:text-indigo-600 transition-colors duration-300">
-                                            {{ $event->title }}
-                                            <p class="text-xs text-gray-500 mt-1">
-                                                {{ $event->start_date->format('d M Y') }}
-                                                @if($event->start_date->format('Y-m-d') === $event->end_date->format('Y-m-d'))
-                                                    {{ $event->start_date->format('g:i A') }} - {{ $event->end_date->format('g:i A') }}
-                                                @else
-                                                    - {{ $event->end_date->format('d M Y g:i A') }}
-                                                @endif
-                                            </p>
-                                            @php
-                                                $statusClass = match($event->status) {
-                                                    'published' => 'bg-green-100 text-green-800 group-hover:bg-green-200 transition-colors duration-300',
-                                                    'cancelled' => 'bg-red-100 text-red-800 group-hover:bg-red-200 trasition-colors duration-300',
-                                                    'completed' => 'bg-gray-100 text-gray-800 group-hover:bg-gray-200 trasition-colors duration-300',
-                                                    default => 'bg-yellow-100 text-yellow-800 group-hover:bg-yellow-200 trasition-colors duration-300',
-                                                };
-                                            @endphp
-                                            
-                                            <div class="mt-2">
-                                                <span class="inline-flex text-xs leading-5 font-semibold rounded-full mt-1 px-2.5 py-1 {{ $statusClass }}">
-                                                    {{ ucfirst($event->status) }}
-                                                </span>
-                                                
-                                                @if($event->end_date > now())
-                                                <span class="inline-flex text-xs leading-5 font-semibold rounded-full mt-1 px-2.5 py-1 bg-yellow-100 text-yellow-800">
-                                                    Still Accepting Registrations
-                                                </span>
-                                                @endif
-                                            </div>
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="text-sm text-gray-500 flex items-center justify-center gap-2 py-4">
-                                <svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 9H21M7 3V5M17 3V5M6 12H8M11 12H13M16 12H18M6 15H8M11 15H13M16 15H18M6 18H8M11 18H13M16 18H18M6.2 21H17.8C18.9201 21 19.4802 21 19.908 20.782C20.2843 20.5903 20.5903 20.2843 20.782 19.908C21 19.4802 21 18.9201 21 17.8V8.2C21 7.07989 21 6.51984 20.782 6.09202C20.5903 5.71569 20.2843 5.40973 19.908 5.21799C19.4802 5 18.9201 5 17.8 5H6.2C5.0799 5 4.51984 5 4.09202 5.21799C3.71569 5.40973 3.40973 5.71569 3.21799 6.09202C3 6.51984 3 7.07989 3 8.2V17.8C3 18.9201 3 19.4802 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.07989 21 6.2 21Z" stroke="#cfcfcf" stroke-width="2" stroke-linecap="round"></path> </g></svg>
-                                <span class="text-gray-500 text-sm">No events yet</span>
-                            </p>
-                        @endif
-                    </div>
                 </div>
             </div>
         </div>

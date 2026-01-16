@@ -128,7 +128,8 @@ class LocationQrCodeModal extends Component
                     ->exists();
                 
                 if ($recentEntry) {
-                    $this->error = 'it requires ' . $timeGapSeconds . ' second(s) gap to scan again.';
+                    // $this->error = 'it requires ' . $timeGapSeconds . ' second(s) gap to scan again.';
+                    $this->error = 'Sign in already recorded';
                     $this->processing = false;
                     return;
                 }

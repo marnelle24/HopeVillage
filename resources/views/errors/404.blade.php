@@ -95,7 +95,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Hope Village | Page Not Found</title>
-        <meta name="description" content="{{ 'Hope Village is the online community for Migrants & Guest Workers.' }}">
+        <meta name="description" content="{{ 'A community hub for migrants community in Singapore - brought to you by Hope Initiative Allaince in partnership with Advancer IFM and other supporting partners.' }}">
         <link rel="icon" type="image/png" href="{{ asset('hv-logo.png') }}">
         <link rel="shortcut icon" type="image/png" href="{{ asset('hv-logo.png') }}">
         <link rel="preconnect" href="https://fonts.bunny.net">

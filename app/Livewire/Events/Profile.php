@@ -3,6 +3,7 @@
 namespace App\Livewire\Events;
 
 use App\Models\Event;
+use App\Services\QrCodeService;
 use Livewire\Component;
 
 class Profile extends Component
@@ -25,8 +26,12 @@ class Profile extends Component
 
     public function render()
     {
+        $qrCodeService = app(QrCodeService::class);
+        $qrCodeImage = $qrCodeService->generateQrCodeImage($this->event->event_code, 400);
+
         return view('livewire.events.profile', [
             'event' => $this->event,
+            'qrCodeImage' => $qrCodeImage,
         ])->layout('components.layouts.app');
     }
 }

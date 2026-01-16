@@ -1,27 +1,19 @@
 <div>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
-                {{ __('Events Management') }}
-            </h2>
-            <div class="md:block hidden">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex md:flex-row flex-col md:justify-between justify-center items-center gap-4">
+                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
+                    {{ __('Events Management') }}
+                </h2>
                 <a href="{{ route('admin.locations.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg mr-2">
                     View Locations
-                </a>
-            </div>
-            <div class="md:hidden block">
-                <a href="{{ route('admin.locations.index') }}" title="View Locations" class="bg-gray-600 hover:bg-gray-500 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                    </svg>
                 </a>
             </div>
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -63,19 +55,19 @@
 
             <!-- Search and Filter -->
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 text-gray-800">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                    <div class="md:col-span-3">
                         <input 
                             type="text" 
                             wire:model.live.debounce.300ms="search" 
                             placeholder="Search events..." 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700"
                         >
                     </div>
-                    <div>
+                    <div class="md:col-span-2">
                         <select 
                             wire:model.live="locationFilter" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700"
                         >
                             <option value="">All Locations</option>
                             @foreach($locations as $location)
@@ -83,10 +75,10 @@
                             @endforeach
                         </select>
                     </div>
-                    <div>
+                    <div class="md:col-span-1">
                         <select 
                             wire:model.live="statusFilter" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700"
                         >
                             <option value="all">All Status</option>
                             <option value="draft">Draft</option>
@@ -98,17 +90,23 @@
                 </div>
             </div>
 
-            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:px-0 px-4">
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:px-0 px-4">
                 @forelse($events as $event)
                     @php
                         $thumbnailHeight = 'h-[200px]';
-                        $status = ucfirst($event->status);
-                        $statusClass = match($event->status) {
-                            'published' => 'bg-green-100 text-green-800',
-                            'cancelled' => 'bg-red-100 text-red-800',
-                            'completed' => 'bg-gray-100 text-gray-800',
-                            default => 'bg-yellow-100 text-yellow-800',
-                        };
+                        $isPastEvent = $event->end_date->isPast();
+                        if ($isPastEvent) {
+                            $status = 'Finished';
+                            $statusClass = 'bg-gray-100 border border-gray-400 text-gray-800';
+                        } else {
+                            $status = ucfirst($event->status);
+                            $statusClass = match($event->status) {
+                                'published' => 'bg-green-100 border border-green-500 text-green-800',
+                                'cancelled' => 'bg-red-100 border border-red-400 text-red-800',
+                                'completed' => 'bg-gray-100 border border-gray-400 text-gray-800',
+                                default => 'bg-yellow-100 border border-yellow-400 text-yellow-800',
+                            };
+                        }
 
                         // Location map thumbnail (static image)
                         $mapThumbnailUrl = null;
@@ -128,13 +126,13 @@
                         }
                     @endphp
                     @if(!$event->location->deleted_at)
-                        <div class="bg-white group overflow-hidden shadow-md flex flex-col rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative">
+                        <div class="bg-white group overflow-hidden shadow-md flex flex-col rounded-t-2xl group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative">
                             <a href="{{ route('admin.events.profile', $event->event_code) }}" class="absolute inset-0 z-0"></a>
-                            <div class="w-full {{ $thumbnailHeight }} border border-gray-300 rounded-t-lg relative z-10">
+                            <div class="w-full {{ $thumbnailHeight }} border border-gray-300 rounded-t-2xl relative z-10">
                                 @if($event->thumbnail_url)
-                                    <img src="{{ $event->thumbnail_url }}" alt="{{ $event->title }}" class="w-full {{ $thumbnailHeight }} border-b border-gray-300 object-cover rounded-t-lg">
+                                    <img src="{{ $event->thumbnail_url }}" alt="{{ $event->title }}" class="w-full {{ $thumbnailHeight }} border-b border-gray-300 object-cover rounded-t-2xl">
                                 @else
-                                    <div class="w-full {{ $thumbnailHeight }} bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center rounded-t-lg">
+                                    <div class="w-full {{ $thumbnailHeight }} bg-linear-to-br from-indigo-100 to-purple-100 flex items-center justify-center rounded-t-2xl">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-indigo-300">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                                         </svg>
@@ -197,7 +195,7 @@
                                     </table>
                                 </a>
                                 <div class="mt-2 flex justify-between items-baseline">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">{{ $status }}</span>
+                                    <span class="px-2.5 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {{ $statusClass }}">{{ $status }}</span>
 
                                     <div class="flex items-center gap-2" onclick="event.stopPropagation()">
                                         <a 
