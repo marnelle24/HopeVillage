@@ -84,10 +84,15 @@
                             @forelse($activities as $activity)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="font-semibold text-gray-900">{{ $activity->user->name }}</div>
-                                        <div class="text-xs text-gray-500">{{ $activity->user->email }}</div>
-                                        @if($activity->user->fin)
-                                            <div class="text-xs text-gray-500 font-mono">{{ $activity->user->fin }}</div>
+                                        @if($activity->user)
+                                            <div class="font-semibold text-gray-900">{{ $activity->user->name ?? 'Unknown' }}</div>
+                                            <div class="text-xs text-gray-500">{{ $activity->user->email ?? '-' }}</div>
+                                            @if($activity->user->fin)
+                                                <div class="text-xs text-gray-500 font-mono">{{ $activity->user->fin }}</div>
+                                            @endif
+                                        @else
+                                            <div class="font-semibold text-gray-500 italic">Deleted User</div>
+                                            <div class="text-xs text-gray-400">User ID: {{ $activity->user_id }}</div>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
