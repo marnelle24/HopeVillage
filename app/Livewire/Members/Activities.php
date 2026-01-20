@@ -83,7 +83,7 @@ class Activities extends Component
         // Get filter options
         $locations = Location::orderBy('name')->get(['id', 'name']);
 
-        $activityTypes = ActivityType::orderBy('name')->get(['id', 'name']);
+        $activityTypes = ActivityType::orderBy('name')->get(['id', 'description']);
 
         return view('livewire.members.activities', [
             'activities' => $activities,
