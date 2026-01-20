@@ -4,6 +4,7 @@ namespace App\Livewire\Merchant;
 
 use App\Models\Merchant;
 use App\Models\User;
+use App\Rules\ValidRecaptcha;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -31,9 +32,13 @@ class Apply extends Component
     public $terms = false;
     public $showSuccess = false;
     public $isSubmitting = false;
+    public $gRecaptchaResponse = '';
 
     protected function rules()
     {
+        // Normalize phone number before validation
+        $this->normalizePhone();
+        
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -41,7 +46,7 @@ class Apply extends Component
             'phone' => [
                 'required',
                 'string',
-                'max:9',
+                'max:12', // E.164 format can be up to 15 digits (e.g., +6512345678)
                 'unique:users,whatsapp_number',
             ],
             'email' => 'nullable|email|max:255|unique:users,email',
@@ -62,6 +67,7 @@ class Apply extends Component
                 'confirmed',
             ],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+            'gRecaptchaResponse' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
         ];
     }
 
@@ -70,7 +76,7 @@ class Apply extends Component
         'contact_name.required' => 'Contact person name is required.',
         'phone.required' => 'Phone number is required.',
         'phone.unique' => 'This mobile number is already registered. Please use a different number.',
-        'phone.max' => 'The mobile number must be 9 digits long.',
+        'phone.max' => 'The phone number is too long. Please enter a valid phone number.',
         'email.email' => 'Please provide a valid email address.',
         'website.url' => 'Please provide a valid website URL.',
         'password.required' => 'Password is required.',
@@ -82,11 +88,62 @@ class Apply extends Component
         'password.confirmed' => 'Password confirmation does not match.',
         'terms.accepted' => 'You must accept the terms and conditions.',
         'terms.required' => 'You must accept the terms and conditions.',
+        'gRecaptchaResponse.required' => 'Please complete the reCAPTCHA verification.',
     ];
 
     public function updated($propertyName)
     {
+        // Normalize phone number when it's updated
+        if ($propertyName === 'phone') {
+            $this->normalizePhone();
+        }
+        
         $this->validateOnly($propertyName);
+    }
+    
+    /**
+     * Normalize phone number to always include +65 country code
+     */
+    protected function normalizePhone(): void
+    {
+        if (empty($this->phone)) {
+            return;
+        }
+        
+        // Remove all non-digit characters except +
+        $normalized = preg_replace('/[^\d+]/', '', trim($this->phone));
+        
+        // Extract digits only for processing
+        $digitsOnly = preg_replace('/\D/', '', $normalized);
+        
+        // If doesn't start with +, add +65
+        if (!str_starts_with($normalized, '+')) {
+            // Check if it already starts with 65 (without +)
+            if (str_starts_with($digitsOnly, '65') && strlen($digitsOnly) > 2) {
+                // Remove the leading 65 and add +65
+                $localNumber = substr($digitsOnly, 2);
+                $this->phone = '+65' . $localNumber;
+            } else {
+                // Just add +65 prefix
+                $this->phone = '+65' . $digitsOnly;
+            }
+        } else {
+            // Already has +, ensure it's properly formatted
+            // If it starts with +65, keep it
+            if (str_starts_with($normalized, '+65')) {
+                $this->phone = $normalized;
+            } elseif (str_starts_with($normalized, '+') && !str_starts_with($normalized, '+65')) {
+                // Has + but different country code, replace with +65
+                $localNumber = preg_replace('/\D/', '', substr($normalized, 1));
+                // If local number starts with 65, remove it
+                if (str_starts_with($localNumber, '65') && strlen($localNumber) > 2) {
+                    $localNumber = substr($localNumber, 2);
+                }
+                $this->phone = '+65' . $localNumber;
+            } else {
+                $this->phone = $normalized;
+            }
+        }
     }
 
     /**
@@ -106,7 +163,19 @@ class Apply extends Component
     public function submit()
     {
         $this->isSubmitting = true;
-        $this->validate();
+        
+        // Normalize phone number before validation
+        $this->normalizePhone();
+        
+        try {
+            $this->validate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Reset reCAPTCHA on validation errors since tokens are single-use
+            $this->dispatch('reset-recaptcha');
+            $this->gRecaptchaResponse = '';
+            $this->isSubmitting = false;
+            throw $e;
+        }
         
         // Minimum 2 second delay
         sleep(2);
@@ -195,8 +264,12 @@ class Apply extends Component
             'password',
             'password_confirmation',
             'terms',
+            'gRecaptchaResponse',
         ]);
         $this->resetErrorBag();
+        
+        // Reset reCAPTCHA widget
+        $this->dispatch('reset-recaptcha');
 
         $this->showSuccess = true;
         $this->isSubmitting = false;

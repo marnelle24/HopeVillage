@@ -85,6 +85,7 @@
                                     wire:model.blur="name" 
                                     class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('name') border-red-500 @enderror"
                                     placeholder="Your Business Name"
+                                    required
                                 >
                                 @error('name') 
                                     <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
@@ -194,6 +195,7 @@
                                         wire:model.blur="contact_name" 
                                         class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('contact_name') border-red-500 @enderror"
                                         placeholder="Contact Person Name"
+                                        required
                                     >
                                     @error('contact_name') 
                                         <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
@@ -209,7 +211,9 @@
                                         id="phone"
                                         wire:model.blur="phone" 
                                         class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('phone') border-red-500 @enderror"
-                                        placeholder="+65 1234 5678"
+                                        placeholder="+6512345678"
+                                        maxlength="12"
+                                        required
                                     >
                                     @error('phone') 
                                         <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
@@ -265,6 +269,7 @@
                                             wire:model.blur="password" 
                                             class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('password') border-red-500 @enderror"
                                             placeholder="Enter password"
+                                            required
                                         >
                                         @error('password') 
                                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
@@ -319,6 +324,18 @@
                         </div>
                     @endif
 
+                    <!-- Google reCAPTCHA -->
+                    @if(config('services.recaptcha.site_key'))
+                        <div class="mt-6">
+                            <div wire:ignore id="recaptcha-container">
+                                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}" data-callback="onRecaptchaCallback"></div>
+                            </div>
+                            @error('gRecaptchaResponse')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
+
                     <!-- Submit Button -->
                     <div class="mt-10 flex flex-col lg:flex-row items-center justify-between">
                         <div class="lg:flex hidden items-center gap-2">
@@ -354,3 +371,24 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+@if(config('services.recaptcha.site_key'))
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        function onRecaptchaCallback(token) {
+            @this.set('gRecaptchaResponse', token);
+        }
+
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('reset-recaptcha', () => {
+                if (typeof grecaptcha !== 'undefined') {
+                    grecaptcha.reset();
+                    @this.set('gRecaptchaResponse', '');
+                }
+            });
+        });
+    </script>
+@endif
+@endpush

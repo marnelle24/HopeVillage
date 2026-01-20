@@ -1,13 +1,15 @@
 <div>
     <x-slot name="header">
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
                 <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
                     {{ __('Members') }}
                 </h2>
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.members.activities') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-normal py-2 px-4 rounded-lg text-sm">
-                        View Activities
+                    <a href="{{ route('admin.members.activities') }}" class="bg-orange-500 hover:bg-orange-600 text-white font-normal py-2 px-4 rounded-lg text-sm">
+                        <span class="flex items-center gap-1">
+                            View Activities
+                        </span>
                     </a>
                 </div>
             </div>
@@ -15,7 +17,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             @if (session()->has('message') || session()->has('error'))
                 <div 
                     x-data="{ 
@@ -269,6 +271,7 @@
                                             @endif
                                         </button>
                                     </th>
+                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">&nbsp;</th>
                                     <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                                 </tr>
                             </thead>
@@ -300,9 +303,35 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm font-semibold text-gray-800">{{ $member->total_points }}</td>
                                         <td class="px-6 py-4 text-sm text-gray-700">
+                                            <div class="flex flex-col text-xs text-gray-600">
+                                                <span class="text-xs text-gray-500">
+                                                    {{ $member->created_at ? $member->created_at->format('d M Y') : 'N/A' }}
+                                                </span>
+                                                <span class="text-xs text-gray-500">
+                                                    {{ $member->created_at ? $member->created_at->format('g:i A') : '' }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
                                             <div class="text-xs text-gray-600">
-                                                {{ $member->created_at ? $member->created_at->format('d M Y') : 'N/A' }}
-                                                , {{ $member->created_at ? $member->created_at->format('g:i A') : '' }}
+                                                @php 
+                                                    $userType = $member->user_type;
+                                                    $userTypeClass = match($userType) {
+                                                        'admin' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                                        'member' => 'bg-gray-100 text-gray-800 border-gray-200',
+                                                        'merchant_user' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                                                        default => 'bg-gray-100 text-gray-800 border-gray-200',
+                                                    };
+                                                    $userTypeText = match($userType) {
+                                                        'admin' => 'Administrator',
+                                                        'member' => 'Member',
+                                                        'merchant_user' => 'Merchant',
+                                                        default => $userType,
+                                                    };
+                                                @endphp
+                                                <span class="px-2 py-1 text-xs font-semibold rounded-lg border {{ $userTypeClass }}">
+                                                    {{ $userTypeText }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-right">
@@ -347,9 +376,9 @@
                                                     class="w-52 z-[9999] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                                 >
                                                     <div class="py-1" role="menu" aria-orientation="vertical">
-                                                        @if($member->fin)
+                                                        @if($member->qr_code)
                                                             <a
-                                                                href="{{ route('admin.members.profile', $member->fin) }}"
+                                                                href="{{ route('admin.members.profile', $member->qr_code) }}"
                                                                 class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                                                                 role="menuitem"
                                                                 @click="open = false"
@@ -360,19 +389,10 @@
                                                                 </svg>
                                                                 <span>View Profile</span>
                                                             </a>
-                                                        @else
-                                                            <div class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 cursor-not-allowed" role="menuitem">
-                                                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                                </svg>
-                                                                <span>View Profile (No FIN)</span>
-                                                            </div>
+                                                            <div class="border-t border-gray-100 my-1"></div>
                                                         @endif
 
                                                         @if(auth()->user()->isAdmin())
-                                                            <div class="border-t border-gray-100 my-1"></div>
-                                                            
                                                             <button
                                                                 wire:click="triggerPasswordReset({{ $member->id }})"
                                                                 @click="open = false"
@@ -405,7 +425,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
+                                        <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500">
                                             No members found.
                                         </td>
                                     </tr>

@@ -8,14 +8,14 @@ use Livewire\Component;
 
 class Profile extends Component
 {
-    public string $fin;
+    public string $qr_code;
     public User $member;
     public bool $showMessage = false;
     public ?string $selectedUserType = null;
 
-    public function mount(string $fin): void
+    public function mount(string $qr_code): void
     {
-        $this->fin = $fin;
+        $this->qr_code = $qr_code;
         $this->loadMember();
         $this->showMessage = session()->has('message') || session()->has('error');
         $this->selectedUserType = $this->member->user_type;
@@ -25,7 +25,7 @@ class Profile extends Component
     {
         // Remove user_type filter to allow viewing users even after type change
         $this->member = User::query()
-            ->where('fin', $this->fin)
+            ->where('qr_code', $this->qr_code)
             ->with([
                 'memberActivities' => function ($q) {
                     $q->with(['activityType', 'location', 'pointLog'])
@@ -97,7 +97,7 @@ class Profile extends Component
             'target_user_id' => $this->member->id,
             'target_user_name' => $this->member->name,
             'target_user_email' => $this->member->email,
-            'target_user_fin' => $this->member->fin,
+            'target_user_qr_code' => $this->member->qr_code,
             'old_user_type' => $oldUserType,
             'new_user_type' => $newUserType,
             'changed_at' => now()->toIso8601String(),
