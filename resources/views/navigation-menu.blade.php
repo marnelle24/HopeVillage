@@ -29,7 +29,7 @@
                     <!-- Navigation Links -->
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         @if(auth()->user()->isAdmin())
-                            <x-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard')">
+                            <x-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard') || request()->routeIs('admin.dashboard.v2')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
                             <x-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations*')">
@@ -121,7 +121,7 @@
         <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
             <div class="pt-2 pb-3 space-y-1">
                 @if(auth()->user()->isAdmin())
-                    <x-responsive-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard')">
+                    <x-responsive-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard') || request()->routeIs('admin.dashboard.v2')">
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations*')">

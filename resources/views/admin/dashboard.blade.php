@@ -18,6 +18,10 @@
                     </div>
                 </div>
             </div>
+            <p class="text-sm text-gray-600 mb-4 text-md">
+                New dashboard v2 is now available.
+                <a href="{{ route('admin.dashboard.v2') }}" class="text-blue-500 underline cursor-pointer">Check it out here</a>.
+            </p>
             <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg p-6 lg:mx-0 mx-4">
 
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mt-6">
