@@ -1,19 +1,25 @@
-<div class="bg-white p-6 rounded-lg shadow border border-gray-300 mt-6">
-    <div class="flex justify-between items-center mb-4 flex-col md:flex-row gap-4">
-        <h3 class="text-lg font-semibold text-orange-400">Recent Events Participants</h3>
-        <div class="w-full md:w-1/2">
-            <select 
-                wire:model.live="selectedLocationId"
-                class="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            >
+<div class="card bg-base-100 shadow-lg">
+    <div class="card-body">
+        <div class="flex justify-between items-center mb-4 flex-col md:flex-row gap-4">
+            <h2 class="card-title text-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5 stroke-current">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                Recent Events Participants
+            </h2>
+            <div class="w-full md:w-1/2">
+                <select 
+                    wire:model.live="selectedLocationId"
+                    class="select select-bordered w-full"
+                >
                 <option value="">Select Location</option>
                 @foreach($activeLocations as $location)
                     <option value="{{ $location->id }}">{{ $location->name }}</option>
                 @endforeach
             </select>
+            </div>
         </div>
-    </div>
-    <div class="relative h-[400px] mt-4">
+        <div class="relative h-[450px] mt-4">
         @if(empty($recentEvents['labels']))
             <div class="flex items-center justify-center h-full">
                 <p class="text-gray-500 text-center">No finished events found for this location.</p>
@@ -76,10 +82,10 @@
                                         grid: {
                                             display: false
                                         },
-                                        {{-- ticks: {
-                                            maxRotation: 90,
-                                            minRotation: 90
-                                        } --}}
+                                        ticks: {
+                                            maxRotation: 30,
+                                            minRotation: 30
+                                        }
                                     }
                                 },
                                 interaction: {
@@ -98,6 +104,6 @@
                 @destroy.window="destroy()"
             ></canvas>
         @endif
+        </div>
     </div>
-    {{-- <p class="text-xs text-gray-500 mt-2 text-center">Last 5 finished events for selected location</p> --}}
 </div>

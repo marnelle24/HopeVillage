@@ -1,4 +1,8 @@
-<div class="grid grid-cols-1 lg:grid-cols-1 gap-6">
+<div class="space-y-6">
+
+    {{-- Voucher Analytics --}}
+    <livewire:admin.voucher-analytics />
+
     <!-- Weekly Registration Traffic Chart -->
     <livewire:admin.weekly-registration-traffic />
 
@@ -8,4 +12,3 @@
     <!-- Entry Scanning Per Location Chart -->
     <livewire:admin.entry-scans-per-location />
 </div>
-

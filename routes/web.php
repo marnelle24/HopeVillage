@@ -55,6 +55,10 @@ Route::middleware([
         return view('admin.dashboard');
     })->name('admin.dashboard');
     
+    Route::get('/admin/dashboard-v2', function () {
+        return view('admin.dashboard-v2');
+    })->name('admin.dashboard.v2');
+    
     // Location CRUD Routes
     Route::get('/admin/locations', \App\Livewire\Locations\Index::class)->name('admin.locations.index');
     Route::get('/admin/locations/create', \App\Livewire\Locations\Form::class)->name('admin.locations.create');

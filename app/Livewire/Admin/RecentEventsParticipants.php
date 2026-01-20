@@ -69,7 +69,7 @@ class RecentEventsParticipants extends Component
             // Truncate event title to 3 words max
             $words = explode(' ', $event->title);
             if (count($words) > 7) {
-                $labels[] = implode(' ', array_slice($words, 0, 7)) . '...';
+                $labels[] = implode(' ', array_slice($words, 0, 3)) . '...';
             } else {
                 $labels[] = $event->title;
             }

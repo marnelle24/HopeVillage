@@ -1,6 +1,12 @@
-<div class="bg-white p-6 rounded-lg shadow border border-gray-300">
-    <h3 class="text-lg font-semibold text-orange-400 mb-4">Weekly Registration Traffic</h3>
-    <div class="relative h-[400px] mt-4">
+<div class="card bg-base-100 shadow-lg">
+    <div class="card-body">
+        <h2 class="card-title text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5 stroke-current">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 00-2 2z"></path>
+            </svg>
+            Weekly Registration Traffic
+        </h2>
+        <div class="relative h-[350px] mt-4">
         <canvas 
             x-data="{
                 chart: null,
@@ -27,20 +33,12 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'bottom',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'bottom'
                                     }
                                 },
-                                tooltip: {
-                                    mode: 'index',
-                                    intersect: false,
-                                }
-                            },
                             scales: {
                                 y: {
                                     beginAtZero: true,
@@ -68,6 +66,7 @@
                 }
             }"
         ></canvas>
+        </div>
+        <p class="text-xs text-base-content/60 mt-2 text-center">Last 7 days of member registrations</p>
     </div>
-    <p class="text-xs text-gray-500 mt-2 text-center">Last 7 days of member registrations</p>
 </div>
