@@ -18,9 +18,9 @@
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
 
             {{-- add the activity chart component --}}
-            <livewire:admin.entry-scans-per-location />
-
-            <br />
+            <div class="mb-12">
+                <livewire:admin.entry-scans-per-location />
+            </div>
 
             <!-- Search and Filters -->
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 mb-6">

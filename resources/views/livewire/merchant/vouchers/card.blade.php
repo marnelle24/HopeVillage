@@ -48,8 +48,8 @@
                 <div class="flex justify-between items-center gap-1">
                     @php
                         if (!$voucher->is_active) {
-                            $status = 'Inactive';
-                            $statusClass = 'bg-red-200 text-red-700';
+                            $status = 'Pending Approval';
+                            $statusClass = 'bg-yellow-200 text-yellow-700';
                         } elseif ($voucher->isValid()) {
                             $status = 'Active';
                             $statusClass = 'bg-green-200 text-green-700';
@@ -59,7 +59,7 @@
                             $statusClass = 'bg-yellow-200 text-yellow-700';
                         }
                     @endphp
-                    <span class="flex items-center gap-1 {{ $statusClass }} mt-2 rounded-lg px-2.5 py-1 text-xs" title="{{ $voucher->is_active ? ($voucher->isValid() ? 'Voucher is active and valid' : 'Voucher is active but ' . strtolower($status)) : 'Voucher is inactive' }}">
+                    <span class="flex items-center gap-1 {{ $statusClass }} mt-2 rounded-lg px-2.5 py-1 text-xs" title="{{ $voucher->is_active ? ($voucher->isValid() ? 'Voucher is active and valid' : 'Voucher is active but ' . strtolower($status)) : 'Voucher is pending administrator approval' }}">
                         <span class="text-xs">{{ $status }}</span>
                     </span>
                     @if($voucher->usage_limit)

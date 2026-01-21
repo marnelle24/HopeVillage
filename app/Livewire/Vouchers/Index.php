@@ -66,7 +66,11 @@ class Index extends Component
         }
 
         if ($this->statusFilter !== 'all') {
-            $query->where('is_active', $this->statusFilter === 'active');
+            if ($this->statusFilter === 'pending') {
+                $query->where('is_active', false);
+            } else {
+                $query->where('is_active', $this->statusFilter === 'active');
+            }
         }
 
         if ($this->merchantFilter) {

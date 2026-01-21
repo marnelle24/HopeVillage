@@ -74,6 +74,7 @@
                         >
                             <option value="all">All Status</option>
                             <option value="active">Active</option>
+                            <option value="pending">Pending Approval</option>
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>

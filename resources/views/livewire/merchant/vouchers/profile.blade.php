@@ -78,13 +78,24 @@
                                         @php
                                             $isValid = $voucher->is_active && $voucher->isValid();
                                             $statusReason = $voucher->getStatusReason();
-                                            $statusClass = $isValid ? 'bg-green-100 text-green-800 border border-green-500' : 'bg-red-100 text-red-800 border border-red-500';
-                                            $statusText = $isValid ? 'Active' : ($statusReason ?: 'Inactive');
+                                            if (!$voucher->is_active) {
+                                                $statusText = 'Pending Approval';
+                                                $statusClass = 'bg-yellow-100 text-yellow-800 border border-yellow-500';
+                                                $statusTitle = 'Voucher is pending administrator approval';
+                                            } elseif ($isValid) {
+                                                $statusText = 'Active';
+                                                $statusClass = 'bg-green-100 text-green-800 border border-green-500';
+                                                $statusTitle = 'Voucher is active and valid';
+                                            } else {
+                                                $statusText = $statusReason ?: 'Inactive';
+                                                $statusClass = 'bg-red-100 text-red-800 border border-red-500';
+                                                $statusTitle = $statusReason ? 'Reason: ' . $statusReason : '';
+                                            }
                                         @endphp
-                                        <span class="px-3 py-1 inline-flex text-md leading-5 font-semibold rounded-full {{ $statusClass }}" title="{{ $statusReason ? 'Reason: ' . $statusReason : '' }}">
+                                        <span class="px-3 py-1 inline-flex text-md leading-5 font-semibold rounded-full {{ $statusClass }}" title="{{ $statusTitle }}">
                                             {{ $statusText }}
                                         </span>
-                                        @if($statusReason && !$isValid)
+                                        @if($statusReason && !$isValid && $voucher->is_active)
                                             <p class="text-xs text-red-600 mt-1">{{ $statusReason }}</p>
                                         @endif
                                     </p>

@@ -20,7 +20,7 @@ class Form extends Component
     public $valid_from = '';
     public $valid_until = '';
     public $usage_limit = '';
-    public $is_active = true;
+    public $is_active = false;
     public $showMessage = false;
     public $voucherImage;
     public $existingVoucherImage = null;
@@ -80,11 +80,6 @@ class Form extends Component
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);
-        
-        // Ensure is_active is always a boolean
-        if ($propertyName === 'is_active') {
-            $this->is_active = (bool) $this->is_active;
-        }
     }
 
     public function save()
@@ -100,9 +95,6 @@ class Form extends Component
 
         $this->validate();
 
-        // Ensure is_active is properly set (defaults to true if not explicitly set)
-        $isActive = $this->is_active !== null ? (bool) $this->is_active : true;
-
         $data = [
             'merchant_id' => $merchant->id,
             'name' => $this->name,
@@ -114,18 +106,24 @@ class Form extends Component
             'valid_from' => $this->valid_from ? date('Y-m-d H:i:s', strtotime($this->valid_from)) : null,
             'valid_until' => $this->valid_until ? date('Y-m-d H:i:s', strtotime($this->valid_until)) : null,
             'usage_limit' => $this->usage_limit ?: null,
-            'is_active' => $isActive,
         ];
 
         if ($this->voucherCode) {
+            // Updating existing voucher - preserve current is_active value (merchants cannot change it)
             $voucher = Voucher::where('voucher_code', $this->voucherCode)
                 ->where('merchant_id', $merchant->id)
                 ->firstOrFail();
             $voucher->update($data);
-            $message = 'Voucher updated successfully.';
+            if (!$voucher->is_active) {
+                $message = 'Voucher updated successfully. It is still pending administrator approval.';
+            } else {
+                $message = 'Voucher updated successfully.';
+            }
         } else {
+            // Creating new voucher - always set is_active to false (requires admin approval)
+            $data['is_active'] = false;
             $voucher = Voucher::create($data);
-            $message = 'Voucher created successfully.';
+            $message = 'Voucher created successfully and is pending administrator approval.';
         }
 
         // Handle voucher image upload
