@@ -6,7 +6,7 @@
                     {{ __('Members') }}
                 </h2>
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.members.activities') }}" class="bg-orange-500 hover:bg-orange-600 text-white font-normal py-2 px-4 rounded-lg text-sm">
+                    <a href="{{ route('admin.members.activities') }}" class="bg-orange-500 hover:bg-orange-600 text-white font-normal py-2 px-4 rounded-full text-sm">
                         <span class="flex items-center gap-1">
                             View Activities
                         </span>

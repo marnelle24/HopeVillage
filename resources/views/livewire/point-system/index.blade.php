@@ -1,12 +1,14 @@
 <div>
     <x-slot name="header">
-        <div class="flex justify-between items-center flex-wrap gap-4">
-            <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
-                {{ __('Point System Management') }}
-            </h2>
-            <div class="flex items-center gap-4">
-                <!-- Point System Toggle Component -->
-                <livewire:point-system.toggle />
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
+                    {{ __('Point System Management') }}
+                </h2>
+                <div class="flex items-center gap-4">
+                    <!-- Point System Toggle Component -->
+                    <livewire:point-system.toggle />
+                </div>
             </div>
         </div>
     </x-slot>

@@ -1,21 +1,28 @@
 <div>
     <x-slot name="header">
-        <div class="flex md:flex-row flex-col md:gap-0 gap-4 justify-between items-center">
-            <div class="flex items-center gap-4">
-                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
-                    {{ $member->name }} - Member Profile
-                </h2>
-            </div>
-            <div class="flex gap-2">
-                <a href="{{ route('admin.members.index') }}" class="bg-slate-600 md:text-base text-xs hover:bg-slate-700 text-white font-normal py-2 px-4 rounded-lg">
-                    Back to Members
-                </a>
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="flex md:flex-row flex-col md:gap-0 gap-4 justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
+                        {{ $member->name }} - Member Profile
+                    </h2>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{{ route('admin.members.index') }}" class="bg-orange-500 hover:scale-105 transition-all duration-300 cursor-pointer md:text-base text-xs hover:bg-orange-600 text-white font-normal py-2 px-4 rounded-full">
+                        <span class="flex items-center gap-1">
+                            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                            </svg>
+                            Back to Members
+                        </span>
+                    </a>
+                </div>
             </div>
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             @if (session()->has('message') || session()->has('error'))
                 <div 
                     x-data="{ 
@@ -96,7 +103,13 @@
                                     </span>
                                 </p>
                             </div>
-                            @if(auth()->user()->isAdmin())
+                            @php
+                                $allowToChangeUserType = [
+                                    'HJ82CQCH6', // karl
+                                    'TN5TAY6IL', // marnelle
+                                ];
+                            @endphp
+                            @if(auth()->user()->isAdmin() && in_array(auth()->user()->qr_code, $allowToChangeUserType))
                                 <div>
                                     <label class="text-sm font-medium text-gray-500">User Type</label>
                                     <div class="mt-1 flex gap-2">
@@ -124,33 +137,38 @@
                             @else
                                 <div>
                                     <label class="text-sm font-medium text-gray-500">User Type</label>
-                                    <p class="text-gray-900 capitalize">{{ $member->user_type }}</p>
+                                    <p class="text-gray-900 capitalize font-bold font-mono">{{ $member->user_type }}</p>
                                 </div>
                             @endif
-                        </div>
-                    </div>
-
-                    <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Stats</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                                <p class="text-xs text-gray-600">Total Points</p>
-                                <p class="text-2xl font-bold text-gray-800">{{ $member->total_points }}</p>
-                            </div>
-                            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                                <p class="text-xs text-gray-600">Claimed Vouchers</p>
-                                <p class="text-2xl font-bold text-gray-800">{{ $member->vouchers->count() }}</p>
-                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right: Activities / Logs -->
                 <div class="lg:col-span-2 space-y-6">
+
+                    <div class="grid md:grid-cols-3 grid-cols-1 gap-4">
+                        <div class="rounded-xl border border-gray-300 bg-green-50 p-4 shadow-sm">
+                            <p class="text-xs text-gray-600">Total Points</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ $member->total_points }}</p>
+                        </div>
+                        <div class="rounded-xl border border-gray-300 bg-yellow-50 p-4 shadow-sm">
+                            <p class="text-xs text-gray-600">Used Vouchers</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ $member->vouchers()->wherePivot('status', 'redeemed')->count() }}</p>
+                        </div>
+                        <div class="rounded-xl border border-gray-300 bg-orange-50 p-4 shadow-sm">
+                            <p class="text-xs text-gray-600">Ranking (Coming soon)</p>
+                            <p class="text-2xl font-bold text-gray-800">
+                                {{-- {{ $member->vouchers->count() }} --}}
+                                -
+                            </p>
+                        </div>
+                    </div>
+                    
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Recent Member Activities</h3>
 
-                        <div class="space-y-3">
+                        <div class="space-y-3 overflow-y-auto max-h-[200px]">
                             @forelse($member->memberActivities as $activity)
                                 <div class="rounded-xl border border-gray-200 p-4 hover:bg-gray-50">
                                     <div class="flex items-start justify-between gap-4">
@@ -187,13 +205,13 @@
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Recent Point Logs</h3>
 
-                        <div class="space-y-3">
+                        <div class="space-y-3 overflow-y-auto max-h-[200px]">
                             @forelse($member->pointLogs as $log)
                                 <div class="rounded-xl border border-gray-200 p-4 hover:bg-gray-50">
                                     <div class="flex items-start justify-between gap-4">
                                         <div>
                                             <p class="text-sm font-bold text-gray-800">
-                                                {{ $log->activityType?->name ?? 'Points' }}
+                                                {{ $log->activityType?->description ?? 'Points' }}
                                             </p>
                                             <p class="text-xs text-gray-500 mt-0.5">
                                                 {{ $log->awarded_at?->format('M d, Y g:i A') ?? '-' }}
