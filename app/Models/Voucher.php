@@ -153,7 +153,7 @@ class Voucher extends Model implements HasMedia
 
         // Check if voucher has expired (valid_until)
         if ($this->valid_until !== null) {
-            if ($now->isAfter($this->valid_until)) {
+            if ($now->isAfter($this->valid_until) && $this->is_active) {
                 return 'Expired';
             }
         }
@@ -163,7 +163,7 @@ class Voucher extends Model implements HasMedia
             return 'Usage Limit Reached';
         }
 
-        return null; // Valid
+        return 'Active'; // Valid
     }
 
     /**

@@ -211,5 +211,64 @@ class MemberActivityController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get all member activities with optional filters
+     * 
+     * Optional query parameters:
+     * - activity_type_id: Filter by specific activity type ID
+     * - qr_code: Filter by member QR code
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $query = MemberActivity::query()
+                ->with(['user', 'activityType', 'location', 'amenity', 'pointLog'])
+                ->orderByDesc('activity_time');
+
+            // Filter by activity type ID if provided
+            if ($request->has('activity_type_id') && $request->activity_type_id !== null) {
+                $query->where('activity_type_id', $request->activity_type_id);
+            }
+
+            // Filter by member QR code if provided
+            if ($request->has('qr_code') && $request->qr_code !== null) {
+                $query->whereHas('user', function ($userQuery) use ($request) {
+                    $userQuery->where('qr_code', $request->qr_code);
+                });
+            }
+
+            // Paginate results (default: 15 per page)
+            $perPage = $request->get('per_page', 15);
+            $activities = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $activities->items(),
+                'pagination' => [
+                    'current_page' => $activities->currentPage(),
+                    'last_page' => $activities->lastPage(),
+                    'per_page' => $activities->perPage(),
+                    'total' => $activities->total(),
+                    'from' => $activities->firstItem(),
+                    'to' => $activities->lastItem(),
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch member activities', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch member activities',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 }
 

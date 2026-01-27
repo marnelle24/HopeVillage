@@ -3,6 +3,7 @@
 namespace App\Livewire\Merchant\Vouchers;
 
 use App\Models\Voucher;
+use App\Models\AdminVoucher;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -68,6 +69,7 @@ class Index extends Component
             abort(403, 'No merchant associated with your account. Please contact an administrator.');
         }
 
+        // Get all merchant vouchers (not filtered by is_active), sorted by valid_until DESC
         $query = Voucher::where('merchant_id', $merchant->id);
 
         if ($this->search) {
@@ -78,15 +80,33 @@ class Index extends Component
             });
         }
 
-        if ($this->statusFilter !== 'all') {
-            $isActive = $this->statusFilter === 'active';
-            $query->where('is_active', $isActive);
+        // Remove status filter - show all vouchers
+        // Sort by valid_until DESC (nulls will be last in MySQL, first in PostgreSQL)
+        // Use orderByRaw with CASE for better cross-database compatibility
+        $vouchers = $query->orderByRaw('CASE WHEN valid_until IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('valid_until', 'desc')
+            ->get();
+
+        // Get admin vouchers associated with this merchant, sorted by valid_until DESC
+        $adminVouchersQuery = AdminVoucher::whereHas('merchants', function ($q) use ($merchant) {
+            $q->where('merchants.id', $merchant->id);
+        });
+
+        if ($this->search) {
+            $adminVouchersQuery->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('voucher_code', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
+            });
         }
 
-        $vouchers = $query->orderBy('created_at', 'desc')->get();
+        $adminVouchers = $adminVouchersQuery->orderByRaw('CASE WHEN valid_until IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('valid_until', 'desc')
+            ->get();
 
         return view('livewire.merchant.vouchers.index', [
             'vouchers' => $vouchers,
+            'adminVouchers' => $adminVouchers,
             'merchant' => $merchant,
         ])->layout('components.layouts.app');
     }

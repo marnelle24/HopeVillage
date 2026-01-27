@@ -34,3 +34,7 @@ Route::get('/events', [EventController::class, 'getEvents'])
 // Optional query parameter "key" - if empty, fetch all; if specified, return matching setting
 Route::get('/settings', [SettingsController::class, 'index'])
     ->name('api.settings.index');
+
+// create an API to get all member activities
+Route::get('/member-activities', [MemberActivityController::class, 'index'])
+    ->name('api.member-activities.index');

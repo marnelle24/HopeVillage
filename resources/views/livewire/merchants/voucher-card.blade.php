@@ -18,8 +18,10 @@
         // Get status
         if ($isAdminVoucher) {
             $statusReason = $voucher->getStatusReason();
-            $isExpired = $statusReason === 'Expired';
+            $isExpired = $statusReason === 'Expired' || ($voucher->valid_until && $voucher->valid_until->isPast());
             $isFull = $voucher->usage_limit && $voucher->usage_count >= $voucher->usage_limit;
+            $isInactive = !$voucher->is_active;
+            $isDisabled = $isExpired || $isInactive;
             
             if ($isExpired) {
                 $statusLabel = 'Expired';
@@ -33,7 +35,9 @@
             }
         } else {
             $statusReason = $voucher->getStatusReason();
-            $isExpired = $statusReason === 'Expired';
+            $isExpired = $statusReason === 'Expired' || ($voucher->valid_until && $voucher->valid_until->isPast());
+            $isInactive = !$voucher->is_active;
+            $isDisabled = $isExpired || $isInactive;
             $statusClass = $voucher->is_active && $voucher->isValid() ? 'bg-green-100 text-green-800 border border-green-500' : 'bg-red-100 text-red-800 border border-red-500';
             $statusLabel = $voucher->is_active && $voucher->isValid() ? 'Active' : 'Inactive';
         }
@@ -44,12 +48,15 @@
             : route('admin.vouchers.profile', $voucher->voucher_code);
     @endphp
 
-    <div class="relative w-full bg-white overflow-hidden border-2 {{ $borderColor }} rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+    @php
+        $isDisabled = isset($isDisabled) ? $isDisabled : false;
+    @endphp
+    <div class="relative w-full bg-white overflow-hidden border-2 {{ $borderColor }} rounded-lg group {{ $isDisabled ? 'cursor-not-allowed opacity-60 grayscale' : 'hover:shadow-lg hover:-translate-y-0.5' }} transition-all duration-300">
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-linear-to-br {{ $overlayGradient }} opacity-50 group-hover:opacity-70 transition-opacity duration-300 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-linear-to-br {{ $overlayGradient }} opacity-50 {{ $isDisabled ? '' : 'group-hover:opacity-70' }} transition-opacity duration-300 pointer-events-none"></div>
         
         <!-- Content -->
-        <a href="{{ $route }}" class="relative block p-4">
+        <a href="{{ $isDisabled ? '#' : $route }}" class="relative block p-4 {{ $isDisabled ? 'pointer-events-none cursor-not-allowed' : '' }}">
             <div class="flex items-start gap-4">
                 {{-- QR Code on the left --}}
                 @if($qrCodeImage)

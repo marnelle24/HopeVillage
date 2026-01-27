@@ -18,10 +18,11 @@ https://hopevillage.sg/api
 ## Table of Contents
 
 1. [Member Activity Scan](#1-member-activity-scan)
-2. [Get Activity Types](#2-get-activity-types)
-3. [Get Locations](#3-get-locations)
-4. [Get Events](#4-get-events)
-5. [Get Settings](#5-get-settings)
+2. [Get Member Activities](#2-get-member-activities)
+3. [Get Activity Types](#3-get-activity-types)
+4. [Get Locations](#4-get-locations)
+5. [Get Events](#5-get-events)
+6. [Get Settings](#6-get-settings)
 
 ---
 
@@ -140,7 +141,156 @@ https://hopevillage.sg/api
 
 ---
 
-## 2. Get Activity Types
+## 2. Get Member Activities
+
+**Endpoint:** `GET /api/member-activities`
+
+**Authentication:** Not Required
+
+**Description:** Returns all member activities with optional filtering by activity type or member QR code.
+
+### Step-by-Step Instructions:
+
+#### Option A: Get All Member Activities
+
+1. **Open Postman** and create a new request
+2. **Set Method:** GET
+3. **Enter URL:** `https://hopevillage.sg/api/member-activities`
+4. **Set Headers:**
+   - `Accept`: `application/json`
+5. **Click Send**
+
+#### Option B: Filter by Activity Type
+
+1. **Open Postman** and create a new request
+2. **Set Method:** GET
+3. **Enter URL:** `https://hopevillage.sg/api/member-activities?activity_type_id=1`
+4. **Set Headers:**
+   - `Accept`: `application/json`
+5. **Click Send**
+
+#### Option C: Filter by Member QR Code
+
+1. **Open Postman** and create a new request
+2. **Set Method:** GET
+3. **Enter URL:** `https://hopevillage.sg/api/member-activities?qr_code=ABC123XYZ`
+4. **Set Headers:**
+   - `Accept`: `application/json`
+5. **Click Send**
+
+#### Option D: Combine Filters
+
+1. **Open Postman** and create a new request
+2. **Set Method:** GET
+3. **Enter URL:** `https://hopevillage.sg/api/member-activities?activity_type_id=1&qr_code=ABC123XYZ&per_page=20`
+4. **Set Headers:**
+   - `Accept`: `application/json`
+5. **Click Send**
+
+### Query Parameters:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `activity_type_id` | integer | No | Filter by specific activity type ID |
+| `qr_code` | string | No | Filter by member QR code |
+| `per_page` | integer | No | Number of results per page (default: 15) |
+
+### Example URLs:
+
+- Get all activities: `https://hopevillage.sg/api/member-activities`
+- Get activities by type: `https://hopevillage.sg/api/member-activities?activity_type_id=1`
+- Get activities by member: `https://hopevillage.sg/api/member-activities?qr_code=ABC123XYZ`
+- Get activities with pagination: `https://hopevillage.sg/api/member-activities?per_page=20`
+- Combine filters: `https://hopevillage.sg/api/member-activities?activity_type_id=1&qr_code=ABC123XYZ`
+
+### Expected Response (200 OK):
+
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": 1,
+            "user_id": 1,
+            "activity_type_id": 1,
+            "location_id": 1,
+            "amenity_id": null,
+            "activity_time": "2024-01-15T10:30:00.000000Z",
+            "description": "Member ENTRY at Main Location",
+            "metadata": {
+                "scanned_at": "2024-01-15T10:30:00+00:00",
+                "location_code": "LOC001",
+                "member_fin": "123W",
+                "qr_code": "ABC123XYZ",
+                "device_info": "Mozilla/5.0...",
+                "ip_address": "127.0.0.1"
+            },
+            "created_at": "2024-01-15T10:30:00.000000Z",
+            "updated_at": "2024-01-15T10:30:00.000000Z",
+            "user": {
+                "id": 1,
+                "name": "John Doe",
+                "email": "john@example.com",
+                "fin": "123W",
+                "qr_code": "ABC123XYZ",
+                "user_type": "member",
+                "total_points": 60
+            },
+            "activity_type": {
+                "id": 1,
+                "name": "ENTRY",
+                "description": "Entry activity",
+                "is_active": true
+            },
+            "location": {
+                "id": 1,
+                "location_code": "LOC001",
+                "name": "Main Location",
+                "address": "123 Main St",
+                "is_active": true
+            },
+            "amenity": null,
+            "point_log": {
+                "id": 1,
+                "points": 10,
+                "awarded_at": "2024-01-15T10:30:00.000000Z"
+            }
+        }
+    ],
+    "pagination": {
+        "current_page": 1,
+        "last_page": 5,
+        "per_page": 15,
+        "total": 75,
+        "from": 1,
+        "to": 15
+    }
+}
+```
+
+### Error Response (500 Internal Server Error):
+
+```json
+{
+    "success": false,
+    "message": "Failed to fetch member activities",
+    "error": "Internal server error"
+}
+```
+
+### Testing Scenarios:
+
+1. **Test get all activities** - Should return paginated list of all activities
+2. **Test filter by activity_type_id** - Should return only activities of that type
+3. **Test filter by qr_code** - Should return only activities for that member
+4. **Test combine filters** - Should return activities matching both filters
+5. **Test pagination** - Should respect per_page parameter
+6. **Test with invalid activity_type_id** - Should return empty results
+7. **Test with invalid qr_code** - Should return empty results
+
+---
+
+## 3. Get Activity Types
 
 **Endpoint:** `GET /api/activity-types`
 
@@ -185,7 +335,7 @@ https://hopevillage.sg/api
 
 ---
 
-## 3. Get Locations
+## 4. Get Locations
 
 **Endpoint:** `GET /api/locations`
 
@@ -226,7 +376,7 @@ https://hopevillage.sg/api
 
 ---
 
-## 4. Get Events
+## 5. Get Events
 
 **Endpoint:** `GET /api/events`
 
@@ -303,7 +453,7 @@ https://hopevillage.sg/api
 
 ---
 
-## 5. Get Settings
+## 6. Get Settings
 
 **Endpoint:** `GET /api/settings`
 

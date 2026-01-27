@@ -17,9 +17,9 @@ class Card extends Component
         $this->voucherCode = $voucherCode;
         $this->merchant = auth()->user()->currentMerchant();
         
-        if (!$this->merchant) {
-            abort(403, 'No merchant associated with your account.');
-        }
+        // if (!$this->merchant) {
+        //     abort(403, 'No merchant associated with your account.');
+        // }
 
         $this->voucher = Voucher::where('voucher_code', $voucherCode)
             ->where('merchant_id', $this->merchant->id)

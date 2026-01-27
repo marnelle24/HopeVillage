@@ -116,7 +116,12 @@
                 <div class="w-full overflow-x-auto md:px-0 px-4 pb-4 scroll-smooth voucher-scroll-container">
                     <div class="flex flex-nowrap gap-4 items-stretch min-w-max">
                         @foreach($vouchers as $voucher)
-                            <div class="shrink-0 w-69">
+                            @php
+                                $isExpired = $voucher->valid_until && $voucher->valid_until->isPast();
+                                $isInactive = !$voucher->is_active;
+                                $isDisabled = $isExpired || $isInactive;
+                            @endphp
+                            <div class="shrink-0 w-69 {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
                                 <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
                             </div>
                         @endforeach
@@ -131,15 +136,20 @@
             <br />
             <br />
             <div class="my-4 md:px-0 px-4">
-                <h3 class="text-xl font-bold text-gray-600">Other Vouchers ({{ $vouchers->count() }})</h3>
+                <h3 class="text-xl font-bold text-gray-600">Other Vouchers ({{ $adminVouchers->count() }})</h3>
                 <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by administrator</p>
             </div>
-            @if (!$vouchers->count() > 0)
+            @if ($adminVouchers->count() > 0)
                 <div class="w-full overflow-x-auto md:px-0 px-4 pb-4 scroll-smooth voucher-scroll-container">
                     <div class="flex flex-nowrap gap-4 items-stretch min-w-max">
-                        @foreach($vouchers as $voucher)
-                            <div class="shrink-0 w-69">
-                                <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
+                        @foreach($adminVouchers as $adminVoucher)
+                            @php
+                                $isExpired = $adminVoucher->valid_until && $adminVoucher->valid_until->isPast();
+                                $isInactive = !$adminVoucher->is_active;
+                                $isDisabled = $isExpired || $isInactive;
+                            @endphp
+                            <div class="shrink-0 w-69 {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
+                                <livewire:merchants.voucher-card :voucher-code="$adminVoucher->voucher_code" type="admin" :key="'admin-voucher-' . $adminVoucher->id" />
                             </div>
                         @endforeach
                     </div>

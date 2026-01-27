@@ -44,7 +44,10 @@
                             <x-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
                                 {{ __('Activities') }}
                             </x-nav-link>
-                            <x-nav-link href="{{ route('admin.admin-vouchers.index') }}" :active="request()->routeIs('admin.admin-vouchers*')">
+                            {{-- <x-nav-link href="{{ route('admin.admin-vouchers.index') }}" :active="request()->routeIs('admin.admin-vouchers*')">
+                                {{ __('Vouchers') }}
+                            </x-nav-link> --}}
+                            <x-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
                                 {{ __('Vouchers') }}
                             </x-nav-link>
                             <x-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants*')">
@@ -136,6 +139,9 @@
                     <x-responsive-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
                         {{ __('Member Activities') }}
                     </x-responsive-nav-link>
+                    {{-- <x-responsive-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
+                        {{ __('Vouchers') }}
+                    </x-responsive-nav-link> --}}
                     <x-responsive-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
                         {{ __('Vouchers') }}
                     </x-responsive-nav-link>
