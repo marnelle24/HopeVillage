@@ -161,6 +161,10 @@ Route::middleware([
         return redirect()->route('member.vouchers', request()->query());
     })->name('member.voucher');
 
+    // Member Activities History
+    Route::get('/member/activities', \App\Livewire\Member\Activities::class)
+        ->name('member.activities');
+
     Route::get('/member/event/{event_code}', \App\Livewire\Member\Events\Profile::class)
         ->name('member.events.profile');
     

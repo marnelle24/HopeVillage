@@ -32,12 +32,6 @@
                             <livewire:member.dashboard-points />
                         </div>
                     </div>
-                    {{-- <a href="{{ route('member.vouchers') }}" class="btn btn-accent btn-sm gap-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                        </svg>
-                        JOIN NOW
-                    </a> --}}
                 </div>
             </div>
 
@@ -46,11 +40,17 @@
                 <!-- Search Section -->
                 <div class="mb-6 animate-slide-down">
                     <h1 class="text-2xl font-bold text-base-content mb-4">What's on your mind?</h1>
-                    <label class="w-full input input-bordered rounded-full flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 opacity-70">
+                    <label class="relative">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 opacity-70">
                             <path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" />
                         </svg>
-                        <input type="text" class="w-full grow" placeholder="Ask anything about Hope Village" id="location-search" class="p-5 rounded-full focus:ring-0 focus:border-0" />
+                        <input 
+                            type="text" 
+                            wire:model.live.debounce.300ms="search"
+                            placeholder="Ask anything about Hope Village" 
+                            id="location-search" 
+                            class="w-full pl-10 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 placeholder:text-gray-400" 
+                        />
                     </label>
                 </div>
 
@@ -61,38 +61,39 @@
                         @php
                             $categories = [
                                 [
-                                    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" /></svg>',
-                                    'name' => 'Locations',
-                                    'route' => route('member.events'),
+                                    'icon' => '<img width="30" height="30" src="https://img.icons8.com/pulsar-gradient/48/business-group.png" alt="business-group"/>',
+                                    'name' => 'Activities',
+                                    'route' => route('member.activities'),
                                     'color' => 'primary'
                                 ],
                                 [
-                                    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>',
+                                    'icon' => '<img width="30" height="30" src="https://img.icons8.com/cotton/64/events--v1.png" alt="events--v1"/>',
                                     'name' => 'Events',
                                     'route' => route('member.events'),
                                     'color' => 'secondary'
                                 ],
                                 [
-                                    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236c2.026-.099 4.024-.3 5.974-.461a48.34 48.34 0 0 0 2.96-.493m-9.934 0a50.697 50.697 0 0 1 9.934 0m0 0a48.191 48.191 0 0 1 2.96-.493m-9.934 0c.18.865.428 1.712.981 3.172m0 0a48.415 48.415 0 0 0 2.923-.744M11.348 7.752c-.17.865-.428 1.712-.981 3.172M11.348 7.752l3.496 4.499m9.656-8.994l-3.496 4.499m0 0-3.497 4.499m3.497-4.499L21 12m-9.652-4.248L8.977 10.53" /></svg>',
+                                    
+                                    'icon' => '<img width="30" height="30" src="https://img.icons8.com/dusk/64/discount-ticket.png" alt="discount-ticket"/>',
                                     'name' => 'Vouchers',
                                     'route' => route('member.vouchers'),
                                     'color' => 'accent'
                                 ],
                                 [
-                                    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 1 3 2.48Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.546 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" /></svg>',
+                                    'icon' => '<img width="30" height="30" src="https://img.icons8.com/cotton/50/online-store.png" alt="online-store"/>',
                                     'name' => 'Merchants',
-                                    'route' => route('member.events'),
+                                    'route' => route('member.vouchers'),
                                     'color' => 'info'
                                 ],
                                 [
-                                    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>',
-                                    'name' => 'Programes',
-                                    'route' => route('member.events'),
+                                    'icon' => '<img width="40" height="40" src="https://img.icons8.com/plasticine/50/share-2.png" alt="share-2"/>',
+                                    'name' => 'Refer A Friend',
+                                    'route' => route('member.referral-system'),
                                     'color' => 'success'
                                 ],
                                 [
-                                    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.905 59.905 0 0 1 12 4.497a59.902 59.902 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443a55.381 55.381 0 0 1 5.25 2.882V15" /></svg>',
-                                    'name' => 'Amenities',
+                                    'icon' => '<img width="30" height="30" src="https://img.icons8.com/dusk/50/news.png" alt="news"/>',
+                                    'name' => 'News',
                                     'route' => route('member.events'),
                                     'color' => 'warning'
                                 ],
@@ -111,7 +112,8 @@
                                 ];
                                 $iconColorClass = $colorClasses[$category['color']] ?? 'text-primary';
                             @endphp
-                            <a href="{{ $category['route'] }}" 
+
+                            <a href="{{ $category['name'] === 'News' ? '#!' : $category['route'] }}" 
                                class="card bg-base-100 shadow-md hover:shadow-xl border border-base-300 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in"
                                style="animation-delay: {{ ($index + 1) * 50 }}ms">
                                 <div class="flex flex-col items-center justify-center gap-2">
@@ -159,7 +161,7 @@
                             @endphp
                             <div class="carousel-item flex-none w-64 animate-slide-in" style="animation-delay: {{ ($index + 1) * 100 }}ms; scroll-snap-align: start;">
                                 <a href="{{ route('member.events') }}" class="card bg-base-100 shadow-lg hover:shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 w-full">
-                                    <figure class="h-40 bg-base-200 overflow-hidden">
+                                    <figure class="h-40 bg-gray-200 overflow-hidden">
                                         @if($locationImageUrl)
                                             <img src="{{ $locationImageUrl }}" alt="{{ $location->name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
                                         @else
@@ -194,197 +196,197 @@
     </div>
 
     @if(auth()->user()->qr_code)
-    @push('scripts')
-    <script>
-        // Load QR code on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadQrCode();
-        });
-
-        function loadQrCode() {
-            fetch('{{ route("member.qr-code") }}', {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-                credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.image) {
-                    const thumbnail = document.getElementById('qr-code-thumbnail');
-                    const full = document.getElementById('qr-code-full');
-                    if (thumbnail) thumbnail.src = data.image;
-                    if (full) full.src = data.image;
-                }
-            })
-            .catch(error => {
-                console.error('Error loading QR code:', error);
-            });
-        }
-
-        function openQrCodeModal() {
-            const modal = document.getElementById('qr-code-modal');
-            if (modal) {
-                // Load full size QR code
-                fetch('{{ route("qr-code.full") }}', {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const full = document.getElementById('qr-code-full');
-                    if (data.image && full) {
-                        full.src = data.image;
-                    }
-                    modal.showModal();
-                })
-                .catch(error => {
-                    console.error('Error loading full QR code:', error);
-                    modal.showModal();
+        @push('scripts')
+            <script>
+                // Load QR code on page load
+                document.addEventListener('DOMContentLoaded', function() {
+                    loadQrCode();
                 });
-            }
-        }
-    </script>
-    @endpush
+
+                function loadQrCode() {
+                    fetch('{{ route("member.qr-code") }}', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.image) {
+                            const thumbnail = document.getElementById('qr-code-thumbnail');
+                            const full = document.getElementById('qr-code-full');
+                            if (thumbnail) thumbnail.src = data.image;
+                            if (full) full.src = data.image;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading QR code:', error);
+                    });
+                }
+
+                function openQrCodeModal() {
+                    const modal = document.getElementById('qr-code-modal');
+                    if (modal) {
+                        // Load full size QR code
+                        fetch('{{ route("qr-code.full") }}', {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const full = document.getElementById('qr-code-full');
+                            if (data.image && full) {
+                                full.src = data.image;
+                            }
+                            modal.showModal();
+                        })
+                        .catch(error => {
+                            console.error('Error loading full QR code:', error);
+                            modal.showModal();
+                        });
+                    }
+                }
+            </script>
+        @endpush
     @endif
 
     @push('styles')
-    <style>
-        @keyframes fade-in {
-            from {
+        <style>
+            @keyframes fade-in {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slide-down {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slide-up {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slide-in {
+                from {
+                    opacity: 0;
+                    transform: translateX(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes wave {
+                0%, 100% {
+                    transform: rotate(0deg);
+                }
+                25% {
+                    transform: rotate(20deg);
+                }
+                75% {
+                    transform: rotate(-20deg);
+                }
+            }
+
+            @keyframes pulse-slow {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            @keyframes bounce-slow {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .animate-fade-in {
+                animation: fade-in 0.6s ease-out forwards;
                 opacity: 0;
-                transform: translateY(10px);
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
 
-        @keyframes slide-down {
-            from {
+            .animate-slide-down {
+                animation: slide-down 0.6s ease-out forwards;
+            }
+
+            .animate-slide-up {
+                animation: slide-up 0.6s ease-out forwards;
                 opacity: 0;
-                transform: translateY(-20px);
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
 
-        @keyframes slide-up {
-            from {
+            .animate-slide-in {
+                animation: slide-in 0.6s ease-out forwards;
                 opacity: 0;
-                transform: translateY(30px);
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+            .animate-wave {
+                display: inline-block;
+                animation: wave 1s ease-in-out infinite;
+                transform-origin: 70% 70%;
             }
-        }
 
-        @keyframes slide-in {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
+            .animate-pulse-slow {
+                animation: pulse-slow 3s ease-in-out infinite;
             }
-            to {
-                opacity: 1;
-                transform: translateX(0);
+
+            .animate-bounce-slow {
+                animation: bounce-slow 2s ease-in-out infinite;
             }
-        }
 
-        @keyframes wave {
-            0%, 100% {
-                transform: rotate(0deg);
+            .delay-100 {
+                animation-delay: 100ms;
             }
-            25% {
-                transform: rotate(20deg);
+
+            .delay-200 {
+                animation-delay: 200ms;
             }
-            75% {
-                transform: rotate(-20deg);
+
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
             }
-        }
 
-        @keyframes pulse-slow {
-            0%, 100% {
-                opacity: 1;
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
             }
-            50% {
-                opacity: 0.8;
+
+            .line-clamp-2 {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
-        }
-
-        @keyframes bounce-slow {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fade-in 0.6s ease-out forwards;
-            opacity: 0;
-        }
-
-        .animate-slide-down {
-            animation: slide-down 0.6s ease-out forwards;
-        }
-
-        .animate-slide-up {
-            animation: slide-up 0.6s ease-out forwards;
-            opacity: 0;
-        }
-
-        .animate-slide-in {
-            animation: slide-in 0.6s ease-out forwards;
-            opacity: 0;
-        }
-
-        .animate-wave {
-            display: inline-block;
-            animation: wave 1s ease-in-out infinite;
-            transform-origin: 70% 70%;
-        }
-
-        .animate-pulse-slow {
-            animation: pulse-slow 3s ease-in-out infinite;
-        }
-
-        .animate-bounce-slow {
-            animation: bounce-slow 2s ease-in-out infinite;
-        }
-
-        .delay-100 {
-            animation-delay: 100ms;
-        }
-
-        .delay-200 {
-            animation-delay: 200ms;
-        }
-
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-    </style>
+        </style>
     @endpush
 </x-app-layout>
 
