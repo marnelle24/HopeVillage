@@ -142,6 +142,42 @@
                     }}
                 </a>
             </div>
+
+            @if(request()->query('singpass') === 'true')
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">
+                                {{ 
+                                    match($lang) {
+                                        'bang' => 'অথবা',
+                                        'zh' => '或者',
+                                        'ta' => 'அல்லது',
+                                        default => 'Or',
+                                    }
+                                }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <a href="{{ route('singpass.redirect') }}" 
+                        class="w-full flex items-center justify-center font-bold px-4 py-3 text-white rounded-lg shadow-sm tracking-wide text-lg bg-[#F4333D]">
+                            {{ 
+                                match($lang) {
+                                    'bang' => 'Singpass দিয়ে লগ ইন করুন',
+                                    'zh' => '使用 Singpass 登录',
+                                    'ta' => 'Singpass உடன் உள்நுழைய',
+                                    default => 'Log in with Singpass',
+                                }
+                            }}
+                        </a>
+                    </div>
+                </div>
+            @endif
         </form>
     </x-authentication-card>
 

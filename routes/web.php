@@ -3,6 +3,7 @@
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\PointsActionsController;
+use App\Http\Controllers\SingpassController;
 use App\Http\Controllers\VerificationCodeController;
 use App\Http\Controllers\WhatsAppValidationController;
 use Illuminate\Http\Request;
@@ -22,6 +23,13 @@ Route::post('/api/check-whatsapp', [WhatsAppValidationController::class, 'check'
 
 // Public Merchant Application Route
 Route::get('/merchant/apply', \App\Livewire\Merchant\Apply::class)->name('merchant.apply');
+
+// Singpass Authentication Routes
+Route::get('/auth/singpass', [SingpassController::class, 'redirect'])->name('singpass.redirect');
+Route::get('/auth/singpass/callback', [SingpassController::class, 'callback'])->name('singpass.callback');
+// Client JWKS URL – must be publicly reachable by Singpass (PX-E0101). Register this URL in Singpass Developer Portal.
+Route::get('/.well-known/jwks.json', [SingpassController::class, 'jwks'])->name('singpass.jwks');
+Route::get('/well-known/jwks.json', [SingpassController::class, 'jwks']); // fallback if server strips leading dot
 
 // Member verification (OTP via email / WhatsApp)
 Route::middleware([

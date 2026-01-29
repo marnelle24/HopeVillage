@@ -59,4 +59,16 @@ return [
         'secret_key' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
+    'singpass' => [
+        'client_id' => env('SINGPASS_CLIENT_ID'),
+        'client_secret' => env('SINGPASS_CLIENT_SECRET'),
+        'redirect' => env('SINGPASS_REDIRECT_URI'),
+        'authorization_endpoint' => env('SINGPASS_AUTHORIZATION_ENDPOINT', 'https://stg-id.singpass.gov.sg/auth'),
+        'token_endpoint' => env('SINGPASS_TOKEN_ENDPOINT', 'https://stg-id.singpass.gov.sg/token'),
+        'jwks_uri' => env('SINGPASS_JWKS_URI', 'https://stg-id.singpass.gov.sg/.well-known/keys'),
+        'environment' => env('SINGPASS_ENVIRONMENT', 'sandbox'), // sandbox or production
+        // Client JWKS: public keys for Singpass to reach (PX-E0101). Set via SINGPASS_CLIENT_JWKS_JSON or run php artisan singpass:generate-jwks
+        'client_jwks_json' => env('SINGPASS_CLIENT_JWKS_JSON'),
+    ],
+
 ];

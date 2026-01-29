@@ -47,6 +47,9 @@ class User extends Authenticatable
         'total_points',
         'current_merchant_id',
         'referred_by_user_id',
+        'singpass_sub',
+        'singpass_uuid',
+        'singpass_verified_at',
     ];
 
     /**
@@ -81,6 +84,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_verified' => 'boolean',
+            'singpass_verified_at' => 'datetime',
         ];
     }
 
