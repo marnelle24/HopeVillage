@@ -34,23 +34,20 @@ class RouletteV2 extends Component
 
     public function mount(): void
     {
+        $attendeeFilter = fn ($q) => $q->where('status', 'attended')->whereNotNull('user_id');
+
         $this->events = Event::query()
+            ->where('status', 'published')
+            ->where('end_date', '>=', now())
+            ->whereHas('registrations', $attendeeFilter)
+            ->withCount(['registrations as attendee_count' => $attendeeFilter])
             ->orderByDesc('start_date')
-            ->limit(200)
             ->get(['id', 'title'])
-            ->map(function (Event $e) {
-                $attendeeCount = EventRegistration::query()
-                    ->where('event_id', $e->id)
-                    ->where('status', 'attended')
-                    ->whereNotNull('user_id')
-                    ->count();
-                
-                return [
-                    'id' => $e->id,
-                    'title' => $e->title,
-                    'attendee_count' => $attendeeCount,
-                ];
-            })
+            ->map(fn (Event $e) => [
+                'id' => $e->id,
+                'title' => $e->title,
+                'attendee_count' => (int) $e->attendee_count,
+            ])
             ->all();
 
         $this->loadEntries();

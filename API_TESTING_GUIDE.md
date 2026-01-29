@@ -23,6 +23,7 @@ https://hopevillage.sg/api
 4. [Get Locations](#4-get-locations)
 5. [Get Events](#5-get-events)
 6. [Get Settings](#6-get-settings)
+7. [Event Registration Scan](#7-event-registration-scan)
 
 ---
 
@@ -538,6 +539,148 @@ https://hopevillage.sg/api
     "error": "No setting found with key: invalid_key"
 }
 ```
+
+---
+
+## 7. Event Registration Scan
+
+**Endpoint:** `POST /api/event-registration/scan`
+
+**Authentication:** Not Required (Public Endpoint)
+
+**Description:** Records member attendance at an event when scanning event QR codes using an external scanner. Creates or updates an event registration with status `attended`, sets `attended_at` to the current timestamp, and sets `type` to `external_scanner`.
+
+### Step-by-Step Instructions:
+
+1. **Open Postman** and create a new request
+2. **Set Method:** POST
+3. **Enter URL:** `https://hopevillage.sg/api/event-registration/scan`
+4. **Set Headers:**
+   - `Content-Type`: `application/json`
+   - `Accept`: `application/json`
+5. **Go to Body tab:**
+   - Select **raw**
+   - Select **JSON** from dropdown
+   - Enter the following JSON:
+
+```json
+{
+    "event_code": "EVT-XXXXX",
+    "qr_code": "ABC123XYZ"
+}
+```
+
+6. **Click Send**
+
+### Request Parameters:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `event_code` | string | Yes | Event's unique code (scanned from event QR code, max 255 characters) |
+| `qr_code` | string | Yes | Member's QR code (scanned from member QR code, max 255 characters) |
+
+### Expected Response (201 Created):
+
+```json
+{
+    "success": true,
+    "message": "Member attendance recorded successfully",
+    "data": {
+        "member": {
+            "fin": "123W",
+            "qr_code": "ABC123XYZ",
+            "name": "John Doe"
+        },
+        "event": {
+            "id": 1,
+            "code": "EVT-XXXXX",
+            "title": "Basketball Tournament"
+        },
+        "registration": {
+            "id": 1,
+            "status": "attended",
+            "type": "external_scanner",
+            "attended_at": "2024-01-15T10:30:00+00:00"
+        }
+    }
+}
+```
+
+### Error Responses:
+
+**Event Not Found (404):**
+```json
+{
+    "success": false,
+    "message": "Event not found",
+    "error": "No event found with code: EVT-INVALID"
+}
+```
+
+**Event Not Active (422):**
+```json
+{
+    "success": false,
+    "message": "Event is not active",
+    "error": "Event 'Basketball Tournament' (code: EVT-XXXXX) is not active"
+}
+```
+
+**Member Not Found (404):**
+```json
+{
+    "success": false,
+    "message": "Member not found",
+    "error": "No member found with QR code: INVALID-QR-CODE"
+}
+```
+
+**User Not a Member (422):**
+```json
+{
+    "success": false,
+    "message": "User is not a member",
+    "error": "User with QR code ABC123XYZ is not a member (user_type: admin)"
+}
+```
+
+**Validation Error (422):**
+```json
+{
+    "message": "The event code field is required.",
+    "errors": {
+        "event_code": ["The event code field is required."]
+    }
+}
+```
+
+**Server Error (500):**
+```json
+{
+    "success": false,
+    "message": "Failed to record attendance",
+    "error": "Internal server error"
+}
+```
+
+### Important Notes:
+
+- The event code is automatically normalized (trimmed and uppercased) before lookup
+- If a registration already exists for the member and event, it will be updated to `attended` status with `external_scanner` type
+- The `attended_at` timestamp is set to the current time when the scan occurs
+- The registration type is always set to `external_scanner` for scans via this API endpoint
+- The event must have `status` set to `'active'` for the scan to succeed
+
+### Testing Scenarios:
+
+1. **Test successful scan** - Should create/update registration with `attended` status and `external_scanner` type
+2. **Test with invalid event_code** - Should return 404
+3. **Test with inactive event** - Should return 422
+4. **Test with invalid qr_code** - Should return 404
+5. **Test with non-member user** - Should return 422
+6. **Test duplicate scan** - Should update existing registration (idempotent)
+7. **Test missing required fields** - Should return 422 validation error
+8. **Test with event code in different case** - Should work (normalized to uppercase)
 
 ---
 

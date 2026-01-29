@@ -154,8 +154,9 @@ class LocationQrCodeModal extends Component
                     'metadata' => [
                         'scanned_at' => now()->toIso8601String(),
                         'location_code' => $this->location->location_code,
-                        'member_fin' => $user->fin,
+                        'qr_code' => $user->qr_code,
                         'device_info' => request()->header('User-Agent'),
+                        'access_type' => 'built_in_scanner',
                         'ip_address' => request()->ip(),
                     ],
                 ]);

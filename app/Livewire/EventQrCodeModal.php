@@ -2,14 +2,15 @@
 
 namespace App\Livewire;
 
-use App\Models\ActivityType;
 use App\Models\Event;
-use App\Models\EventRegistration;
+use App\Models\Setting;
+use Livewire\Component;
+use App\Models\ActivityType;
 use App\Models\MemberActivity;
 use App\Services\PointsService;
+use App\Models\EventRegistration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Livewire\Component;
 
 class EventQrCodeModal extends Component
 {
@@ -104,8 +105,63 @@ class EventQrCodeModal extends Component
         $this->success = false;
         $this->successMessage = null;
 
-        try {
-            DB::transaction(function () use ($user) {
+        try 
+        {
+            // After granting the points for attend event. 
+            // Check if member has a recent entry at this location within the time gap in the settings
+            $timeGapSeconds = (int) Setting::get('entry_time_gap', 3600);
+            $timeGapAgo = now()->subSeconds($timeGapSeconds);
+            
+            $recentEntry = MemberActivity::where('user_id', $user->id)
+                ->where('location_id', $this->event->location_id)
+                ->whereHas('activityType', function($query) {
+                    $query->where('name', 'ENTRY');
+                })
+                ->where('activity_time', '>=', $timeGapAgo)
+                ->exists();
+            
+            if (!$recentEntry) 
+            {
+                // Find or create activity type for ENTRY
+                $activityType = ActivityType::firstOrCreate(
+                    ['name' => 'ENTRY'],
+                    [
+                        'description' => 'Entry activity',
+                        'is_active' => true,
+                    ]
+                );
+
+                // Create member activity record
+                $memberActivity = MemberActivity::create([
+                    'user_id' => $user->id,
+                    'activity_type_id' => $activityType->id,
+                    'location_id' => $this->event->location_id,
+                    'amenity_id' => null,
+                    'activity_time' => now(),
+                    'description' => "Member Re-ENTRY to event {$this->event->title}",
+                    'metadata' => [
+                        'scanned_at' => now()->toIso8601String(),
+                        'qr_code' => $user->qr_code,
+                        'event_code' => $this->event->event_code,
+                        'device_info' => request()->header('User-Agent'),
+                        'access_type' => 'built_in_scanner',
+                        'ip_address' => request()->ip(),
+                    ],
+                ]);
+                
+                // Award points for RE-ENTRY activity
+                app(PointsService::class)->award(
+                    user: $user,
+                    activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
+                    description: "Member Re-ENTRY to event {$this->event->title} - entry_time_gap lapses",
+                    locationId: $this->event->location_id,
+                    memberActivityId: $memberActivity->id,
+                );
+            }
+
+
+            DB::transaction(function () use ($user) 
+            {
                 // Check if member has already attended this event
                 $existingRegistration = EventRegistration::where('user_id', $user->id)
                     ->where('event_id', $this->event->id)
@@ -160,16 +216,14 @@ class EventQrCodeModal extends Component
                         'scanned_at' => now()->toIso8601String(),
                         'event_code' => $this->event->event_code,
                         'event_id' => $this->event->id,
-                        'member_fin' => $user->fin,
+                        'qr_code' => $user->qr_code,
                         'device_info' => request()->header('User-Agent'),
+                        'access_type' => 'built_in_scanner',
                         'ip_address' => request()->ip(),
                     ],
                 ]);
 
                 // Award points for ATTEND activity
-                $pointsBefore = $user->total_points;
-                $pointsAwarded = 0;
-                
                 app(PointsService::class)->award(
                     user: $user,
                     activityName: PointsService::ACTIVITY_EVENT_ATTEND,
@@ -177,6 +231,10 @@ class EventQrCodeModal extends Component
                     locationId: $this->event->location_id,
                     memberActivityId: $memberActivity->id,
                 );
+
+                // Award points for ENTRY activity
+                $pointsBefore = $user->total_points;
+                $pointsAwarded = 0;
                 
                 $user->refresh();
                 $pointsAwarded = $user->total_points - $pointsBefore;
