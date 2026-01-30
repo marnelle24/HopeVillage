@@ -1,4 +1,16 @@
+@php
+    $allowToChangeUserType = [
+        'HJ82CQCH6', // karl
+        'TN5TAY6IL', // marnelle
+        'BTSKKURCJ', // Jaslyn
+    ];
+    $canAddActivity = auth()->user()->isAdmin() && in_array(auth()->user()->qr_code, $allowToChangeUserType);
+@endphp
 <div>
+    @if($canAddActivity)
+        <livewire:members.add-activity-modal :member="$member" :key="'add-activity-'.$member->id" />
+    @endif
+
     <x-slot name="header">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="flex md:flex-row flex-col md:gap-0 gap-4 justify-between items-center">
@@ -107,14 +119,7 @@
                                 <label class="text-sm font-medium text-gray-500">Date Registered</label>
                                 <p class="text-gray-900">{{ $member->created_at?->format('d M Y g:i A') ?? '-' }}</p>
                             </div>
-                            @php
-                                $allowToChangeUserType = [
-                                    'HJ82CQCH6', // karl
-                                    'TN5TAY6IL', // marnelle
-                                    'BTSKKURCJ', // Jaslyn
-                                ];
-                            @endphp
-                            @if(auth()->user()->isAdmin() && in_array(auth()->user()->qr_code, $allowToChangeUserType))
+                            @if($canAddActivity)
                                 <div>
                                     <label class="text-sm font-medium text-gray-500">User Type</label>
                                     <div class="mt-1 flex gap-2">
@@ -174,9 +179,15 @@
                         <div class="flex items-center justify-between mb-4 border-b pb-2">
                             <h3 class="text-lg font-semibold text-gray-800">Recent Member Activities</h3>
 
-                            <button class="text-sm hover:underline hover:scale-105 transition-all duration-300 text-orange-500 hover:text-orange-600 cursor-pointer">
-                                Manually Add Activity
-                            </button>
+                            @if($canAddActivity)
+                                <button
+                                    type="button"
+                                    wire:click="$dispatch('openAddActivityModal')"
+                                    class="text-sm hover:underline hover:scale-105 transition-all duration-300 text-orange-500 hover:text-orange-600 cursor-pointer"
+                                >
+                                    Manually Add Activity
+                                </button>
+                            @endif
                         </div>
                         <div class="space-y-3 overflow-y-auto max-h-[350px]">
                             @forelse($member->memberActivities as $activity)
@@ -185,9 +196,9 @@
                                         <div>
                                             <div class="flex items-center gap-2">
                                                 <p class="text-sm font-bold text-gray-800">
-                                                    {{ $activity->activityType?->name ?? 'Some Activity' }}
+                                                    {{ $activity->activityType?->description ?? $activity->activityType?->name ?? 'Some Activity' }}
                                                 </p>
-                                                @if(auth()->user()->isAdmin() && in_array(auth()->user()->qr_code, $allowToChangeUserType))
+                                                @if($canAddActivity)
                                                     <livewire:members.set-activity-void-button 
                                                         :member-activity="$activity" 
                                                         wire:click="refreshMember"
