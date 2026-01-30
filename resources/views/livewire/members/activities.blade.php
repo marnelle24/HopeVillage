@@ -82,6 +82,13 @@
                 </p>
             </div>
 
+            @php
+                $allowToChangeUserType = [
+                    'HJ82CQCH6', // karl
+                    'TN5TAY6IL', // marnelle
+                    'BTSKKURCJ', // Jaslyn
+                ];
+            @endphp
             <!-- Activities Table -->
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg md:mx-0 mx-4">
                 <div class="overflow-x-auto">
@@ -89,6 +96,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Member</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">&nbsp;</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Activity Type</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Location</th>
                                 <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Timestamp</th>
@@ -109,6 +117,15 @@
                                             <div class="text-xs text-gray-400">User ID: {{ $activity->user_id }}</div>
                                         @endif
                                     </td>
+                                    @if(auth()->user()->isAdmin() && in_array(auth()->user()->qr_code, $allowToChangeUserType))
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <livewire:members.set-activity-void-button 
+                                                :member-activity="$activity" 
+                                                wire:click="refreshMember"
+                                                :key="'void-'.$activity->id" 
+                                            />
+                                        </td>
+                                    @endif
                                     <td class="px-6 space-x-1 py-4 whitespace-nowrap">
                                         <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                                             {{ $activity->activityType->name ?? 'N/A' }}

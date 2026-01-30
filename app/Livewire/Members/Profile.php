@@ -4,6 +4,7 @@ namespace App\Livewire\Members;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Profile extends Component
@@ -19,6 +20,12 @@ class Profile extends Component
         $this->loadMember();
         $this->showMessage = session()->has('message') || session()->has('error');
         $this->selectedUserType = $this->member->user_type;
+    }
+
+    #[On('activity-updated')]
+    public function refreshMember(): void
+    {
+        $this->loadMember();
     }
 
     public function loadMember(): void

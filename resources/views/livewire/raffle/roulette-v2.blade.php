@@ -344,7 +344,7 @@
                     
                     <p class="text-sm text-gray-600 mb-3">The winner is:</p>
                     <p class="text-2xl font-bold text-primary break-all px-4 mb-6">
-                        {{ $winnerData['value'] ?? '' }}
+                        {{ $member['name'] ?? $winnerData['value'] }}
                     </p>
                     
                     @if($member)

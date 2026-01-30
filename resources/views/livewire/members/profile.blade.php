@@ -78,8 +78,8 @@
                                 <p class="text-gray-900">{{ $member->email }}</p>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-500">FIN</label>
-                                <p class="text-gray-900 font-mono">{{ $member->fin ?? '-' }}</p>
+                                <label class="text-sm font-medium text-gray-500">Membership Code</label>
+                                <p class="text-gray-900 font-mono">{{ $member->qr_code ?? '-' }}</p>
                             </div>
                             <div>
                                 <label class="text-sm font-medium text-gray-500">WhatsApp</label>
@@ -103,10 +103,15 @@
                                     </span>
                                 </p>
                             </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-500">Date Registered</label>
+                                <p class="text-gray-900">{{ $member->created_at?->format('d M Y g:i A') ?? '-' }}</p>
+                            </div>
                             @php
                                 $allowToChangeUserType = [
                                     'HJ82CQCH6', // karl
                                     'TN5TAY6IL', // marnelle
+                                    'BTSKKURCJ', // Jaslyn
                                 ];
                             @endphp
                             @if(auth()->user()->isAdmin() && in_array(auth()->user()->qr_code, $allowToChangeUserType))
@@ -166,24 +171,38 @@
                     </div>
                     
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Recent Member Activities</h3>
+                        <div class="flex items-center justify-between mb-4 border-b pb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Recent Member Activities</h3>
 
-                        <div class="space-y-3 overflow-y-auto max-h-[200px]">
+                            <button class="text-sm hover:underline hover:scale-105 transition-all duration-300 text-orange-500 hover:text-orange-600 cursor-pointer">
+                                Manually Add Activity
+                            </button>
+                        </div>
+                        <div class="space-y-3 overflow-y-auto max-h-[350px]">
                             @forelse($member->memberActivities as $activity)
                                 <div class="rounded-xl border border-gray-200 p-4 hover:bg-gray-50">
                                     <div class="flex items-start justify-between gap-4">
                                         <div>
-                                            <p class="text-sm font-bold text-gray-800">
-                                                {{ $activity->activityType?->name ?? 'Activity' }}
-                                            </p>
-                                            <p class="text-xs text-gray-500 mt-0.5">
+                                            <div class="flex items-center gap-2">
+                                                <p class="text-sm font-bold text-gray-800">
+                                                    {{ $activity->activityType?->name ?? 'Some Activity' }}
+                                                </p>
+                                                @if(auth()->user()->isAdmin() && in_array(auth()->user()->qr_code, $allowToChangeUserType))
+                                                    <livewire:members.set-activity-void-button 
+                                                        :member-activity="$activity" 
+                                                        wire:click="refreshMember"
+                                                        :key="'void-'.$activity->id" 
+                                                    />
+                                                @endif
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-2">
                                                 {{ $activity->activity_time?->format('M d, Y g:i A') ?? '-' }}
                                                 @if($activity->location)
                                                     • {{ $activity->location->name }}
                                                 @endif
                                             </p>
                                             @if($activity->description)
-                                                <p class="text-sm text-gray-700 mt-2">{{ $activity->description }}</p>
+                                                <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
                                             @endif
                                         </div>
                                         <div class="text-right">
@@ -205,7 +224,7 @@
                     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Recent Point Logs</h3>
 
-                        <div class="space-y-3 overflow-y-auto max-h-[200px]">
+                        <div class="space-y-3 overflow-y-auto max-h-[350px]">
                             @forelse($member->pointLogs as $log)
                                 <div class="rounded-xl border border-gray-200 p-4 hover:bg-gray-50">
                                     <div class="flex items-start justify-between gap-4">

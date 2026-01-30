@@ -43,7 +43,7 @@
             <!-- Activities List -->
             <div class="space-y-3">
                 @forelse($activities as $activity)
-                    <div class="card bg-base-100 shadow-md hover:shadow-xl border border-base-300 rounded-2xl overflow-hidden transition-all duration-300">
+                    <div class="{{(isset($activity->metadata['status']) && $activity->metadata['status'] === 'void') ? 'bg-gray-200' : 'bg-white'}} card shadow-md hover:shadow-xl border border-base-300 rounded-2xl overflow-hidden transition-all duration-300">
                         <div class="card-body p-4">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="flex-1">
@@ -76,6 +76,9 @@
                                         <span>{{ $activity->activity_time->format('g:i A') }}</span>
                                     </div>
                                 </div>
+                                @if(isset($activity->metadata['status']) && $activity->metadata['status'] === 'void')
+                                    <span class="badge badge-ghost badge-sm text-gray-400 shrink-0">Void</span>
+                                @endif
                             </div>
                         </div>
                     </div>

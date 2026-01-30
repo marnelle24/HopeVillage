@@ -22,7 +22,7 @@
                                 <div class="badge badge-warning text-warning-content badge-sm p-2">{{ $index + 1 }}</div>
                             </td>
                             <td>
-                                <div class="font-medium">{{ $member->name }}</div>
+                                <a href="{{ route('admin.members.profile', $member->qr_code) }}" class="font-medium hover:underline hover:text-blue-600 cursor-pointer">{{ $member->name }}</a>
                             </td>
                             <td>
                                 <div class="flex items-center gap-1">
