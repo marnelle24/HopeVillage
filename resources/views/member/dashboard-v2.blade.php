@@ -94,7 +94,7 @@
                                 [
                                     'icon' => '<img width="30" height="30" src="https://img.icons8.com/dusk/50/news.png" alt="news"/>',
                                     'name' => 'News',
-                                    'route' => route('member.events'),
+                                    'route' => route('member.news'),
                                     'color' => 'warning'
                                 ],
                             ];
@@ -113,7 +113,7 @@
                                 $iconColorClass = $colorClasses[$category['color']] ?? 'text-primary';
                             @endphp
 
-                            <a href="{{ $category['name'] === 'News' ? '#!' : $category['route'] }}" 
+                            <a href="{{ $category['route'] }}" 
                                class="card bg-base-100 shadow-md hover:shadow-xl border border-base-300 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in"
                                style="animation-delay: {{ ($index + 1) * 50 }}ms">
                                 <div class="flex flex-col items-center justify-center gap-2">

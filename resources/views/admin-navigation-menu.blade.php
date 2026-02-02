@@ -229,6 +229,12 @@
                     <x-responsive-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
                         {{ __('Raffle') }}
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.news.index') }}" :active="request()->routeIs('admin.news*')">
+                        {{ __('News') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.news-categories.index') }}" :active="request()->routeIs('admin.news-categories*')">
+                        {{ __('News Categories') }}
+                    </x-responsive-nav-link>
                 </nav>
 
                 <!-- Sidebar footer (user & settings) -->

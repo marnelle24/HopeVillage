@@ -36,6 +36,12 @@ export default defineConfig({
     ],
     build: {
         rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules/chart.js')) return 'chart';
+                    if (id.includes('node_modules/@tiptap')) return 'tiptap';
+                },
+            },
             onwarn(warning, warn) {
                 // Suppress @property warnings from DaisyUI
                 if (warning.message?.includes('@property') || warning.message?.includes('Unknown at rule')) {
@@ -44,6 +50,7 @@ export default defineConfig({
                 warn(warning);
             },
         },
+        chunkSizeWarningLimit: 600,
         // Use esbuild for CSS minification to avoid @property warnings
         cssMinify: 'esbuild',
     },

@@ -170,6 +170,12 @@
                 </svg>
                 My Profile
             </a>
+            {{-- <a href="{{ route('member.news') }}" class="flex items-center gap-1 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 {{ request()->routeIs('member.news*') ? 'bg-orange-50 text-orange-700' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
+                </svg>
+                News
+            </a> --}}
             <a href="{{ route('member.referral-system') }}" class="flex items-center gap-1 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 {{ request()->routeIs('member.referral-system') ? 'bg-orange-50 text-orange-700' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />

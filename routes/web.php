@@ -123,6 +123,17 @@ Route::middleware([
     Route::get('/admin/raffle-v1', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle.v1');
     Route::get('/admin/raffle', \App\Livewire\Raffle\RouletteV2::class)->name('admin.raffle');
 
+    // News CRUD Routes
+    Route::get('/admin/news', \App\Livewire\News\Index::class)->name('admin.news.index');
+    Route::get('/admin/news/create', \App\Livewire\News\Form::class)->name('admin.news.create');
+    Route::get('/admin/news/{id}/edit', \App\Livewire\News\Form::class)->name('admin.news.edit');
+    Route::get('/admin/news/{id}', \App\Livewire\News\Profile::class)->name('admin.news.profile');
+
+    // News Categories CRUD Routes
+    Route::get('/admin/news-categories', \App\Livewire\NewsCategories\Index::class)->name('admin.news-categories.index');
+    Route::get('/admin/news-categories/create', \App\Livewire\NewsCategories\Form::class)->name('admin.news-categories.create');
+    Route::get('/admin/news-categories/{id}/edit', \App\Livewire\NewsCategories\Form::class)->name('admin.news-categories.edit');
+
     // Points actions (admin-operated)
     Route::post('/admin/points/location-entry', [PointsActionsController::class, 'locationEntry'])->name('admin.points.location-entry');
     Route::post('/admin/points/event-attend', [PointsActionsController::class, 'attendEvent'])->name('admin.points.event-attend');
@@ -179,6 +190,10 @@ Route::middleware([
     // Referral System
     Route::get('/member/referral-system', \App\Livewire\Member\ReferralSystem::class)
         ->name('member.referral-system');
+
+    // News (published by admin)
+    Route::get('/member/news', \App\Livewire\Member\News\Index::class)->name('member.news');
+    Route::get('/member/news/{slug}', \App\Livewire\Member\News\Profile::class)->name('member.news.profile');
     
     // QR Code routes
     Route::get('/member/qr-code', [QrCodeController::class, 'show'])->name('member.qr-code');
