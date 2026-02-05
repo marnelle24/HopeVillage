@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,6 +56,24 @@ class Voucher extends Model implements HasMedia
         return $this->belongsToMany(User::class)
             ->withPivot(['status', 'claimed_at', 'redeemed_at'])
             ->withTimestamps();
+    }
+
+    /**
+     * Scope: active and valid (within validity period, under usage limit).
+     */
+    public function scopeValid(Builder $query): Builder
+    {
+        $now = now();
+        return $query->where('is_active', true)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('valid_from')->orWhere('valid_from', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('valid_until')->orWhere('valid_until', '>=', $now);
+            })
+            ->where(function ($q) {
+                $q->whereNull('usage_limit')->orWhereRaw('usage_count < usage_limit');
+            });
     }
 
     /**

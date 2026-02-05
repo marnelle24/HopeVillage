@@ -28,7 +28,7 @@ class LoginResponse implements LoginResponseContract
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->isMember()) {
-            return redirect()->route('member.events');
+            return redirect()->route('member.dashboard');
         } elseif ($user->isMerchantUser()) {
             return redirect()->route('merchant.dashboard');
         }

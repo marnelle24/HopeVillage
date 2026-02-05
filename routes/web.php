@@ -88,6 +88,7 @@ Route::middleware([
     // Members
     Route::get('/admin/members', \App\Livewire\Members\Index::class)->name('admin.members.index');
     Route::get('/admin/members/activities', \App\Livewire\Members\Activities::class)->name('admin.members.activities');
+    Route::get('/admin/members/activities/export', \App\Http\Controllers\MemberActivitiesExportController::class)->name('admin.members.activities.export');
     Route::get('/admin/members/{qr_code}', \App\Livewire\Members\Profile::class)->name('admin.members.profile');
 
     // Merchant CRUD Routes

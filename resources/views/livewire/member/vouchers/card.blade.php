@@ -36,7 +36,7 @@
                     Redeem Now
                 </span>
             </div>
-            <div class="relative h-20 bg-gradient-to-br from-orange-400 via-orange-300 to-orange-200 flex items-center justify-center">
+            <div class="relative h-20 bg-linear-to-br from-orange-400 via-orange-300 to-orange-200 flex items-center justify-center">
                 <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-orange-600/50">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M16 2H0V6C1.10457 6 2 6.89543 2 8C2 9.10457 1.10457 10 0 10V14H16V10C14.8954 10 14 9.10457 14 8C14 6.89543 14.8954 6 16 6V2ZM8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" fill="currentColor"></path>
                 </svg>
@@ -72,8 +72,8 @@
                     </div>
                 @endif
             </div>
-            <div class="p-3 bg-gradient-to-b from-white to-orange-50/30">
-                <h3 class="font-bold text-sm text-gray-800 mb-1 line-clamp-1">{{ $voucher->name }}</h3>
+            <div class="p-3 bg-linear-to-b from-white to-orange-50/30">
+                <h3 class="font-bold text-md text-gray-800 mb-1 leading-tight">{{ $voucher->name }}</h3>
                 @if($merchant && $merchant->name)
                     <p class="text-xs text-gray-600 mb-2">You can redeem this voucher at <span class="font-bold">{{ $merchant->name }}</span></p>
                 @endif
@@ -101,7 +101,7 @@
                     Redeem Now
                 </span>
             </div>
-            <div class="relative h-20 bg-gradient-to-br from-blue-400 via-blue-300 to-blue-200 flex items-center justify-center">
+            <div class="relative h-20 bg-linear-to-br from-blue-400 via-blue-300 to-blue-200 flex items-center justify-center">
                 <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-blue-600/50">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M16 2H0V6C1.10457 6 2 6.89543 2 8C2 9.10457 1.10457 10 0 10V14H16V10C14.8954 10 14 9.10457 14 8C14 6.89543 14.8954 6 16 6V2ZM8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" fill="currentColor"></path>
                 </svg>
@@ -139,8 +139,8 @@
                     </div>
                 @endif
             </div>
-            <div class="p-3 bg-gradient-to-b from-white to-blue-50/30">
-                <h3 class="font-bold text-lg text-gray-800 mb-1 line-clamp-1">{{ $voucher->name }}</h3>
+            <div class="p-3 bg-linear-to-b from-white to-blue-50/30">
+                <h3 class="font-bold text-md text-gray-800 mb-1 leading-tight">{{ $voucher->name }}</h3>
                 {{-- add here the merchant name if available --}}
                 @if($merchants && $merchants->isNotEmpty())
                     <p class="text-xs text-gray-600 mb-2">You can redeem this voucher at <span class="font-bold">{{ $merchants->pluck('name')->join(', ') }}</span></p>
@@ -164,7 +164,7 @@
             @keydown.escape.window="showQr = false"
         >
             <div class="bg-white w-full max-w-lg flex flex-col items-center justify-center rounded-2xl p-5" @click.stop>
-                <h3 class="text-lg font-bold text-gray-800 text-center">{{ $voucher->name }}</h3>
+                <h3 class="text-md font-bold text-gray-800 text-center leading-tight">{{ $voucher->name }}</h3>
                 <p class="mb-2 text-xs text-gray-600 text-center font-semibold">({{ $value }})</p>
                 @if($qrImage)
                     <div class="relative">

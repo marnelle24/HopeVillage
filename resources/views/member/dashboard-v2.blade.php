@@ -80,9 +80,9 @@
                                     'color' => 'secondary'
                                 ],
                                 [
-                                    
                                     'icon' => '<img width="30" height="30" src="https://img.icons8.com/dusk/64/discount-ticket.png" alt="discount-ticket"/>',
                                     'name' => 'Vouchers',
+                                    'count' => auth()->user()->getClaimableVouchersCount(),
                                     'route' => route('member.vouchers'),
                                     'color' => 'accent'
                                 ],
@@ -127,7 +127,10 @@
                                     <div class="{{ $iconColorClass }} mb-1">
                                         {!! $category['icon'] !!}
                                     </div>
-                                    <p class="text-xs font-semibold text-base-content text-center leading-tight">{{ $category['name'] }}</p>
+                                    <p class="text-xs font-semibold text-base-content text-center leading-tight">
+                                        {{ $category['name'] }}
+                                        {{ isset($category['count']) && $category['count'] > 0 ? '(' . $category['count'] . ')' : '' }}
+                                    </p>
                                 </div>
                             </a>
                         @endforeach

@@ -3,7 +3,6 @@
 namespace App\Livewire\Members;
 
 use App\Models\ActivityType;
-use App\Models\Location;
 use App\Models\MemberActivity;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,18 +12,12 @@ class Activities extends Component
     use WithPagination;
 
     public string $search = '';
-    public string $locationFilter = '';
     public string $activityTypeFilter = '';
     public string $dateFilter = 'all'; // all | today | week | month
 
     protected $paginationTheme = 'tailwind';
 
     public function updatingSearch(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatingLocationFilter(): void
     {
         $this->resetPage();
     }
@@ -39,12 +32,14 @@ class Activities extends Component
         $this->resetPage();
     }
 
-    public function render()
+    /**
+     * Build the filtered query (shared by table and CSV export).
+     */
+    private function getFilteredQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $query = MemberActivity::query()
-            ->with(['user', 'activityType', 'location', 'amenity', 'pointLog']);
+            ->with(['user', 'activityType', 'pointLog']);
 
-        // Search filter
         if ($this->search !== '') {
             $s = '%' . $this->search . '%';
             $query->where(function ($q) use ($s) {
@@ -57,17 +52,10 @@ class Activities extends Component
             });
         }
 
-        // Location filter
-        if ($this->locationFilter !== '') {
-            $query->where('location_id', $this->locationFilter);
-        }
-
-        // Activity type filter
         if ($this->activityTypeFilter !== '') {
             $query->where('activity_type_id', $this->activityTypeFilter);
         }
 
-        // Date filter
         if ($this->dateFilter === 'today') {
             $query->whereDate('activity_time', today());
         } elseif ($this->dateFilter === 'week') {
@@ -76,18 +64,26 @@ class Activities extends Component
             $query->where('activity_time', '>=', now()->subMonth());
         }
 
-        $activities = $query
-            ->orderByDesc('activity_time')
-            ->paginate(15);
+        return $query->orderByDesc('activity_time');
+    }
 
-        // Get filter options
-        $locations = Location::orderBy('name')->get(['id', 'name']);
+    public function exportCsv()
+    {
+        return $this->redirect(route('admin.members.activities.export', [
+            'search' => $this->search,
+            'activity_type' => $this->activityTypeFilter,
+            'date' => $this->dateFilter,
+        ]));
+    }
+
+    public function render()
+    {
+        $activities = $this->getFilteredQuery()->paginate(15);
 
         $activityTypes = ActivityType::orderBy('name')->get(['id', 'description']);
 
         return view('livewire.members.activities', [
             'activities' => $activities,
-            'locations' => $locations,
             'activityTypes' => $activityTypes,
         ])->layout('components.layouts.app');
     }

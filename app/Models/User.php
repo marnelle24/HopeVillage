@@ -134,6 +134,22 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * Count of active, valid vouchers (merchant + admin) not yet claimed or redeemed by this member.
+     */
+    public function getClaimableVouchersCount(): int
+    {
+        $merchantCount = Voucher::valid()
+            ->whereDoesntHave('users', fn ($q) => $q->where('users.id', $this->id))
+            ->count();
+
+        $adminCount = AdminVoucher::valid()
+            ->whereDoesntHave('users', fn ($q) => $q->where('users.id', $this->id))
+            ->count();
+
+        return $merchantCount + $adminCount;
+    }
+
     public function defaultMerchant()
     {
         return $this->merchants()->wherePivot('is_default', true)->first();
