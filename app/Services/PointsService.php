@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\User;
+use App\Models\Event;
+use App\Models\Setting;
+use App\Models\Voucher;
+use App\Models\PointLog;
 use App\Models\ActivityType;
 use App\Models\AdminVoucher;
-use App\Models\Event;
-use App\Models\PointLog;
+use App\Models\MemberActivity;
 use App\Models\PointSystemConfig;
-use App\Models\Setting;
-use App\Models\User;
-use App\Models\Voucher;
 use Illuminate\Support\Facades\DB;
 
 class PointsService
@@ -46,12 +47,35 @@ class PointsService
 
     public function awardRegistration(User $user): void
     {
+
+        // Create member activity record
+        $memberActivity = MemberActivity::create([
+            'user_id' => $user->id,
+            'activity_type_id' => ActivityType::where('name', 'member_registration')->first()->id,
+            'location_id' => 1, // hardcoded location id for now
+            'amenity_id' => null,
+            'activity_time' => now(),
+            'description' => "Member account created.",
+            'metadata' => [
+                'scanned_at' => now()->toIso8601String(),
+                'location_code' => 1, // hardcoded location id for now
+                'qr_code' => $user->qr_code,
+                'device_info' => 'mobile_device',
+                'access_type' => 'browser_application',
+            ],
+        ]);
+        
+        $memberActivity->save();
+
         $this->award(
             user: $user,
-            activityName: self::ACTIVITY_REGISTRATION,
-            description: 'New member registration',
+            activityName: 'member_registration',
+            description: 'Member account created',
             locationId: null,
+            memberActivityId: $memberActivity->id,
+            amenityId: null,
         );
+
     }
 
     public function awardLocationEntry(User $user, int $locationId): void
@@ -106,11 +130,32 @@ class PointsService
 
     public function awardReferral(User $referrer, User $referredUser): void
     {
+        // log the activity to the member activity table
+        $memberActivity = MemberActivity::create([
+            'user_id' => $referrer->id,
+            'activity_type_id' => ActivityType::where('name', 'member_referral')->first()->id,
+            'location_id' => 1, // hardcoded location id for now
+            'amenity_id' => null,
+            'activity_time' => now(),
+            'description' => "Referred new member: " . $referredUser->name . " (" . $referredUser->qr_code . ")",
+            'metadata' => [
+                'scanned_at' => now()->toIso8601String(),
+                'location_code' => 1, // hardcoded location id for now
+                'referred_user_qr_code' => $referredUser->qr_code,
+                'referrer_user_qr_code' => $referrer->qr_code,
+                'device_info' => 'mobile_device',
+                'access_type' => 'browser_application',
+            ],
+        ]);
+        $memberActivity->save();
+
         $this->award(
             user: $referrer,
-            activityName: self::ACTIVITY_REFERRAL,
+            activityName: 'member_referral',
             description: 'Referred new member: ' . $referredUser->name . ' (' . $referredUser->qr_code . ')',
             locationId: null,
+            memberActivityId: $memberActivity->id,
+            amenityId: null,
         );
     }
 

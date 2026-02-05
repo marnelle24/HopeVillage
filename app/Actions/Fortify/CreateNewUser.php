@@ -63,7 +63,7 @@ class CreateNewUser implements CreatesNewUsers
             'gender' => ['nullable', 'string', 'max:20'],
             'type_of_work' => ['nullable', 'string', 'max:255', 'in:Migrant worker,Migrant domestic worker,Others'],
             'type_of_work_custom' => ['nullable', 'required_if:type_of_work,Others', 'string', 'max:255'],
-            'g-recaptcha-response' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
+            // 'g-recaptcha-response' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ], [
@@ -136,19 +136,6 @@ class CreateNewUser implements CreatesNewUsers
                 $userData['referred_by_user_id'] = $referrer->id;
             }
 
-            // OLD CODE - Auto-generation of FIN (commented out)
-            // if (($userData['user_type'] ?? 'member') === 'member') {
-            //     // Generate a unique 9-character UID
-            //     do {
-            //         $fin = strtoupper(Str::random(9));
-            //     } while (User::where('fin', $fin)->exists());
-            //     
-            //     $userData['fin'] = $fin;
-            //     
-            //     // Set QR code to FIN value
-            //     $userData['qr_code'] = $userData['fin'];
-            // }
-
             return tap(User::create($userData), function (User $user) use ($referrer) {
                 if (Jetstream::userHasTeamFeatures($user)) {
                     $this->createTeam($user);
@@ -166,7 +153,8 @@ class CreateNewUser implements CreatesNewUsers
                     $referrer->refresh();
                     if ($referrer->user_type === 'member' && !$referrer->trashed()) {
                         app(PointsService::class)->awardReferral($referrer, $user);
-                    } else {
+                    } 
+                    else {
                         // Referrer became invalid, remove referral link
                         $user->update(['referred_by_user_id' => null]);
                     }

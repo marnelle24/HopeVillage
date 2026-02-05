@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Raffle Draw Spin Wheel') }}
+                {{ __('Luck Draw Spinning Wheel') }}
             </h2>
             <div class="flex gap-2">
                 <a href="{{ route('admin.dashboard') }}" class="text-sm text-gray-600 hover:text-gray-900">
@@ -76,8 +76,26 @@
                                             <option value="{{ $e['id'] }}">{{ $e['title'] }} ({{ $e['attendee_count'] }} {{ $e['attendee_count'] == 1 ? 'attendee' : 'attendees' }})</option>
                                         @endforeach
                                     </select>
-                                    @error('selectedEventId') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                                    @error('selectedEventId') <p class="text-xs text-red-600 mt-1">{{ 'Please select an event' }}</p> @enderror
                                 </div>
+                                @if($selectedEventId)
+                                    <div class="mt-3">
+                                        <label class="text-xs font-semibold text-gray-600 block mb-2">Type of work</label>
+                                        <p class="text-xs text-gray-500 mb-2">Choose which types to include in the wheel. Default: All.</p>
+                                        <div class="space-y-1.5">
+                                            <label class="flex items-center gap-2 my-2" x-bind:class="isSpinning ? 'opacity-50 cursor-not-allowed' : ''">
+                                                <input type="checkbox" wire:model.live="typeOfWorkAll" class="rounded border-gray-300 text-indigo-600 focus:ring-orange-500 p-2" x-bind:disabled="isSpinning">
+                                                <span class="text-sm text-gray-800 font-medium text-nowrap">All</span>
+                                            </label>
+                                            @foreach(\App\Livewire\Raffle\RouletteV2::TYPE_OF_WORK_OPTIONS as $option)
+                                                <label class="flex items-center gap-2 my-2" x-bind:class="isSpinning ? 'opacity-50 cursor-not-allowed' : ''">
+                                                    <input type="checkbox" wire:model.live="selectedTypeOfWork" value="{{ $option }}" class="rounded border-gray-300 text-indigo-600 focus:ring-orange-500 p-2" x-bind:disabled="isSpinning || $wire.typeOfWorkAll">
+                                                    <span class="text-sm text-gray-700 text-nowrap capitalize">{{ $option }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
     
                             <br />

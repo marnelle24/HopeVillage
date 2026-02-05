@@ -16,6 +16,19 @@ class RouletteV2 extends Component
 
     public ?int $selectedEventId = null;
 
+    /** When true, load all event attendees regardless of type of work. Default for Event Attendees. */
+    public bool $typeOfWorkAll = true;
+
+    /** Selected type_of_work values when typeOfWorkAll is false. */
+    public array $selectedTypeOfWork = [];
+
+    /** Fixed type of work options to display as checkboxes (excluding "All"). */
+    public const TYPE_OF_WORK_OPTIONS = [
+        'Migrant worker',
+        'Migrant domestic worker',
+        'Others',
+    ];
+
     /** @var array<int, string> */
     public array $entries = [];
 
@@ -82,11 +95,34 @@ class RouletteV2 extends Component
     public function updatedSelectedEventId(): void
     {
         if ($this->source === 'event_attendees' && $this->selectedEventId) {
+            $this->typeOfWorkAll = true;
+            $this->selectedTypeOfWork = [];
             $this->resetWinners();
             $this->loadEntries();
         } elseif ($this->source === 'event_attendees' && !$this->selectedEventId) {
             $this->entries = [];
+            $this->typeOfWorkAll = true;
+            $this->selectedTypeOfWork = [];
             $this->resetWinners();
+        }
+    }
+
+    public function updatedTypeOfWorkAll(): void
+    {
+        if ($this->source === 'event_attendees' && $this->selectedEventId) {
+            if ($this->typeOfWorkAll) {
+                $this->selectedTypeOfWork = [];
+            }
+            $this->resetWinners();
+            $this->loadEntries();
+        }
+    }
+
+    public function updatedSelectedTypeOfWork(): void
+    {
+        if ($this->source === 'event_attendees' && $this->selectedEventId) {
+            $this->resetWinners();
+            $this->loadEntries();
         }
     }
 
@@ -159,11 +195,17 @@ class RouletteV2 extends Component
                 'selectedEventId' => ['required', 'integer'],
             ]);
 
-            $qrCodes = EventRegistration::query()
+            $query = EventRegistration::query()
                 ->where('event_id', $this->selectedEventId)
                 ->where('status', 'attended')
                 ->whereNotNull('user_id')
-                ->with('user:id,qr_code')
+                ->with('user:id,qr_code,type_of_work');
+
+            if (!$this->typeOfWorkAll && !empty($this->selectedTypeOfWork)) {
+                $query->whereHas('user', fn ($q) => $q->whereIn('type_of_work', $this->selectedTypeOfWork));
+            }
+
+            $qrCodes = $query
                 ->get()
                 ->map(fn (EventRegistration $r) => $r->user?->qr_code)
                 ->filter(fn ($qrCode) => is_string($qrCode) && trim($qrCode) !== '')

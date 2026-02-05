@@ -4,9 +4,18 @@
             <!-- Header Section with Avatar and Greeting -->
             <div class="bg-linear-to-br from-orange-300 to-orange-400 p-6 pb-8 rounded-b-4xl shadow-lg">
                 <div class="flex items-center justify-between animate-fade-in">
-                    <div class="flex items-start gap-3">
-                        <div>
-                            <p class="text-orange-100 text-lg font-bold mb-4 drop-shadow">Welcome back!</p>
+                    <div class="flex items-start gap-3 w-full min-w-0">
+                        <div class="min-w-0 w-full">
+                            <div class="flex flex-nowrap items-start gap-3 w-full">
+                                <p class="text-orange-100 text-2xl font-bold mb-4 drop-shadow shrink-0">Welcome back!</p>
+                                <div class="ml-auto shrink-0">
+                                    @if(auth()->user()->is_verified)
+                                        <span class="text-[11px] font-normal bg-green-400/40 text-white border border-green-400/50 px-2.5 py-1 rounded-full whitespace-nowrap">Verified</span>
+                                    @else
+                                        <span class="text-[11px] font-normal bg-red-600/40 text-white border border-red-600/50 px-2.5 py-1 rounded-full whitespace-nowrap">Unverified</span>
+                                    @endif
+                                </div>
+                            </div>
                             <div class="flex items-start gap-2">
                                 <div class="border-2 border-white bg-white/70 shadow-lg rounded-xl p-2">
                                     <svg class="size-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,17 +23,15 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 class="text-orange-900 text-3xl font-bold flex items-center gap-2">
+                                    <h2 class="text-orange-900 text-3xl font-bold flex items-center gap-2 drop-shadow leading-tight">
                                         {{ auth()->user()->name }}
                                     </h2>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-white font-mono tracking-wider text-sm font-medium">{{ auth()->user()->qr_code }}</p>
-                                        {{-- verified badge --}}
-                                        @if(auth()->user()->is_verified)
-                                            <span class="text-white text-[11px] font-medium bg-green-400 px-1.5 py-0.5 rounded-full">Verified</span>
-                                        @else
-                                            <span class="text-white text-[11px] font-medium bg-red-400 px-1.5 py-0.5 rounded-full">Unverified</span>
-                                        @endif
+                                    <div class="flex flex-col items-start gap-0">
+                                        <span class="text-orange-600 mt-1 text-[0.7rem] font-normal leading-1 capitalize">{{ auth()->user()->type_of_work }}</span>
+                                        <p class="flex items-center gap-0 mt-4">
+                                            <span class="text-white text-[11px] font-mono tracking-wider font-normal leading-0 capitalize">Code:</span>
+                                            <span class="text-white text-[11px] font-mono tracking-wider font-normal leading-0 capitalize">{{ auth()->user()->qr_code }}</span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>

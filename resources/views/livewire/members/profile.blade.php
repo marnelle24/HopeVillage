@@ -216,12 +216,14 @@
                                                 <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
                                             @endif
                                         </div>
-                                        <div class="text-right">
-                                            <p class="text-xs text-gray-500">Points</p>
-                                            <p class="text-lg font-bold text-gray-800">
-                                                {{ $activity->pointLog?->points ?? '-' }}
-                                            </p>
-                                        </div>
+                                        @if($activity->pointLog !== null)
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500">Points</p>
+                                                <p class="text-lg font-bold text-gray-800">
+                                                    {{ $activity->pointLog->points }}
+                                                </p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             @empty

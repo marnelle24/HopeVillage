@@ -27,37 +27,6 @@
                             <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-12">
                         </a>
                     </div>
-
-                    <!-- Navigation Links -->
-                    {{-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <x-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard') || request()->routeIs('admin.dashboard.v2')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations*')">
-                            {{ __('Locations') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events*')">
-                            {{ __('Events') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.members.index') }}" :active="request()->routeIs('admin.members.index') || request()->routeIs('admin.members.profile')">
-                            {{ __('Members') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
-                            {{ __('Activities') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
-                            {{ __('Vouchers') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants*')">
-                            {{ __('Merchants') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.point-system.index') }}" :active="request()->routeIs('admin.point-system*')">
-                            {{ __('Point System') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
-                            {{ __('Raffle') }}
-                        </x-nav-link>
-                    </div> --}}
                 </div>
 
                 <!-- Settings Dropdown + Hamburger (last menu elements) -->
@@ -227,7 +196,7 @@
                         {{ __('Point System') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
-                        {{ __('Raffle') }}
+                        {{ __('Lucky Draw') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link href="{{ route('admin.news.index') }}" :active="request()->routeIs('admin.news*')">
                         {{ __('News') }}
