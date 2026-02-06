@@ -1,7 +1,8 @@
 <div
+    x-cloak
     x-data="{ 
         loaded: false,
-        imageLoaded: false,
+        {{-- imageLoaded: false, --}}
         interestedLoading: false,
         joinLoading: false,
         registrationStatus: @js($event['registration_status'] ?? null),
@@ -69,14 +70,14 @@
     <div class="card-body flex-row gap-4 p-4">
         <!-- Event Image -->
         <div class="shrink-0">
-            <div class="w-20 h-20 rounded-lg bg-base-200 overflow-hidden relative">
+            <div class="w-20 h-20 border border-gray-300 rounded-lg bg-base-200 overflow-hidden relative">
                 @if($event['thumbnail_url'] ?? null)
                     <img
                         src="{{ $event['thumbnail_url'] }}"
                         alt="{{ $event['title'] }}"
                         class="w-full h-full object-cover"
-                        @load="imageLoaded = true"
-                        x-show="imageLoaded"
+                        {{-- @load="imageLoaded = true"
+                        x-show="imageLoaded" --}}
                         x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0"
                         x-transition:enter-end="opacity-100"
@@ -97,7 +98,7 @@
         <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between gap-2 mb-1">
                 <!-- Event Title -->
-                <a href="/member/event/{{ $event['event_code'] }}" class="text-gray-900 text-xl font-bold line-clamp-2 hover:text-orange-600 transition-colors flex-1">{{ $event['title'] }}</a>
+                <a href="/member/event/{{ $event['event_code'] }}" class="text-gray-900 text-xl font-bold hover:text-orange-600 transition-colors flex-1">{{ $event['title'] }}</a>
             </div>
             {{-- add the description here with truncate and add ... at the end if the description is longer than 100 characters --}}
             <p class="text-gray-800 text-xs line-clamp-2 italic">{{ str()->words($event['description'] ?? '', 15) }}</p>

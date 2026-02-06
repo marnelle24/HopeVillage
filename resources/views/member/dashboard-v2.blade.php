@@ -171,7 +171,7 @@
                                 $distance = rand(5, 50);
                             @endphp
                             <div class="carousel-item flex-none w-64 animate-slide-in" style="animation-delay: {{ ($index + 1) * 100 }}ms; scroll-snap-align: start;">
-                                <a href="{{ route('member.events') }}" class="card bg-base-100 shadow-lg hover:shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 w-full">
+                                <a href="{{ route('member.events') }}" class="border border-gray-300 card bg-base-100 shadow-lg rounded-2xl hover:shadow-md transition-all duration-300 w-full">
                                     <figure class="h-40 bg-gray-200 overflow-hidden">
                                         @if($locationImageUrl)
                                             <img src="{{ $locationImageUrl }}" alt="{{ $location->name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
