@@ -124,7 +124,7 @@
             </template>
         </div>
 
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-white {{ auth()->check() && auth()->user()->isAdmin() ? 'pt-20' : '' }}">
             @livewire('navigation-menu')
 
             <!-- Page Heading -->

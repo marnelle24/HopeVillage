@@ -6,6 +6,7 @@ use App\Models\MemberActivity;
 use App\Models\PointLog;
 use App\Models\PointSystemConfig;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -17,6 +18,9 @@ class AddActivityModal extends Component
     public bool $open = false;
 
     public ?string $pointSystemConfigId = null;
+
+    /** Datetime for the manual activity entry (Y-m-d\TH:i for datetime-local). */
+    public ?string $activityDateTime = null;
 
     public bool $submitting = false;
 
@@ -32,6 +36,7 @@ class AddActivityModal extends Component
     {
         return [
             'pointSystemConfigId' => ['required', 'string', 'exists:point_system_configs,id'],
+            'activityDateTime' => ['required', 'string', 'date'],
         ];
     }
 
@@ -47,6 +52,7 @@ class AddActivityModal extends Component
 
         $this->resetValidation();
         $this->pointSystemConfigId = null;
+        $this->activityDateTime = now()->format('Y-m-d\TH:i');
         $this->error = null;
         $this->successMessage = null;
         $this->open = true;
@@ -77,14 +83,16 @@ class AddActivityModal extends Component
             $config = PointSystemConfig::with(['activityType', 'location'])
                 ->where('is_active', true)
                 ->findOrFail($this->pointSystemConfigId);
+                
+            $activityAt = Carbon::createFromFormat('Y-m-d\TH:i', $this->activityDateTime);
 
-            DB::transaction(function () use ($config) {
+            DB::transaction(function () use ($config, $activityAt) {
                 $memberActivity = MemberActivity::create([
                     'user_id' => $this->member->id,
                     'activity_type_id' => $config->activity_type_id,
-                    'location_id' => $config->location_id,
+                    'location_id' => $config->location_id ?? 1,
                     'amenity_id' => $config->amenity_id,
-                    'activity_time' => now(),
+                    'activity_time' => $activityAt,
                     'description' => $config->description,
                     'metadata' => [
                         'added_by_admin_id' => auth()->id(),
@@ -106,7 +114,7 @@ class AddActivityModal extends Component
                     'amenity_id' => $config->amenity_id,
                     'points' => $config->points,
                     'description' => $config->description,
-                    'awarded_at' => now(),
+                    'awarded_at' => $activityAt,
                 ]);
 
                 $this->member->increment('total_points', $config->points);

@@ -43,6 +43,15 @@ class MemberActivitiesExportController extends Controller
             $query->where('activity_time', '>=', now()->subWeek());
         } elseif ($dateFilter === 'month') {
             $query->where('activity_time', '>=', now()->subMonth());
+        } elseif ($dateFilter === 'custom') {
+            $dateFrom = $request->query('date_from');
+            $dateTo = $request->query('date_to');
+            if ($dateFrom) {
+                $query->whereDate('activity_time', '>=', $dateFrom);
+            }
+            if ($dateTo) {
+                $query->whereDate('activity_time', '<=', $dateTo);
+            }
         }
 
         $activities = $query->orderByDesc('activity_time')->get();

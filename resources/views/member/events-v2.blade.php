@@ -90,7 +90,7 @@
                     >
                         <span>All Events</span>
                     </button>
-                    <button
+                    {{-- <button
                         type="button"
                         @click="activeCategory = 'upcoming'; tab = 'upcoming'; setTab('upcoming'); setFilter('upcoming')"
                         :class="tab === 'upcoming' && filter === 'upcoming' ? 'bg-orange-500 shadow-md text-white' : 'border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white'"
@@ -100,7 +100,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                         <span>Upcoming</span>
-                    </button>
+                    </button> --}}
                     <button
                         type="button"
                         @click="activeCategory = 'my-events'; tab = 'mine'; setTab('mine')"

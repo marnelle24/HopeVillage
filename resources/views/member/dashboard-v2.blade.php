@@ -76,6 +76,7 @@
                                 [
                                     'icon' => '<img width="30" height="30" src="https://img.icons8.com/cotton/64/events--v1.png" alt="events--v1"/>',
                                     'name' => 'Events',
+                                    'count' => \App\Models\Event::where('status', 'published')->where('end_date', '>', now())->count(),
                                     'route' => route('member.events'),
                                     'color' => 'secondary'
                                 ],

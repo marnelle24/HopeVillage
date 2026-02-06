@@ -83,7 +83,31 @@
                                     </option>
                                 @endforeach
                             </select>
+                            {{-- Activity Date --}}
                             @error('pointSystemConfigId')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="activityDateTime" class="block text-sm font-medium text-gray-700 mb-1">Date & time <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <input
+                                    type="datetime-local"
+                                    id="activityDateTime"
+                                    x-ref="datetimeInput"
+                                    wire:model="activityDateTime"
+                                    class="w-full pl-3 pr-3 py-2 border border-gray-300 text-gray-800 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm [color-scheme:light]"
+                                    required
+                                >
+                                <label
+                                    for="activityDateTime"
+                                    class="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600"
+                                    @click.prevent="if ($refs.datetimeInput?.showPicker) $refs.datetimeInput.showPicker()"
+                                >
+                                </label>
+                            </div>
+                            @error('activityDateTime')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

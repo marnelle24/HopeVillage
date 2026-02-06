@@ -13,7 +13,9 @@ class Activities extends Component
 
     public string $search = '';
     public string $activityTypeFilter = '';
-    public string $dateFilter = 'all'; // all | today | week | month
+    public string $dateFilter = 'all'; // all | today | week | month | custom
+    public ?string $customStartDate = null;
+    public ?string $customEndDate = null;
 
     protected $paginationTheme = 'tailwind';
 
@@ -28,6 +30,16 @@ class Activities extends Component
     }
 
     public function updatingDateFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCustomStartDate(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCustomEndDate(): void
     {
         $this->resetPage();
     }
@@ -62,6 +74,13 @@ class Activities extends Component
             $query->where('activity_time', '>=', now()->subWeek());
         } elseif ($this->dateFilter === 'month') {
             $query->where('activity_time', '>=', now()->subMonth());
+        } elseif ($this->dateFilter === 'custom' && ($this->customStartDate || $this->customEndDate)) {
+            if ($this->customStartDate) {
+                $query->whereDate('activity_time', '>=', $this->customStartDate);
+            }
+            if ($this->customEndDate) {
+                $query->whereDate('activity_time', '<=', $this->customEndDate);
+            }
         }
 
         return $query->orderByDesc('activity_time');
@@ -69,11 +88,16 @@ class Activities extends Component
 
     public function exportCsv()
     {
-        return $this->redirect(route('admin.members.activities.export', [
+        $params = [
             'search' => $this->search,
             'activity_type' => $this->activityTypeFilter,
             'date' => $this->dateFilter,
-        ]));
+        ];
+        if ($this->dateFilter === 'custom') {
+            $params['date_from'] = $this->customStartDate;
+            $params['date_to'] = $this->customEndDate;
+        }
+        return $this->redirect(route('admin.members.activities.export', $params));
     }
 
     public function render()

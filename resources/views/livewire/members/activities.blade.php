@@ -26,7 +26,7 @@
             <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-4 md:mx-0 mx-4 mb-6">
                 <div class="grid lg:grid-cols-7 grid-cols-1 gap-2">
                     <!-- Search -->
-                    <div class="lg:col-span-3">
+                    <div class="col-span-1 lg:col-span-3">
                         <input
                             type="text"
                             wire:model.live.debounce.300ms="search"
@@ -34,8 +34,7 @@
                             class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                     </div>
-
-                    <div class="lg:col-span-4 flex lg:flex-row flex-col gap-4">
+                    <div class="relative cols-span-1 lg:col-span-4 grid lg:grid-cols-3 grid-cols-1 gap-4">
                         <!-- Activity Type Filter -->
                         <div class="lg:col-span-1">
                             <select
@@ -49,7 +48,7 @@
                             </select>
                         </div>
                         <!-- Date Filter -->
-                        <div>
+                        <div class="col-span-1 flex flex-col gap-1">
                             <select
                                 wire:model.live="dateFilter"
                                 class="w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
@@ -58,18 +57,57 @@
                                 <option value="today">Today</option>
                                 <option value="week">Last 7 Days</option>
                                 <option value="month">Last 30 Days</option>
+                                <option value="custom">Custom Date</option>
                             </select>
+                            @if($dateFilter === 'custom')
+                                <div class="lg:absolute lg:right-0 lg:top-12 flex lg:flex-row flex-col gap-2 lg:space-y-0 space-y-2 lg:mt-0 mt-4 items-center lg:px-4 px-0">
+                                    <div class="relative w-full flex items-center gap-2">
+                                        <span class="text-gray-400 text-sm shrink-0">from:</span>
+                                        <input
+                                            id="customDateStart"
+                                            x-ref="dateFromInput"
+                                            type="date"
+                                            wire:model.live="customStartDate"
+                                            class="w-full px-2 py-1 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        >
+                                        <label
+                                            for="customDateStart"
+                                            class="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600"
+                                            @click.prevent="if ($refs.dateFromInput?.showPicker) $refs.dateFromInput.showPicker()"
+                                        >
+                                        </label>
+                                    </div>
+                                    <div class="relative w-full flex items-center gap-2">
+                                        <span class="text-gray-400 text-sm shrink-0">to:</span>
+                                        <input
+                                            id="customDateEnd"
+                                            x-ref="dateToInput"
+                                            type="date"
+                                            wire:model.live="customEndDate"
+                                            class="w-full px-2 py-1 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        >
+                                        <label
+                                            for="customDateEnd"
+                                            @click.prevent="if ($refs.dateToInput?.showPicker) $refs.dateToInput.showPicker()"
+                                            class="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600"
+                                        >
+                                        </label>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
-                        <button
-                            type="button"
-                            wire:click="exportCsv"
-                            class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-orange-500 rounded-full hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Export CSV
-                        </button>
+                        <div class="col-span-1">
+                            <button
+                                type="button"
+                                wire:click="exportCsv"
+                                class="w-full flex gap-2 items-center justify-center py-3 text-xs font-medium text-white bg-orange-500 rounded-full hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Export CSV
+                            </button>
+                        </div>
                     </div>
 
                 </div>
