@@ -11,6 +11,7 @@
             canvas: null,
             context: null,
             useJsQR: false,
+            facingMode: 'environment',
             async loadJsQR() {
                 if (window.jsQR) return true;
                 return new Promise((resolve, reject) => {
@@ -36,7 +37,7 @@
     
                 try {
                     this.stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: { ideal: 'environment' } },
+                        video: { facingMode: { ideal: this.facingMode } },
                         audio: false
                     });
                     this.$refs.qrVideo.srcObject = this.stream;
@@ -149,6 +150,11 @@
                 this.stopScan();
                 $wire.close();
             },
+            switchCamera() {
+                this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
+                this.stopScan();
+                this.startScan();
+            },
             init() {
                 // Auto-start scan when modal opens
                 this.$watch('open', (value) => {
@@ -231,6 +237,20 @@
                         <div class="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-orange-500 rounded-br-lg"></div>
                     </div>
                 </div>
+
+                <!-- Switch camera button -->
+                <button
+                    x-show="!scanError && !scanResult && stream"
+                    @click="switchCamera()"
+                    type="button"
+                    class="absolute bottom-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition pointer-events-auto"
+                    :aria-label="facingMode === 'environment' ? 'Switch to front camera' : 'Switch to back camera'"
+                    title="Switch camera"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
     
                 <!-- Error message -->
                 <div

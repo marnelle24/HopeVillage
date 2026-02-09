@@ -17,9 +17,9 @@ trait PasswordValidationRules
             'required',
             'string',
             Password::min(8)
-                ->mixedCase() // Requires at least one uppercase and one lowercase letter
+                // ->mixedCase() // Requires at least one uppercase and one lowercase letter
+                // ->symbols() // Requires at least one special character
                 ->numbers() // Requires at least one number
-                ->symbols() // Requires at least one special character
                 ->uncompromised(), // Checks if password has been compromised in data leaks
             'confirmed'
         ];
