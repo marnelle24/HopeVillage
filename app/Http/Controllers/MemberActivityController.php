@@ -106,14 +106,14 @@ class MemberActivityController extends Controller
                     }
                 }
 
-                // Find or create activity type
-                $activityType = ActivityType::firstOrCreate(
-                    ['name' => $validated['type_of_activity']],
-                    [
-                        'description' => ucfirst(strtolower($validated['type_of_activity'])) . ' activity',
-                        'is_active' => true,
-                    ]
-                );
+                $activityType = ActivityType::where('name', $validated['type_of_activity'])->first();
+                if (! $activityType) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Activity type does not exist.',
+                        'error' => "Activity type '{$validated['type_of_activity']}' is not configured.",
+                    ], 422);
+                }
 
                 // Create member activity record
                 $memberActivity = MemberActivity::create([

@@ -31,10 +31,10 @@ class PointsActionsController extends Controller
         $location = Location::query()->findOrFail($data['location_id']);
 
         DB::transaction(function () use ($user, $location) {
-            $activityType = ActivityType::query()->firstOrCreate(
-                ['name' => PointsService::ACTIVITY_LOCATION_ENTRY],
-                ['description' => 'Member entry to location', 'is_active' => true]
-            );
+            $activityType = ActivityType::where('name', PointsService::ACTIVITY_LOCATION_ENTRY)->first();
+            if (! $activityType) {
+                throw new \Exception('Activity type "' . PointsService::ACTIVITY_LOCATION_ENTRY . '" does not exist.');
+            }
 
             $memberActivity = $user->memberActivities()->create([
                 'activity_type_id' => $activityType->id,

@@ -122,41 +122,35 @@ class EventQrCodeModal extends Component
             
             if (!$recentEntry) 
             {
-                // Find or create activity type for ENTRY
-                $activityType = ActivityType::firstOrCreate(
-                    ['name' => 'ENTRY'],
-                    [
-                        'description' => 'Entry activity',
-                        'is_active' => true,
-                    ]
-                );
-
-                // Create member activity record
-                $memberActivity = MemberActivity::create([
-                    'user_id' => $user->id,
-                    'activity_type_id' => $activityType->id,
-                    'location_id' => $this->event->location_id,
-                    'amenity_id' => null,
-                    'activity_time' => now(),
-                    'description' => "Member Re-ENTRY to event {$this->event->title}",
-                    'metadata' => [
-                        'scanned_at' => now()->toIso8601String(),
-                        'qr_code' => $user->qr_code,
-                        'event_code' => $this->event->event_code,
-                        'device_info' => request()->header('User-Agent'),
-                        'access_type' => 'built_in_scanner',
-                        'ip_address' => request()->ip(),
-                    ],
-                ]);
-                
-                // Award points for RE-ENTRY activity
-                app(PointsService::class)->award(
-                    user: $user,
-                    activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
-                    description: "Member Re-ENTRY to event {$this->event->title} - entry_time_gap lapses",
-                    locationId: $this->event->location_id,
-                    memberActivityId: $memberActivity->id,
-                );
+                $activityType = ActivityType::where('name', 'ENTRY')->first();
+                if ($activityType) {
+                    // Create member activity record
+                    $memberActivity = MemberActivity::create([
+                        'user_id' => $user->id,
+                        'activity_type_id' => $activityType->id,
+                        'location_id' => $this->event->location_id,
+                        'amenity_id' => null,
+                        'activity_time' => now(),
+                        'description' => "Member Re-ENTRY to event {$this->event->title}",
+                        'metadata' => [
+                            'scanned_at' => now()->toIso8601String(),
+                            'qr_code' => $user->qr_code,
+                            'event_code' => $this->event->event_code,
+                            'device_info' => request()->header('User-Agent'),
+                            'access_type' => 'built_in_scanner',
+                            'ip_address' => request()->ip(),
+                        ],
+                    ]);
+                    
+                    // Award points for RE-ENTRY activity
+                    app(PointsService::class)->award(
+                        user: $user,
+                        activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
+                        description: "Member Re-ENTRY to event {$this->event->title} - entry_time_gap lapses",
+                        locationId: $this->event->location_id,
+                        memberActivityId: $memberActivity->id,
+                    );
+                }
             }
 
 
@@ -195,14 +189,13 @@ class EventQrCodeModal extends Component
                     ]);
                 }
 
-                // Find or create activity type
-                $activityType = ActivityType::firstOrCreate(
-                    ['name' => 'ATTEND'],
-                    [
-                        'description' => 'Attend activity',
-                        'is_active' => true,
-                    ]
-                );
+                // Find ATTEND activity type (do not create)
+                $activityType = ActivityType::where('name', 'member_attend_event')->first();
+                if (! $activityType) {
+                    $this->error = 'Member attend event activity type is not configured. Please contact an administrator.';
+                    $this->processing = false;
+                    return;
+                }
 
                 // Create member activity record
                 $memberActivity = MemberActivity::create([
@@ -211,7 +204,7 @@ class EventQrCodeModal extends Component
                     'location_id' => $this->event->location_id,
                     'amenity_id' => null,
                     'activity_time' => now(),
-                    'description' => "Member ATTEND at {$this->event->title}",
+                    'description' => "Member attend event at {$this->event->title}",
                     'metadata' => [
                         'scanned_at' => now()->toIso8601String(),
                         'event_code' => $this->event->event_code,

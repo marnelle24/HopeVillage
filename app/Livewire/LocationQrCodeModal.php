@@ -97,7 +97,8 @@ class LocationQrCodeModal extends Component
         $this->success = false;
         $this->successMessage = null;
 
-        try {
+        try 
+        {
             DB::transaction(function () use ($user) {
                 // Check if user is a member
                 if ($user->user_type !== 'member') {
@@ -134,70 +135,66 @@ class LocationQrCodeModal extends Component
                     return;
                 }
 
-                // Find or create activity type
-                $activityType = ActivityType::firstOrCreate(
-                    ['name' => 'ENTRY'],
-                    [
-                        'description' => 'Entry activity',
-                        'is_active' => true,
-                    ]
-                );
+                $activityType = ActivityType::where('name', 'ENTRY')->first();
 
-                // Create member activity record
-                $memberActivity = MemberActivity::create([
-                    'user_id' => $user->id,
-                    'activity_type_id' => $activityType->id,
-                    'location_id' => $this->location->id,
-                    'amenity_id' => null,
-                    'activity_time' => now(),
-                    'description' => "Member ENTRY at {$this->location->name}",
-                    'metadata' => [
-                        'scanned_at' => now()->toIso8601String(),
+                if ($activityType) 
+                {
+                    // Create member activity record
+                    $memberActivity = MemberActivity::create([
+                        'user_id' => $user->id,
+                        'activity_type_id' => $activityType->id,
+                        'location_id' => $this->location->id,
+                        'amenity_id' => null,
+                        'activity_time' => now(),
+                        'description' => "Member ENTRY at {$this->location->name}",
+                        'metadata' => [
+                            'scanned_at' => now()->toIso8601String(),
+                            'location_code' => $this->location->location_code,
+                            'qr_code' => $user->qr_code,
+                            'device_info' => request()->header('User-Agent'),
+                            'access_type' => 'built_in_scanner',
+                            'ip_address' => request()->ip(),
+                        ],
+                    ]);
+
+                    // Award points for ENTRY activity
+                    $pointsBefore = $user->total_points;
+                    $pointsAwarded = 0;
+                
+                    app(PointsService::class)->award(
+                        user: $user,
+                        activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
+                        description: 'Member entry to location',
+                        locationId: $this->location->id,
+                        memberActivityId: $memberActivity->id,
+                    );
+                    
+                    $user->refresh();
+                    $pointsAwarded = $user->total_points - $pointsBefore;
+
+                    Log::info('Member activity recorded', [
+                        'member_fin' => $user->fin,
                         'location_code' => $this->location->location_code,
-                        'qr_code' => $user->qr_code,
-                        'device_info' => request()->header('User-Agent'),
-                        'access_type' => 'built_in_scanner',
-                        'ip_address' => request()->ip(),
-                    ],
-                ]);
+                        'activity_type' => 'ENTRY',
+                        'points_awarded' => $pointsAwarded,
+                    ]);
 
-                // Award points for ENTRY activity
-                $pointsBefore = $user->total_points;
-                $pointsAwarded = 0;
+                    // Set success message
+                    $this->success = true;
+                    $this->successMessage = "SUCCESS";
+                    
+                    $this->dispatch('location-qr-processed', [
+                        'code' => $this->locationCode,
+                        'location_name' => $this->location->name,
+                        'points_awarded' => $pointsAwarded,
+                    ]);
                 
-                app(PointsService::class)->award(
-                    user: $user,
-                    activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
-                    description: 'Member entry to location',
-                    locationId: $this->location->id,
-                    memberActivityId: $memberActivity->id,
-                );
-                
-                $user->refresh();
-                $pointsAwarded = $user->total_points - $pointsBefore;
-
-                Log::info('Member activity recorded', [
-                    'member_fin' => $user->fin,
-                    'location_code' => $this->location->location_code,
-                    'activity_type' => 'ENTRY',
-                    'points_awarded' => $pointsAwarded,
-                ]);
-
-                // Set success message
-                $this->success = true;
-                $this->successMessage = "SUCCESS";
-                
-                $this->dispatch('location-qr-processed', [
-                    'code' => $this->locationCode,
-                    'location_name' => $this->location->name,
-                    'points_awarded' => $pointsAwarded,
-                ]);
-                
-                // Dispatch event to update points header in real-time
-                $this->dispatch('points-updated');
-                
-                session()->flash('qr-scan-success', 'SUCCESS');
-                $this->processing = false;
+                    // Dispatch event to update points header in real-time
+                    $this->dispatch('points-updated');
+                    
+                    session()->flash('qr-scan-success', 'SUCCESS');
+                    $this->processing = false;
+                }
             });
         } catch (\Exception $e) {
             Log::error('Failed to record member activity', [

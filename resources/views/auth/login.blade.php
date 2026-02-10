@@ -130,8 +130,7 @@
             </div>
 
             <div class="flex items-center justify-center mt-4">
-                {{-- <a href="/forgot-password" class="text-sm text-orange-600 hover:text-orange-500 underline"> --}}
-                <a href="javascript:void(0)" class="text-sm text-orange-600 hover:text-orange-500 underline">
+                <a href="{{ route('password.request') }}" class="text-sm text-orange-600 hover:text-orange-500 underline">
                     {{ 
                         match($lang) {
                             'bang' => 'পাসওয়ার্ড ভুলে গেছেন?',

@@ -41,27 +41,43 @@ class RequestPasswordResetLink
                 ->first();
         }
 
-        if (!$user) {
+        if (! $user) {
             // Return same message regardless to prevent user enumeration
             return __('If your account exists, we have sent password reset instructions.');
         }
 
-        // Generate a new temporary password
-        $temporaryPassword = Str::random(12);
+        if ($resetMethod === 'email') {
+            // Send Laravel's password reset link email (no temporary password)
+            $status = Password::sendResetLink(['email' => $user->email]);
+            if ($status === Password::RESET_LINK_SENT) {
+                $mailDriver = config('mail.default');
+                Log::info('Password reset link sent to user email', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'mail_driver' => $mailDriver,
+                ]);
+                if ($mailDriver === 'log') {
+                    Log::warning(
+                        'Mail driver is "log" so the email was only written to storage/logs/laravel.log and was NOT delivered to the inbox. Set MAIL_MAILER=smtp in .env to send real emails.',
+                        ['email' => $user->email]
+                    );
+                }
+            } else {
+                Log::warning('Password reset link not sent', [
+                    'user_id' => $user->id,
+                    'status' => $status,
+                ]);
+            }
+            return __('If your account exists, we have sent password reset instructions.');
+        }
 
-        // Update user's password
+        // WhatsApp or SMS: generate temporary password and send via messaging
+        $temporaryPassword = Str::random(12);
         $user->forceFill([
             'password' => Hash::make($temporaryPassword),
         ])->save();
 
-        // Send via chosen method
-        if ($resetMethod === 'whatsapp' || $resetMethod === 'sms') {
-            // Both WhatsApp and SMS use the WhatsApp service
-            $this->sendPasswordViaWhatsApp($user, $temporaryPassword, $resetMethod, $identifier);
-        } else {
-            // Use default Laravel password reset (sends link via email)
-            Password::sendResetLink(['email' => $user->email]);
-        }
+        $this->sendPasswordViaWhatsApp($user, $temporaryPassword, $resetMethod, $identifier);
 
         return __('If your account exists, we have sent password reset instructions.');
     }

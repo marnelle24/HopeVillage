@@ -1,7 +1,19 @@
 <?php
 
+use App\Services\MailCheckService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+
+Artisan::command('mail:check', function () {
+    $result = app(MailCheckService::class)->checkAndLog();
+    if ($result['success']) {
+        $this->info('Mail check passed: ' . $result['message']);
+        return 0;
+    }
+    $this->error('Mail check failed: ' . $result['message']);
+    $this->comment('See storage/logs/laravel.log for details.');
+    return 1;
+})->purpose('Verify mail credentials and settings from .env, log result (no auth error = success)');
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

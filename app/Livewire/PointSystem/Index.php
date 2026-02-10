@@ -87,7 +87,7 @@ class Index extends Component
             $query->where('activity_type_id', $this->activityTypeFilter);
         }
 
-        $configs = $query->orderBy('created_at', 'desc')->paginate(5);
+        $configs = $query->orderBy('created_at', 'desc')->paginate(10);
         $activityTypes = ActivityType::orderBy('name')->get();
 
         return view('livewire.point-system.index', [

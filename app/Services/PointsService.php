@@ -243,10 +243,10 @@ class PointsService
         }
 
         DB::transaction(function () use ($user, $activityName, $description, $locationId, $memberActivityId, $amenityId) {
-            $activityType = ActivityType::query()->firstOrCreate(
-                ['name' => $activityName],
-                ['description' => $activityName, 'is_active' => true]
-            );
+            $activityType = ActivityType::where('name', $activityName)->first();
+            if (! $activityType) {
+                throw new \Exception('Activity type not found: ' . $activityName);
+            }
 
             // Get or create the point system configuration
             $config = $this->getOrCreateConfig(
@@ -301,10 +301,10 @@ class PointsService
         }
 
         DB::transaction(function () use ($user, $points, $activityName, $description, $locationId, $amenityId) {
-            $activityType = ActivityType::query()->firstOrCreate(
-                ['name' => $activityName],
-                ['description' => $activityName, 'is_active' => true]
-            );
+            $activityType = ActivityType::where('name', $activityName)->first();
+            if (! $activityType) {
+                throw new \Exception("Activity type '{$activityName}' does not exist.");
+            }
 
             // Get or create the point system configuration
             $config = $this->getOrCreateConfig(

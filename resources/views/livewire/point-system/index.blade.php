@@ -115,7 +115,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 md:px-0 px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:px-0 px-4">
                 @forelse($configs as $config)
                     <div class="w-full bg-white hover:bg-gray-50 overflow-hidden border-2 border-gray-300 flex md:flex-row flex-col md:justify-between justify-start items-center rounded-lg group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                         <div class="flex-1 flex items-start h-full">
@@ -152,11 +152,11 @@
                                     @if($config->location)
                                         <div class="flex flex-col items-start justify-start mt-2">
                                             <p class="text-xs text-gray-400">Only applicable to:</p>
-                                            <p class="text-sm text-gray-600 flex items-center gap-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 stroke-gray-600">
+                                            <p class="text-sm text-gray-600 flex items-start gap-1 line-clamp-2">
+                                                {{-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 stroke-gray-600">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                                                </svg>
+                                                </svg> --}}
                                                 {{ $config->location->name }}
                                             </p>
                                         </div>
@@ -170,27 +170,27 @@
                                         </div>
                                     @endif
                                 </div>
-                            </div>
-                            <div class="p-4 flex items-start justify-end gap-2">
-                                <button 
-                                    wire:click="edit({{ $config->id }})"
-                                    @if(!$pointSystemEnabled) disabled @endif
-                                    title="Edit Configuration"
-                                    class="rounded-full p-3 flex items-center justify-center bg-blue-500 text-white transition-all duration-300 @if($pointSystemEnabled) hover:scale-110 hover:bg-sky-600 @else cursor-not-allowed opacity-50 @endif">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                    </svg>
-                                </button>
-                                <button 
-                                    wire:confirm="Are you sure you want to delete this configuration?" 
-                                    title="Delete Configuration"
-                                    wire:click="delete({{ $config->id }})"
-                                    @if(!$pointSystemEnabled) disabled @endif
-                                    class="rounded-full p-3 flex items-center justify-center bg-red-400 text-white transition-all duration-300 @if($pointSystemEnabled) hover:scale-110 hover:bg-red-500 @else cursor-not-allowed opacity-50 @endif">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                    </svg>
-                                </button>
+                                <div class="flex items-end justify-start gap-2 mt-2">
+                                    <button 
+                                        wire:click="edit({{ $config->id }})"
+                                        @if(!$pointSystemEnabled) disabled @endif
+                                        title="Edit Configuration"
+                                        class="rounded-full p-3 flex items-center justify-center bg-blue-500 text-white transition-all duration-300 @if($pointSystemEnabled) hover:scale-110 hover:bg-sky-600 @else cursor-not-allowed opacity-50 @endif">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                        </svg>
+                                    </button>
+                                    <button 
+                                        wire:confirm="Are you sure you want to delete this configuration?" 
+                                        title="Delete Configuration"
+                                        wire:click="delete({{ $config->id }})"
+                                        @if(!$pointSystemEnabled) disabled @endif
+                                        class="rounded-full p-3 flex items-center justify-center bg-red-400 text-white transition-all duration-300 @if($pointSystemEnabled) hover:scale-110 hover:bg-red-500 @else cursor-not-allowed opacity-50 @endif">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -104,8 +104,8 @@
 
                 <!-- Search and Filter -->
                 <div class="p-6 md:mx-0 mx-4 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="md:col-span-2">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div class="@if($tab === 'admin') md:col-span-3 @else md:col-span-2 @endif">
                             <input 
                                 type="text" 
                                 wire:model.live.debounce.300ms="search" 
@@ -141,6 +141,26 @@
                                     @endforeach
                                 </select>
                             </div>
+                        @endif
+
+                        @if($tab === 'admin')
+                            <a href="{{ route('admin.admin-vouchers.create') }}" class="text-center rounded-full md:block hidden bg-orange-500 hover:bg-orange-600 duration-300 hover:scale-105 text-white font-semibold py-2 px-4">
+                                Add Admin Voucher
+                            </a>
+                            <a href="{{ route('admin.admin-vouchers.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 duration-300 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                            </a>
+                        @else
+                            <a href="{{ route('admin.vouchers.create') }}" class="text-center rounded-full md:block hidden bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white font-semibold py-2 px-4">
+                                Add Voucher
+                            </a>
+                            <a href="{{ route('admin.vouchers.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                            </a>
                         @endif
                     </div>
                     
