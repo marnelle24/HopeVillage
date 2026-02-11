@@ -31,12 +31,11 @@
                     }}
                 </label>
                 <div class="space-y-2">
-                    <label class="flex items-center">
+                    {{-- <label class="flex items-center">
                         <input 
                             type="radio" 
                             name="reset_method" 
-                            value="whatsapp" 
-                            checked 
+                            value="whatsapp"  
                             class="mr-2"
                             onchange="toggleInputFields()"
                         >
@@ -44,8 +43,8 @@
                             request()->get('lang') === 'bang' ? 'হোয়াটসঅ্যাপ নম্বর' : 
                             (request()->get('lang') === 'zh' ? 'WhatsApp 号码' : 'WhatsApp Number') 
                         }}</span>
-                    </label>
-                    <label class="flex items-center">
+                    </label> --}}
+                    {{-- <label class="flex items-center">
                         <input 
                             type="radio" 
                             name="reset_method" 
@@ -57,13 +56,14 @@
                             request()->get('lang') === 'bang' ? 'এসএমএস' : 
                             (request()->get('lang') === 'zh' ? '短信' : 'SMS') 
                         }}</span>
-                    </label>
+                    </label> --}}
                     <label class="flex items-center">
                         <input 
                             type="radio" 
                             name="reset_method" 
                             value="email" 
                             class="mr-2"
+                            checked
                             onchange="toggleInputFields()"
                         >
                         <span class="text-sm text-gray-700">{{ 
