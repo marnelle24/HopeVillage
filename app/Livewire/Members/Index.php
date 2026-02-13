@@ -122,8 +122,6 @@ class Index extends Component
         }
         $this->updateEmailUserId = $userId;
 
-        // call toast message
-        $this->dispatch('toast', message: 'Email update modal opened', type: 'success');
     }
 
     public function closeUpdateEmailModal(): void
