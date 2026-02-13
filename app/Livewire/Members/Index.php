@@ -27,7 +27,14 @@ class Index extends Component
     public string $password_confirmation = '';
     public bool $showPasswordReset = false;
 
+    /** @var int|null ID of member selected for "Update Email Address" modal. */
+    public ?int $updateEmailUserId = null;
+
     protected $paginationTheme = 'tailwind';
+
+    protected $listeners = [
+        'updateEmailModalClosed' => 'closeUpdateEmailModal',
+    ];
 
     public function mount(): void
     {
@@ -104,6 +111,27 @@ class Index extends Component
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
+    }
+
+    public function openUpdateEmailModal(int $userId): void
+    {
+        if (! auth()->user()->isAdmin()) {
+            session()->flash('error', 'You do not have permission to update member email.');
+            $this->showMessage = true;
+            return;
+        }
+        $this->updateEmailUserId = $userId;
+
+        // call toast message
+        $this->dispatch('toast', message: 'Email update modal opened', type: 'success');
+    }
+
+    public function closeUpdateEmailModal(): void
+    {
+        $this->updateEmailUserId = null;
+        if (session()->has('message') || session()->has('error')) {
+            $this->showMessage = true;
+        }
     }
 
     public function triggerPasswordReset($userId)

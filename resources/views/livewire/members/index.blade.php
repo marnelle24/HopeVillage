@@ -208,39 +208,39 @@
 
             <!-- Search and Filter -->
             @if(!$showPasswordReset)
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div class="md:col-span-3">
-                        <input
-                            type="text"
-                            wire:model.live.debounce.300ms="search"
-                            placeholder="Search members (name, email, FIN, WhatsApp)..."
-                            class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                    </div>
-                    <div class="md:col-span-1">
-                        <select
-                            wire:model.live="verifiedFilter"
-                            class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                            <option value="all">All Users</option>
-                            <option value="verified">Verified</option>
-                            <option value="unverified">Unverified</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-1">
-                        <select
-                            wire:model.live="userTypeFilter"
-                            class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                            <option value="all">All User Types</option>
-                            <option value="member">Member</option>
-                            <option value="merchant_user">Merchant User</option>
-                            <option value="admin">Admin</option>
-                        </select>
+                <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div class="md:col-span-3">
+                            <input
+                                type="text"
+                                wire:model.live.debounce.300ms="search"
+                                placeholder="Search members (name, email, FIN, WhatsApp)..."
+                                class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                        </div>
+                        <div class="md:col-span-1">
+                            <select
+                                wire:model.live="verifiedFilter"
+                                class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="all">All Users</option>
+                                <option value="verified">Verified</option>
+                                <option value="unverified">Unverified</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-1">
+                            <select
+                                wire:model.live="userTypeFilter"
+                                class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="all">All User Types</option>
+                                <option value="member">Member</option>
+                                <option value="merchant_user">Merchant User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endif
 
             @if(!$showPasswordReset)
@@ -406,6 +406,18 @@
                                                             </button>
 
                                                             <button
+                                                                wire:click="openUpdateEmailModal({{ $member->id }})"
+                                                                @click="open = false"
+                                                                class="flex w-full items-center cursor-pointer gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                                                role="menuitem"
+                                                            >
+                                                                <svg class="w-4 h-4 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                                                </svg>
+                                                                <span>Update Email Address</span>
+                                                            </button>
+
+                                                            <button
                                                                 wire:click="delete({{ $member->id }})"
                                                                 wire:confirm="Are you sure you want to delete this member? This action will soft delete the member and they will be hidden from the members list. The member can be restored later if needed."
                                                                 @click="open = false"
@@ -439,6 +451,10 @@
                     {{ $members->links() }}
                 </div>
             @endif
+            @endif
+
+            @if($updateEmailUserId)
+                <livewire:members.update-member-email :user-id="$updateEmailUserId" :key="'update-email-'.$updateEmailUserId" />
             @endif
         </div>
     </div>

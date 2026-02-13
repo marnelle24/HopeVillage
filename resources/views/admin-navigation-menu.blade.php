@@ -88,7 +88,7 @@
                             x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-full mr-2 top-[75px] -translate-y-1/2 z-50 w-64 max-w-[calc(100vw-8rem)] rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
+                            class="absolute right-full mr-2 top-[75px] -translate-y-1/2 w-64 max-w-[calc(100vw-8rem)] rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
                             style="display: none;"
                             role="status"
                             aria-live="polite"
@@ -121,14 +121,16 @@
                             </svg>
                         </button>
                     </div>
-                    {{-- Tour overlay: dark background, hidden when user presses Got it --}}
-                    <div
-                        x-show="showNavTour"
-                        x-cloak
-                        class="fixed inset-0 bg-black/50 z-10"
-                        aria-hidden="true"
-                        style="display: none;"
-                    ></div>
+                    {{-- Tour overlay: dark background, hidden when user presses Got it (teleported to body so it covers full viewport) --}}
+                    <template x-teleport="body">
+                        <div
+                            x-show="showNavTour"
+                            x-cloak
+                            class="absolute inset-0 bg-black/50 z-40"
+                            aria-hidden="true"
+                            style="display: none;"
+                        ></div>
+                    </template>
                 </div>
             </div>
         </div>
