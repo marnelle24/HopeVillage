@@ -144,6 +144,9 @@
 
         @stack('modals')
 
+        <!-- Announcement lightbox - shows active announcement every 5 minutes -->
+        <livewire:announcement-lightbox />
+
         <!-- QR Scanner Component - Available throughout the system -->
         <livewire:qr-scanner />
 

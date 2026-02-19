@@ -215,6 +215,9 @@
                     <x-responsive-nav-link href="{{ route('admin.news-categories.index') }}" :active="request()->routeIs('admin.news-categories*')">
                         {{ __('News Categories') }}
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('admin.announcements.index') }}" :active="request()->routeIs('admin.announcements*')">
+                        {{ __('Announcements') }}
+                    </x-responsive-nav-link>
                 </nav>
 
                 <!-- Sidebar footer (user & settings) -->

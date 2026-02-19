@@ -135,6 +135,12 @@ Route::middleware([
     Route::get('/admin/news-categories/create', \App\Livewire\NewsCategories\Form::class)->name('admin.news-categories.create');
     Route::get('/admin/news-categories/{id}/edit', \App\Livewire\NewsCategories\Form::class)->name('admin.news-categories.edit');
 
+    // Announcements CRUD Routes
+    Route::get('/admin/announcements', \App\Livewire\Announcements\Index::class)->name('admin.announcements.index');
+    Route::get('/admin/announcements/create', \App\Livewire\Announcements\Form::class)->name('admin.announcements.create');
+    Route::get('/admin/announcements/{id}/edit', \App\Livewire\Announcements\Form::class)->name('admin.announcements.edit');
+    Route::get('/admin/announcements/{id}', \App\Livewire\Announcements\Profile::class)->name('admin.announcements.profile');
+
     // Points actions (admin-operated)
     Route::post('/admin/points/location-entry', [PointsActionsController::class, 'locationEntry'])->name('admin.points.location-entry');
     Route::post('/admin/points/event-attend', [PointsActionsController::class, 'attendEvent'])->name('admin.points.event-attend');
