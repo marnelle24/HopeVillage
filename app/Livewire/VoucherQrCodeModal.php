@@ -205,6 +205,13 @@ class VoucherQrCodeModal extends Component
                         $this->error = $errorMsg;
                         return;
                     }
+
+                    // Block expired, not-yet-valid, or usage-exceeded vouchers early
+                    if (!$this->adminVoucher->isValid()) {
+                        $reason = $this->adminVoucher->getStatusReason();
+                        $this->error = $reason ? "Voucher cannot be redeemed: {$reason}." : 'Admin voucher is not valid.';
+                        return;
+                    }
                     
                     Log::info('Admin voucher loaded', [
                         'voucher_id' => $this->adminVoucher->id,
@@ -255,6 +262,13 @@ class VoucherQrCodeModal extends Component
                         $errorMsg = 'Voucher not found.';
                         Log::error('Voucher not found', ['voucher_code' => $normalizedCode]);
                         $this->error = $errorMsg;
+                        return;
+                    }
+
+                    // Block expired, not-yet-valid, or usage-exceeded vouchers early
+                    if (!$this->voucher->isValid()) {
+                        $reason = $this->voucher->getStatusReason();
+                        $this->error = $reason ? "Voucher cannot be redeemed: {$reason}." : 'Voucher is not valid.';
                         return;
                     }
                     
@@ -329,9 +343,10 @@ class VoucherQrCodeModal extends Component
                 return;
             }
 
-            // Check if admin voucher is active
-            if (!$this->adminVoucher->is_active) {
-                $this->error = 'Admin voucher is not active.';
+            // Block expired, not-yet-valid, or usage-exceeded vouchers - no redemption or points
+            if (!$this->adminVoucher->isValid()) {
+                $reason = $this->adminVoucher->getStatusReason();
+                $this->error = $reason ? "Voucher cannot be redeemed: {$reason}." : 'Admin voucher is not valid.';
                 return;
             }
 
@@ -403,9 +418,10 @@ class VoucherQrCodeModal extends Component
                 return;
             }
 
-            // Check if voucher is active
-            if (!$this->voucher->is_active) {
-                $this->error = 'Voucher is not active.';
+            // Block expired, not-yet-valid, or usage-exceeded vouchers - no redemption or points
+            if (!$this->voucher->isValid()) {
+                $reason = $this->voucher->getStatusReason();
+                $this->error = $reason ? "Voucher cannot be redeemed: {$reason}." : 'Voucher is not valid.';
                 return;
             }
 
@@ -536,13 +552,14 @@ class VoucherQrCodeModal extends Component
                     return;
                 }
 
-                // Check if admin voucher is active
-                if (!$this->adminVoucher->is_active) {
-                    $errorMsg = 'Admin voucher is not active.';
-                    Log::warning('Attempted to redeem inactive admin voucher', [
+                // Block expired, not-yet-valid, or usage-exceeded admin vouchers - no redemption
+                if (!$this->adminVoucher->isValid()) {
+                    $reason = $this->adminVoucher->getStatusReason();
+                    $errorMsg = $reason ? "Voucher cannot be redeemed: {$reason}." : 'Admin voucher is not valid.';
+                    Log::warning('Attempted to redeem invalid admin voucher', [
                         'voucher_code' => $this->adminVoucher->voucher_code,
                         'voucher_id' => $this->adminVoucher->id,
-                        'is_active' => $this->adminVoucher->is_active,
+                        'reason' => $reason,
                     ]);
                     $this->error = $errorMsg;
                     $this->processing = false;
@@ -787,13 +804,14 @@ class VoucherQrCodeModal extends Component
                 return;
             }
             
-            // Check if voucher is active
-            if (!$this->voucher->is_active) {
-                $errorMsg = 'Voucher is not active.';
-                Log::warning('Attempted to redeem inactive voucher', [
+            // Block expired, not-yet-valid, or usage-exceeded vouchers - no redemption or points
+            if (!$this->voucher->isValid()) {
+                $reason = $this->voucher->getStatusReason();
+                $errorMsg = $reason ? "Voucher cannot be redeemed: {$reason}." : 'Voucher is not valid.';
+                Log::warning('Attempted to redeem invalid voucher', [
                     'voucher_code' => $this->voucher->voucher_code,
                     'voucher_id' => $this->voucher->id,
-                    'is_active' => $this->voucher->is_active,
+                    'reason' => $reason,
                 ]);
                 $this->error = $errorMsg;
                 $this->processing = false;

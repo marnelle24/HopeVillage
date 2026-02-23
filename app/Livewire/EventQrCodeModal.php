@@ -75,6 +75,13 @@ class EventQrCodeModal extends Component
                 return;
             }
 
+            // Block past/finished events immediately - no further processing
+            $eventEnd = $this->event->end_date ?? $this->event->start_date;
+            if ($eventEnd && $eventEnd->isPast()) {
+                $this->error = 'This event has ended. QR code scanning is no longer available for past events.';
+                return;
+            }
+
             if ($userLat !== null && $userLng !== null) {
                 $this->processEventAttendance($userLat, $userLng);
             } else {
@@ -101,6 +108,13 @@ class EventQrCodeModal extends Component
         // Check if user is a member
         if ($user->user_type !== 'member') {
             $this->error = 'User is not a member.';
+            return;
+        }
+
+        // Block past/finished events - no points or activities for expired events
+        $eventEnd = $this->event->end_date ?? $this->event->start_date;
+        if ($eventEnd && $eventEnd->isPast()) {
+            $this->error = 'This event has ended. QR code scanning is no longer available for past events.';
             return;
         }
 

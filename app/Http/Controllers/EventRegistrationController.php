@@ -55,6 +55,16 @@ class EventRegistrationController extends Controller
                     ], 422);
                 }
 
+                // Block past/finished events - no points or activities for expired events
+                $eventEnd = $event->end_date ?? $event->start_date;
+                if ($eventEnd && $eventEnd->isPast()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Event has ended',
+                        'error' => 'This event has ended. QR code scanning is no longer available for past events.',
+                    ], 422);
+                }
+
                 // Find member by QR code
                 $user = User::where('qr_code', $validated['qr_code'])->first();
                 

@@ -141,6 +141,15 @@ class PointsActionsController extends Controller
             ]);
         }
 
+        // Block expired, not-yet-valid, or usage-exceeded vouchers - no redemption or points
+        if (!$voucher->isValid()) {
+            $reason = $voucher->getStatusReason();
+            return response()->json([
+                'ok' => false,
+                'message' => $reason ? "Voucher cannot be redeemed: {$reason}." : 'Voucher is not valid.',
+            ], 422);
+        }
+
         DB::transaction(function () use ($user, $voucher) {
             // Mark redeemed on pivot
             $user->vouchers()->updateExistingPivot($voucher->id, [
@@ -190,6 +199,15 @@ class PointsActionsController extends Controller
                 'already_redeemed' => true,
                 'total_points' => $user->total_points,
             ]);
+        }
+
+        // Block expired, not-yet-valid, or usage-exceeded admin vouchers - no redemption
+        if (!$adminVoucher->isValid()) {
+            $reason = $adminVoucher->getStatusReason();
+            return response()->json([
+                'ok' => false,
+                'message' => $reason ? "Voucher cannot be redeemed: {$reason}." : 'Admin voucher is not valid.',
+            ], 422);
         }
 
         DB::transaction(function () use ($user, $adminVoucher) {
