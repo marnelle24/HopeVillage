@@ -131,14 +131,14 @@
                                             </div>
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
                                                 <div>
-                                                    <p class="text-lg text-gray-500 mb-1">Key:</p>
-                                                    <p class="text-lg min-w-xs text-gray-700 font-mono bg-gray-100 border border-gray-200 rounded px-4 py-2 inline-block">
+                                                    <p class="text-md text-gray-500 mb-1">Key:</p>
+                                                    <p class="overflow-x-auto text-sm min-w-xs text-gray-700 font-mono bg-gray-100 border border-gray-200 rounded px-4 py-2 inline-block">
                                                         {{ $setting->key }}
                                                     </p>
                                                 </div>
                                                 <div>
-                                                    <p class="text-lg text-gray-500 mb-1">Value:</p>
-                                                    <p class="text-lg min-w-xs text-gray-800 bg-gray-100 border border-gray-200 rounded px-2 py-1 inline-block">
+                                                    <p class="text-md text-gray-500 mb-1">Value:</p>
+                                                    <p class="overflow-x-auto text-sm min-w-xs text-gray-800 bg-gray-100 border border-gray-200 rounded px-2 py-2 inline-block">
                                                         {{ Str::limit($setting->value ?? '(empty)', 50) }}
                                                     </p>
                                                 </div>

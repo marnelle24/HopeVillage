@@ -53,6 +53,8 @@ class Form extends Component
             $this->city = $location->city;
             $this->province = $location->province;
             $this->postal_code = $location->postal_code;
+            $this->latitude = $location->latitude;
+            $this->longitude = $location->longitude;
             $this->phone = $location->phone;
             $this->email = $location->email;
             $this->is_active = $location->is_active;
@@ -82,6 +84,8 @@ class Form extends Component
                 'city' => $this->city,
                 'province' => $this->province,
                 'postal_code' => $this->postal_code,
+                'latitude' => $this->latitude,
+                'longitude' => $this->longitude,
                 'phone' => $this->phone,
                 'email' => $this->email,
                 'is_active' => $this->is_active,
@@ -95,6 +99,8 @@ class Form extends Component
                 'city' => $this->city,
                 'province' => $this->province,
                 'postal_code' => $this->postal_code,
+                'latitude' => $this->latitude,
+                'longitude' => $this->longitude,
                 'phone' => $this->phone,
                 'email' => $this->email,
                 'is_active' => $this->is_active,

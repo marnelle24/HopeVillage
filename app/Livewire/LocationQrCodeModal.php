@@ -6,6 +6,7 @@ use App\Models\ActivityType;
 use App\Models\Location;
 use App\Models\MemberActivity;
 use App\Models\Setting;
+use App\Services\GeoService;
 use App\Services\PointsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +22,7 @@ class LocationQrCodeModal extends Component
     public $error = null;
     public $success = false;
     public $successMessage = null;
+    public $waitingForGeolocation = false;
 
     protected $listeners = [
         'openLocationQrModal' => 'open',
@@ -35,7 +37,7 @@ class LocationQrCodeModal extends Component
         }
     }
 
-    public function open($locationCode = null)
+    public function open($locationCode = null, $userLat = null, $userLng = null)
     {
         if ($locationCode) {
             $this->locationCode = $locationCode;
@@ -44,11 +46,12 @@ class LocationQrCodeModal extends Component
         $this->error = null;
         $this->success = false;
         $this->processing = false;
-        $this->location = null; // Reset location
+        $this->waitingForGeolocation = false;
+        $this->location = null;
         $this->memberFin = auth()->user()?->fin;
-        
+
         if ($this->locationCode) {
-            $this->loadLocation();
+            $this->loadLocation($userLat, $userLng);
         }
     }
 
@@ -60,25 +63,27 @@ class LocationQrCodeModal extends Component
         $this->processing = false;
     }
 
-    public function loadLocation()
+    public function loadLocation($userLat = null, $userLng = null)
     {
         if ($this->locationCode) {
-            // Normalize the location code (trim and uppercase)
             $normalizedCode = strtoupper(trim($this->locationCode));
-            
             $this->location = Location::where('location_code', $normalizedCode)->first();
-            
-            if (!$this->location) {
+
+            if (! $this->location) {
                 $this->error = 'Location not found.';
                 return;
             }
-            
-            // Automatically call member-activity API for location entry
-            $this->processLocationEntry();
+
+            if ($userLat !== null && $userLng !== null) {
+                $this->processLocationEntry($userLat, $userLng);
+            } else {
+                $this->waitingForGeolocation = true;
+                $this->dispatch('location-modal-needs-geolocation');
+            }
         }
     }
-    
-    public function processLocationEntry()
+
+    public function processLocationEntry($latitude = null, $longitude = null)
     {
         $user = auth()->user();
         
@@ -96,9 +101,21 @@ class LocationQrCodeModal extends Component
         $this->error = null;
         $this->success = false;
         $this->successMessage = null;
+        $this->waitingForGeolocation = false;
 
-        try 
-        {
+        // Validate geolocation proximity before check-in
+        $geoService = app(GeoService::class);
+        $validation = $geoService->validateProximity($latitude, $longitude, $this->location);
+
+        if (! $validation['valid']) {
+            $this->processing = false;
+            $this->error = $validation['message'];
+            $this->dispatch('show-proximity-alert', message: $validation['message']);
+
+            return;
+        }
+
+        try {
             DB::transaction(function () use ($user) {
                 // Check if user is a member
                 if ($user->user_type !== 'member') {

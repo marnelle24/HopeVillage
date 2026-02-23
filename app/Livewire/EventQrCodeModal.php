@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Event;
 use App\Models\Setting;
+use App\Services\GeoService;
 use Livewire\Component;
 use App\Models\ActivityType;
 use App\Models\MemberActivity;
@@ -22,6 +23,7 @@ class EventQrCodeModal extends Component
     public $error = null;
     public $success = false;
     public $successMessage = null;
+    public $waitingForGeolocation = false;
 
     protected $listeners = [
         'openEventQrModal' => 'open',
@@ -36,7 +38,7 @@ class EventQrCodeModal extends Component
         }
     }
 
-    public function open($eventCode = null)
+    public function open($eventCode = null, $userLat = null, $userLng = null)
     {
         if ($eventCode) {
             $this->eventCode = $eventCode;
@@ -45,11 +47,12 @@ class EventQrCodeModal extends Component
         $this->error = null;
         $this->success = false;
         $this->processing = false;
-        $this->event = null; // Reset event
+        $this->waitingForGeolocation = false;
+        $this->event = null;
         $this->memberFin = auth()->user()?->fin;
-        
+
         if ($this->eventCode) {
-            $this->loadEvent();
+            $this->loadEvent($userLat, $userLng);
         }
     }
 
@@ -61,26 +64,27 @@ class EventQrCodeModal extends Component
         $this->processing = false;
     }
 
-    public function loadEvent()
+    public function loadEvent($userLat = null, $userLng = null)
     {
         if ($this->eventCode) {
-            // Normalize the event code (trim and uppercase)
             $normalizedCode = strtoupper(trim($this->eventCode));
-            
-            // Event code already includes EVT- prefix in database
-            $this->event = Event::where('event_code', $normalizedCode)->first();
-            
-            if (!$this->event) {
+            $this->event = Event::with('location')->where('event_code', $normalizedCode)->first();
+
+            if (! $this->event) {
                 $this->error = 'Event not found.';
                 return;
             }
-            
-            // Automatically process event attendance
-            $this->processEventAttendance();
+
+            if ($userLat !== null && $userLng !== null) {
+                $this->processEventAttendance($userLat, $userLng);
+            } else {
+                $this->waitingForGeolocation = true;
+                $this->dispatch('event-modal-needs-geolocation');
+            }
         }
     }
-    
-    public function processEventAttendance()
+
+    public function processEventAttendance($latitude = null, $longitude = null)
     {
         $user = auth()->user();
         
@@ -100,7 +104,21 @@ class EventQrCodeModal extends Component
             return;
         }
 
+        // Validate geolocation proximity before check-in (event's location)
+        if ($this->event->location) {
+            $geoService = app(GeoService::class);
+            $validation = $geoService->validateProximity($latitude, $longitude, $this->event->location);
+
+            if (! $validation['valid']) {
+                $this->error = $validation['message'];
+                $this->dispatch('show-proximity-alert', message: $validation['message']);
+
+                return;
+            }
+        }
+
         $this->processing = true;
+        $this->waitingForGeolocation = false;
         $this->error = null;
         $this->success = false;
         $this->successMessage = null;

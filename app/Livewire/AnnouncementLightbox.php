@@ -16,6 +16,7 @@ class AnnouncementLightbox extends Component
     public function getAnnouncementsWithBannerProperty(): Collection
     {
         return Announcement::active()
+            ->visibleTo(auth()->user())
             ->whereHas('media', fn ($q) => $q->where('collection_name', 'banner'))
             ->latest('published_at')
             ->get();

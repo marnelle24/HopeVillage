@@ -95,17 +95,15 @@
                                 <input
                                     type="datetime-local"
                                     id="activityDateTime"
-                                    x-ref="datetimeInput"
                                     wire:model="activityDateTime"
-                                    class="w-full pl-3 pr-3 py-2 border border-gray-300 text-gray-800 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm [color-scheme:light]"
+                                    class="w-full pl-3 pr-10 py-2 border border-gray-300 text-gray-800 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm [color-scheme:light]"
                                     required
                                 >
-                                <label
-                                    for="activityDateTime"
-                                    class="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600"
-                                    @click.prevent="if ($refs.datetimeInput?.showPicker) $refs.datetimeInput.showPicker()"
-                                >
-                                </label>
+                                <button type="button" onclick="(function(){var el=document.getElementById('activityDateTime');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open calendar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                    </svg>
+                                </button>
                             </div>
                             @error('activityDateTime')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

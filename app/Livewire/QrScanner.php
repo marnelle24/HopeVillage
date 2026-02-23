@@ -29,6 +29,8 @@ class QrScanner extends Component
     public $scanError = null;
     public $scanResult = null;
     public $showResultModal = false;
+    public $userLatitude = null;
+    public $userLongitude = null;
     public $resultData = null;
     public $selectedQrType = null; // 'location', 'event', 'voucher', or null
     public $selectedQrCode = null;
@@ -46,7 +48,15 @@ class QrScanner extends Component
         $this->open = true;
         $this->scanError = null;
         $this->scanResult = null;
+        $this->userLatitude = null;
+        $this->userLongitude = null;
         $this->dispatch('qr-scanner-opened');
+    }
+
+    public function setUserLocation(float $latitude, float $longitude)
+    {
+        $this->userLatitude = $latitude;
+        $this->userLongitude = $longitude;
     }
 
     public function close()
@@ -144,12 +154,12 @@ class QrScanner extends Component
                 $this->selectedQrType = 'location';
                 $this->selectedQrCode = $result;
                 Log::info('Dispatching location QR modal', ['location_code' => $result]);
-                $this->dispatch('openLocationQrModal', $result);
+                $this->dispatch('openLocationQrModal', $result, $this->userLatitude, $this->userLongitude);
             } elseif ($isMember && $qrType === 'EVT') {
                 $this->selectedQrType = 'event';
                 $this->selectedQrCode = $result;
                 Log::info('Dispatching event QR modal', ['event_code' => $result]);
-                $this->dispatch('openEventQrModal', $result);
+                $this->dispatch('openEventQrModal', $result, $this->userLatitude, $this->userLongitude);
             }
             elseif ($isMerchant && ($qrType === 'VOU' || $qrType === 'AVOU')) {
                 $this->selectedQrType = 'voucher';

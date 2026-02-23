@@ -26,6 +26,8 @@ class Form extends Component
 
     public $link_url = '';
 
+    public $visibility = 'all';
+
     public $banner;
 
     public $existingBanner = null;
@@ -40,6 +42,7 @@ class Form extends Component
         'starts_at' => 'nullable|date',
         'ends_at' => 'nullable|date|after_or_equal:starts_at',
         'link_url' => 'nullable|url|max:2048',
+        'visibility' => 'required|in:members,merchants,members_and_merchants,all',
         'banner' => 'nullable|image|max:2048',
     ];
 
@@ -57,6 +60,7 @@ class Form extends Component
             $this->starts_at = $announcement->starts_at?->format('Y-m-d\TH:i') ?? '';
             $this->ends_at = $announcement->ends_at?->format('Y-m-d\TH:i') ?? '';
             $this->link_url = $announcement->link_url ?? '';
+            $this->visibility = $announcement->visibility ?? 'all';
             $media = $announcement->getFirstMedia('banner');
             if ($media) {
                 $this->existingBanner = $media->getUrl();
@@ -91,6 +95,7 @@ class Form extends Component
             'starts_at' => $startsAt,
             'ends_at' => $endsAt,
             'link_url' => trim((string) $this->link_url) !== '' ? $this->link_url : null,
+            'visibility' => $this->visibility,
             'created_by' => auth()->id(),
         ];
 

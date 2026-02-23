@@ -63,35 +63,35 @@
                                 <div class="lg:absolute lg:right-0 lg:top-12 flex lg:flex-row flex-col gap-2 lg:space-y-0 space-y-2 lg:mt-0 mt-4 items-center lg:px-4 px-0">
                                     <div class="relative w-full flex items-center gap-2">
                                         <span class="text-gray-400 text-sm shrink-0">from:</span>
-                                        <input
-                                            id="customDateStart"
-                                            x-ref="dateFromInput"
-                                            type="date"
-                                            wire:model.live="customStartDate"
-                                            class="w-full px-2 py-1 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                        >
-                                        <label
-                                            for="customDateStart"
-                                            class="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600"
-                                            @click.prevent="if ($refs.dateFromInput?.showPicker) $refs.dateFromInput.showPicker()"
-                                        >
-                                        </label>
+                                        <div class="relative flex-1">
+                                            <input
+                                                id="customDateStart"
+                                                type="date"
+                                                wire:model.live="customStartDate"
+                                                class="w-full px-2 py-1 pr-9 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            >
+                                            <button type="button" onclick="(function(){var el=document.getElementById('customDateStart');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open calendar">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="relative w-full flex items-center gap-2">
                                         <span class="text-gray-400 text-sm shrink-0">to:</span>
-                                        <input
-                                            id="customDateEnd"
-                                            x-ref="dateToInput"
-                                            type="date"
-                                            wire:model.live="customEndDate"
-                                            class="w-full px-2 py-1 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                        >
-                                        <label
-                                            for="customDateEnd"
-                                            @click.prevent="if ($refs.dateToInput?.showPicker) $refs.dateToInput.showPicker()"
-                                            class="absolute inset-y-0 right-0 flex w-12 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600"
-                                        >
-                                        </label>
+                                        <div class="relative flex-1">
+                                            <input
+                                                id="customDateEnd"
+                                                type="date"
+                                                wire:model.live="customEndDate"
+                                                class="w-full px-2 py-1 pr-9 text-gray-800 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            >
+                                            <button type="button" onclick="(function(){var el=document.getElementById('customDateEnd');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open calendar">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             @endif

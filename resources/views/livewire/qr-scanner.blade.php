@@ -159,6 +159,16 @@
                 // Auto-start scan when modal opens
                 this.$watch('open', (value) => {
                     if (value) {
+                        // Request geolocation when scanner opens (for location/event check-in validation)
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    $wire.setUserLocation(position.coords.latitude, position.coords.longitude);
+                                },
+                                () => { /* User denied or error - modal will handle */ },
+                                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                            );
+                        }
                         // Small delay to ensure video element is ready
                         setTimeout(() => {
                             this.startScan();

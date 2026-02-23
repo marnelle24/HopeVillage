@@ -140,22 +140,36 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">Start Date <span class="text-red-500">*</span></label>
-                                    <input 
-                                        type="date" 
-                                        id="start_date"
-                                        wire:model.blur="start_date" 
-                                        class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('start_date') border-red-500 @enderror"
-                                    >
+                                    <div class="relative">
+                                        <input 
+                                            type="date" 
+                                            id="start_date"
+                                            wire:model.blur="start_date" 
+                                            class="w-full px-4 py-2 pr-10 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('start_date') border-red-500 @enderror"
+                                        >
+                                        <button type="button" onclick="(function(){var el=document.getElementById('start_date');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open calendar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                     @error('start_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                                 <div>
                                     <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">Start Time <span class="text-red-500">*</span></label>
-                                    <input 
-                                        type="time" 
-                                        id="start_time"
-                                        wire:model.blur="start_time" 
-                                        class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('start_time') border-red-500 @enderror"
-                                    >
+                                    <div class="relative">
+                                        <input 
+                                            type="time" 
+                                            id="start_time"
+                                            wire:model.blur="start_time" 
+                                            class="w-full px-4 py-2 pr-10 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('start_time') border-red-500 @enderror"
+                                        >
+                                        <button type="button" onclick="(function(){var el=document.getElementById('start_time');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open time picker">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                     @error('start_time') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -163,22 +177,36 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">End Date <span class="text-red-500">*</span></label>
-                                    <input 
-                                        type="date" 
-                                        id="end_date"
-                                        wire:model.blur="end_date" 
-                                        class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('end_date') border-red-500 @enderror"
-                                    >
+                                    <div class="relative">
+                                        <input 
+                                            type="date" 
+                                            id="end_date"
+                                            wire:model.blur="end_date" 
+                                            class="w-full px-4 py-2 pr-10 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('end_date') border-red-500 @enderror"
+                                        >
+                                        <button type="button" onclick="(function(){var el=document.getElementById('end_date');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open calendar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                     @error('end_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                                 <div>
                                     <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">End Time <span class="text-red-500">*</span></label>
-                                    <input 
-                                        type="time" 
-                                        id="end_time"
-                                        wire:model.blur="end_time" 
-                                        class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('end_time') border-red-500 @enderror"
-                                    >
+                                    <div class="relative">
+                                        <input 
+                                            type="time" 
+                                            id="end_time"
+                                            wire:model.blur="end_time" 
+                                            class="w-full px-4 py-2 pr-10 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('end_time') border-red-500 @enderror"
+                                        >
+                                        <button type="button" onclick="(function(){var el=document.getElementById('end_time');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open time picker">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                     @error('end_time') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>

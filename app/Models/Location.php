@@ -21,6 +21,8 @@ class Location extends Model implements HasMedia
         'city',
         'province',
         'postal_code',
+        'latitude',
+        'longitude',
         'phone',
         'email',
         'is_active',

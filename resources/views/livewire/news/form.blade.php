@@ -113,7 +113,14 @@
 
                         <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-4 mt-4">
                             <label for="published_at" class="block text-sm font-medium text-gray-700 mb-2">Published at</label>
-                            <input type="datetime-local" id="published_at" wire:model.blur="published_at" class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('published_at') border-red-500 @enderror">
+                            <div class="relative">
+                                <input type="datetime-local" id="published_at" wire:model.blur="published_at" class="w-full px-4 py-2 pr-10 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-700 @error('published_at') border-red-500 @enderror">
+                                <button type="button" onclick="(function(){var el=document.getElementById('published_at');try{if(el.showPicker)el.showPicker();else el.click();}catch(e){el.focus();el.click();}})()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Open calendar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                    </svg>
+                                </button>
+                            </div>
                             @error('published_at') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>

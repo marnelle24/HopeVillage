@@ -22,6 +22,7 @@ class Announcement extends Model implements HasMedia
         'starts_at',
         'ends_at',
         'link_url',
+        'visibility',
         'created_by',
     ];
 
@@ -48,6 +49,26 @@ class Announcement extends Model implements HasMedia
                 $announcement->created_by = auth()->id();
             }
         });
+    }
+
+    /**
+     * Scope to announcements visible to the given user.
+     * Unauthenticated users see no announcements.
+     */
+    public function scopeVisibleTo(Builder $query, ?User $user): Builder
+    {
+        if (!$user) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        $allowedVisibilities = match ($user->user_type) {
+            'member' => ['members', 'members_and_merchants', 'all'],
+            'merchant_user' => ['merchants', 'members_and_merchants', 'all'],
+            'admin' => ['all'],
+            default => [],
+        };
+
+        return $query->whereIn('visibility', $allowedVisibilities);
     }
 
     /**
