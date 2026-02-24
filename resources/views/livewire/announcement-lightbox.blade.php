@@ -75,6 +75,18 @@
             >
                 {{-- Carousel: only the current slide is visible; next/prev never shown — fade between slides --}}
                 <div class="relative overflow-hidden" style="height: 70vh; width: 100%;">
+                    {{-- Close button --}}
+                    <button
+                        type="button"
+                        @click="close()"
+                        class="absolute top-3 right-0 p-2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white/50 transition z-30"
+                        aria-label="Close"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
                     @foreach($announcements as $index => $announcement)
                         <div
                             x-show="currentIndex === {{ $index }}"
@@ -88,7 +100,7 @@
                             style="display: none;"
                         >
                             @if($announcement->link_url)
-                                <a href="{{ $announcement->link_url }}" target="_blank" rel="noopener noreferrer" class="block h-auto w-full focus:outline-none">
+                                <a href="{{ $announcement->link_url }}" rel="noopener noreferrer" class="block h-auto w-full focus:outline-none">
                                     <img src="{{ $announcement->banner_url }}" alt="{{ $announcement->title }}" class="w-full h-full object-contain object-center">
                                 </a>
                             @else

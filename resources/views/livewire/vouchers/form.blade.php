@@ -119,11 +119,22 @@
                                 wire:model.blur="discount_value" 
                                 step="0.01"
                                 min="0"
-                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('discount_value') border-red-500 @enderror"
+                                {{ $discount_type === 'item' ? 'readonly' : '' }}
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('discount_value') border-red-500 @enderror {{ $discount_type === 'item' ? 'bg-gray-100 cursor-not-allowed' : '' }}"
                             >
-                            <p class="text-xs text-gray-500 mt-1">
-                                {{ $discount_type === 'percentage' ? 'Enter percentage (e.g., 10 for 10%)' : 'Enter fixed amount (e.g., 5.00 for $5)' }}
-                            </p>
+                            @if($discount_type === 'item')
+                                <p class="text-xs text-gray-500 mt-1">
+                                    100% off the price of the item
+                                </p>
+                            @elseif($discount_type === 'percentage')
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Enter percentage (e.g., 10 for 10%)
+                                </p>
+                            @else
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Enter fixed amount (e.g., 5.00 for $5)
+                                </p>
+                            @endif
                             @error('discount_value') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>

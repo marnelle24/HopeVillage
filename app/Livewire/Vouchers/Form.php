@@ -27,7 +27,7 @@ class Form extends Component
         'merchant_id' => 'required|exists:merchants,id',
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
-        'discount_type' => 'required|in:percentage,fixed',
+        'discount_type' => 'required|in:percentage,fixed,item',
         'discount_value' => 'required|numeric|min:0',
         'min_purchase' => 'nullable|numeric|min:0',
         'max_discount' => 'nullable|numeric|min:0',
@@ -56,6 +56,13 @@ class Form extends Component
             $this->valid_until = $voucher->valid_until ? $voucher->valid_until->format('Y-m-d\TH:i') : '';
             $this->usage_limit = $voucher->usage_limit;
             $this->is_active = $voucher->is_active;
+        }
+    }
+
+    public function updatedDiscountType($value)
+    {
+        if ($value === 'item') {
+            $this->discount_value = 100;
         }
     }
 
@@ -102,6 +109,7 @@ class Form extends Component
         $discountTypes = [
             'percentage' => 'Percentage',
             'fixed' => 'Fixed Amount',
+            'item' => 'Free Item',
         ];
 
         return view('livewire.vouchers.form', [

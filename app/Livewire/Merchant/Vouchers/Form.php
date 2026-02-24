@@ -77,6 +77,13 @@ class Form extends Component
         }
     }
 
+    public function updatedDiscountType($value)
+    {
+        if ($value === 'item') {
+            $this->discount_value = 100;
+        }
+    }
+
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);

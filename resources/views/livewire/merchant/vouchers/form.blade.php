@@ -148,8 +148,8 @@
                             </div>
 
                             <!-- Discount Type and Value -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                <div>
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                                <div class="col-span-2">
                                     <label for="discount_type" class="block text-sm font-medium text-gray-700 mb-2">Discount Type <span class="text-red-500">*</span></label>
                                     <select 
                                         id="discount_type"
@@ -162,7 +162,7 @@
                                     </select>
                                     @error('discount_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
-                                <div>
+                                <div class="col-span-2">
                                     <label for="discount_value" class="block text-sm font-medium text-gray-700 mb-2">Discount Value <span class="text-red-500">*</span></label>
                                     <input 
                                         placeholder="{{ $discount_type === 'percentage' ? '0.00' : '0.00' }}"
@@ -171,11 +171,12 @@
                                         wire:model.blur="discount_value" 
                                         step="0.01"
                                         min="0"
-                                        class="w-full px-4 py-2 border rounded-lg text-gray-700 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 @error('discount_value') border-red-500 @enderror"
+                                        {{ $discount_type === 'item' ? 'readonly' : '' }}
+                                        class="w-full px-4 py-2 border rounded-lg text-gray-700 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 @error('discount_value') border-red-500 @enderror {{ $discount_type === 'item' ? 'bg-gray-100 cursor-not-allowed' : '' }}"
                                     >
                                     @if($discount_type === 'item')
                                         <p class="text-xs text-gray-500 mt-1">
-                                            Enter the amount of the item eligible for the discount (e.g., 10.00 for $10)
+                                            100% off the price of the item
                                         </p>
                                     @elseif($discount_type === 'percentage')
                                         <p class="text-xs text-gray-500 mt-1">
@@ -190,16 +191,19 @@
                                 </div>
         
                                 <!-- Usage Limit -->
-                                <div class="mb-4">
+                                <div class="col-span-1">
                                     <label for="usage_limit" class="block text-sm font-medium text-gray-700 mb-2">Usage Limit</label>
                                     <input 
-                                        placeholder="Leave empty for unlimited"
+                                        placeholder="Max"
                                         type="number" 
                                         id="usage_limit"
                                         wire:model.blur="usage_limit" 
                                         min="1"
                                         class="w-full px-4 py-2 border rounded-lg text-gray-700 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 @error('usage_limit') border-red-500 @enderror"
                                     >
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        (Optional)
+                                    </p>
                                     @error('usage_limit') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
         
