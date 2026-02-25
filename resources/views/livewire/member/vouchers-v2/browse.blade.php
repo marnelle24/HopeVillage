@@ -74,7 +74,7 @@
                                 </button>
                             </div>
                             <div class="text-xs text-gray-500 mt-2 py-2 border-t border-gray-200 px-3">
-                                Valid Until: {{ $voucher->valid_until->format('d M Y') }}
+                                Valid Until: {{ $voucher->valid_until?->format('d M Y') ?? 'N/A' }}
                             </div>
                         </div>
                     </div>
@@ -149,7 +149,7 @@
                                 @endif
                             </div>
                             <div class="text-xs text-gray-500 py-2 border-t border-gray-200 px-3">
-                                Valid Until: {{ $adminVoucher->valid_until->format('d M Y') }}
+                                Valid Until: {{ $adminVoucher->valid_until?->format('d M Y') ?? 'N/A' }}
                             </div>
                         </div>
                     </div>

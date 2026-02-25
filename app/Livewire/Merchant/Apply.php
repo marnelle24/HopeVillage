@@ -60,14 +60,14 @@ class Apply extends Component
                 'required',
                 'string',
                 Password::min(8)
-                    ->mixedCase() // Requires at least one uppercase and one lowercase letter
+                    // ->mixedCase() // Requires at least one uppercase and one lowercase letter
+                    // ->symbols() // Requires at least one special character
                     ->numbers() // Requires at least one number
-                    ->symbols() // Requires at least one special character
                     ->uncompromised(), // Checks if password has been compromised in data leaks
                 'confirmed',
             ],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
-            'gRecaptchaResponse' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
+            // 'gRecaptchaResponse' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
         ];
     }
 
@@ -88,7 +88,7 @@ class Apply extends Component
         'password.confirmed' => 'Password confirmation does not match.',
         'terms.accepted' => 'You must accept the terms and conditions.',
         'terms.required' => 'You must accept the terms and conditions.',
-        'gRecaptchaResponse.required' => 'Please complete the reCAPTCHA verification.',
+        // 'gRecaptchaResponse.required' => 'Please complete the reCAPTCHA verification.',
     ];
 
     public function updated($propertyName)
