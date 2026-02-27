@@ -152,7 +152,7 @@
             this.qrCodeModalValue = null;
         }
     }"
-    class="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-[#3a5870] border-t border-orange-200"
+    class="fixed inset-x-0 bottom-0 z-50 bg-[#3a5870] border-t border-orange-200"
 >
     <!-- Settings submenu -->
     <div
@@ -194,8 +194,8 @@
         </div>
     </div>
 
-    <div class="relative">
-        <div class="grid {{ auth()->check() && auth()->user()->isMerchantUser() ? 'grid-cols-3' : 'grid-cols-4' }}">
+    <div class="relative max-w-md mx-auto">
+        <div class="grid grid-cols-4">
             <a href="{{ auth()->check() && auth()->user()->isMerchantUser() ? route('merchant.dashboard') : route('member.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500 {{ (auth()->check() && auth()->user()->isMerchantUser() && request()->routeIs('merchant.dashboard')) || (auth()->check() && auth()->user()->isMember() && (request()->routeIs('member.dashboard') || request()->routeIs('member.dashboard'))) ? 'text-white bg-orange-500' : 'text-slate-200' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.5A2.25 2.25 0 0 0 6.75 21.75h3.75v-4.5A2.25 2.25 0 0 1 12.75 15h-1.5A2.25 2.25 0 0 1 13.5 17.25v4.5h3.75A2.25 2.25 0 0 0 19.5 19.5V9.75" />

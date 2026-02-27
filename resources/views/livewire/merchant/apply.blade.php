@@ -34,7 +34,14 @@
                     </div>
                 </div>
 
-                <form wire:submit="submit">
+                <form 
+                    x-data
+                    @submit.prevent="
+                        const token = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse() : '';
+                        $wire.set('gRecaptchaResponse', token);
+                        $wire.submit();
+                    "
+                >
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 border-b border-dashed border-gray-400 pt-6 pb-6">
                         <!-- Logo Upload -->
                         <div class="col-span-1 w-full">
@@ -117,19 +124,38 @@
                             <!-- Address -->
                             <div>
                                 <h3 class="text-lg text-gray-500 mb-6 mt-2 col-span-2 font-bold">Business Address</h3>
-                                <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Address
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="address"
-                                    wire:model.blur="address" 
-                                    class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('address') border-red-500 @enderror"
-                                    placeholder="Street Name, Building Name, etc."
-                                >
-                                @error('address') 
-                                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
-                                @enderror
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="sm:col-span-2 col-span-1">
+                                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Address
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="address"
+                                            wire:model.blur="address" 
+                                            class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('address') border-red-500 @enderror"
+                                            placeholder="Street Name, Building Name, etc."
+                                        >
+                                        @error('address') 
+                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
+                                        @enderror
+                                    </div>
+                                    <div class="sm:col-span-1 col-span-1">
+                                        <label for="unitNumber" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Unit Number (Optional)
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="unitNumber"
+                                            wire:model.blur="unitNumber" 
+                                            class="w-full px-4 py-2 border rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('unitNumber') border-red-500 @enderror"
+                                            placeholder="e.g. 01-01"
+                                        >
+                                        @error('unitNumber') 
+                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span> 
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- City, Province, Postal Code -->
