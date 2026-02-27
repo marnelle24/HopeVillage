@@ -21,10 +21,11 @@ class Apply extends Component
     public $contact_name = '';
     public $phone = '';
     public $email = '';
-    public $address = '';
-    public $city = '';
+    public $unitNumber = '';
+    public $address = '7 Kaki Bukit Avenue 3';
+    public $city = 'Singapore';
     public $province = '';
-    public $postal_code = '';
+    public $postal_code = '415814';
     public $website = '';
     public $logo;
     public $password = '';
@@ -51,6 +52,7 @@ class Apply extends Component
             ],
             'email' => 'nullable|email|max:255|unique:users,email',
             'address' => 'nullable|string|max:255',
+            'unitNumber' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
             'postal_code' => 'nullable|string|max:20',
@@ -67,7 +69,7 @@ class Apply extends Component
                 'confirmed',
             ],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
-            // 'gRecaptchaResponse' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
+            'gRecaptchaResponse' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
         ];
     }
 
@@ -88,7 +90,7 @@ class Apply extends Component
         'password.confirmed' => 'Password confirmation does not match.',
         'terms.accepted' => 'You must accept the terms and conditions.',
         'terms.required' => 'You must accept the terms and conditions.',
-        // 'gRecaptchaResponse.required' => 'Please complete the reCAPTCHA verification.',
+        'gRecaptchaResponse.required' => 'Please complete the reCAPTCHA verification.',
     ];
 
     public function updated($propertyName)
@@ -180,13 +182,18 @@ class Apply extends Component
         // Minimum 2 second delay
         sleep(2);
 
+        $addressToSave = trim($this->address ?? '');
+        if (!empty(trim($this->unitNumber ?? ''))) {
+            $addressToSave = trim($addressToSave . ' #' . trim($this->unitNumber));
+        }
+
         $merchant = Merchant::create([
             'name' => $this->name,
             'description' => $this->description,
             'contact_name' => $this->contact_name,
             'phone' => $this->phone,
             'email' => $this->email,
-            'address' => $this->address,
+            'address' => $addressToSave,
             'city' => $this->city,
             'province' => $this->province,
             'postal_code' => $this->postal_code,
@@ -255,6 +262,7 @@ class Apply extends Component
             'contact_name',
             'phone',
             'email',
+            'unitNumber',
             'address',
             'city',
             'province',
