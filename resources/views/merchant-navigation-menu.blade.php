@@ -152,7 +152,7 @@
             this.qrCodeModalValue = null;
         }
     }"
-    class="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-[#3a5870] border-t border-orange-200"
+    class="max-w-xl mx-auto fixed inset-x-0 bottom-0 z-50 bg-[#3a5870] border-t border-orange-200"
 >
     <!-- Settings submenu -->
     <div

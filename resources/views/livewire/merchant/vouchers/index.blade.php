@@ -1,9 +1,7 @@
 <div class="pb-16">
 
-    <div class="shrink-0 flex items-center justify-between px-4 pt-4">
+    <div class="max-w-xl mx-auto sm:px-6 lg:px-8 shrink-0 flex items-center justify-between px-4 pt-4">
         <a href="{{ route('dashboard') }}">
-            {{-- <x-application-mark class="block h-9 w-auto" /> --}}
-            {{-- <span class="text-xl font-bold text-gray-800">Hope Village</span> --}}
             <img src="{{ asset('hv-logo.png') }}" alt="hope village Logo" class="w-16">
         </a>
         {{-- add a logout button --}}
@@ -84,81 +82,71 @@
                 </div>
             @endif
 
-            <!-- Search and Filter -->
-            <div class="mb-8">
-                <div class="flex gap-2">
-                    <div class="w-3/4">
-                        <input 
-                            type="text" 
-                            wire:model.live.debounce.300ms="search" 
-                            placeholder="Search vouchers..." 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-full text-gray-700 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                    </div>
-                    <div class="w-1/4">
-                        <select 
-                            wire:model.live="statusFilter" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-full text-gray-700 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                            <option value="all">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+            <div x-data="{ activeTab: 'vouchers' }">
+                <div class="py-2">
+                    <div class="flex items-center overflow-x-auto border-b border-gray-200">
+                        <button type="button" @click="activeTab='vouchers'" class="w-1/2 pb-3 text-md tracking-wider whitespace-nowrap transition-colors"
+                            :class="activeTab === 'vouchers' ? 'text-red-600 border-b-2 border-red-600 font-semibold' : 'text-gray-600'">
+                            My Vouchers ({{ $vouchers->count() }})
+                        </button>
+                        <button type="button" @click="activeTab='admin-vouchers'" class="w-1/2 pb-3 text-md tracking-wider whitespace-nowrap transition-colors"
+                            :class="activeTab === 'admin-vouchers' ? 'text-red-600 border-b-2 border-red-600 font-semibold' : 'text-gray-600'">
+                            Admin Vouchers ({{ $adminVouchers->count() }})
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <div class="my-4 md:px-0 px-4">
-                <h3 class="text-xl font-bold text-gray-600">My Active Vouchers ({{ $vouchers->count() }})</h3>
-                <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by you</p>
-            </div>
-            @if ($vouchers->count() > 0)
-                <div class="w-full overflow-x-auto md:px-0 px-4 pb-4 scroll-smooth voucher-scroll-container">
-                    <div class="flex flex-nowrap gap-4 items-stretch min-w-max">
-                        @foreach($vouchers as $voucher)
-                            @php
-                                $isExpired = $voucher->valid_until && $voucher->valid_until->isPast();
-                                $isInactive = !$voucher->is_active;
-                                $isDisabled = $isExpired || $isInactive;
-                            @endphp
-                            <div class="shrink-0 w-69 {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
-                                <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @else
-                <div class="md:mx-0 mx-4 text-center text-gray-300 text-lg py-12 border-dashed border-2 border-gray-300 rounded-lg p-4 bg-gray-200">
-                    <p class="text-gray-500 mb-4">No vouchers found.</p>
-                </div>
-            @endif
 
-            <br />
-            <br />
-            <div class="my-4 md:px-0 px-4">
-                <h3 class="text-xl font-bold text-gray-600">Other Vouchers ({{ $adminVouchers->count() }})</h3>
-                <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by administrator</p>
-            </div>
-            @if ($adminVouchers->count() > 0)
-                <div class="w-full overflow-x-auto md:px-0 px-4 pb-4 scroll-smooth voucher-scroll-container">
-                    <div class="flex flex-nowrap gap-4 items-stretch min-w-max">
-                        @foreach($adminVouchers as $adminVoucher)
-                            @php
-                                $isExpired = $adminVoucher->valid_until && $adminVoucher->valid_until->isPast();
-                                $isInactive = !$adminVoucher->is_active;
-                                $isDisabled = $isExpired || $isInactive;
-                            @endphp
-                            <div class="shrink-0 w-69 {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
-                                <livewire:merchants.voucher-card :voucher-code="$adminVoucher->voucher_code" type="admin" :key="'admin-voucher-' . $adminVoucher->id" />
-                            </div>
-                        @endforeach
+                <div x-show="activeTab === 'vouchers'" x-cloak>
+                    <div class="my-4 md:px-0 px-4">
+                        <h3 class="text-xl font-bold text-gray-600">My Active Vouchers ({{ $vouchers->count() }})</h3>
+                        <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by you</p>
                     </div>
+                    @if ($vouchers->count() > 0)
+                        <div class="grid grid-cols-1 gap-4 items-stretch min-w-max">
+                            @foreach($vouchers as $voucher)
+                                @php
+                                    $isExpired = $voucher->valid_until && $voucher->valid_until->isPast();
+                                    $isInactive = !$voucher->is_active;
+                                    $isDisabled = $isExpired || $isInactive;
+                                @endphp
+                                <div class="shrink-0 w-full {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
+                                    <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="md:mx-0 mx-4 text-center text-gray-300 text-lg py-12 border-dashed border-2 border-gray-300 rounded-lg p-4 bg-gray-200">
+                            <p class="text-gray-500 mb-4">No vouchers found.</p>
+                        </div>
+                    @endif
                 </div>
-            @else
-                <div class="md:mx-0 mx-4 text-center text-gray-300 text-lg py-12 border-dashed border-2 border-gray-300 rounded-lg p-4 bg-gray-200">
-                    <p class="text-gray-500 mb-4">No vouchers found.</p>
+
+                <div x-show="activeTab === 'admin-vouchers'" x-cloak>
+                    <div class="my-4 md:px-0 px-4">
+                        <h3 class="text-xl font-bold text-gray-600">Other Vouchers ({{ $adminVouchers->count() }})</h3>
+                        <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by administrator</p>
+                    </div>
+                    @if ($adminVouchers->count() > 0)
+                        <div class="grid grid-cols-1 gap-4 items-stretch min-w-max">
+                            @foreach($adminVouchers as $adminVoucher)
+                                @php
+                                    $isExpired = $adminVoucher->valid_until && $adminVoucher->valid_until->isPast();
+                                    $isInactive = !$adminVoucher->is_active;
+                                    $isDisabled = $isExpired || $isInactive;
+                                @endphp
+                                <div class="shrink-0 w-full {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
+                                    <livewire:merchants.voucher-card :voucher-code="$adminVoucher->voucher_code" type="admin" :key="'admin-voucher-' . $adminVoucher->id" />
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="md:mx-0 mx-4 text-center text-gray-300 text-lg py-12 border-dashed border-2 border-gray-300 rounded-lg p-4 bg-gray-200">
+                            <p class="text-gray-500 mb-4">No vouchers found.</p>
+                        </div>
+                    @endif
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 
