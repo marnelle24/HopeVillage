@@ -178,14 +178,18 @@ Route::middleware([
         return view('member.dashboard-v2');
     })->name('member.dashboard');
 
+    // Route::get('/member/vouchers', function () {
+    //     return view('member.vouchers-v2');
+    // })->name('member.vouchers');
+
     Route::get('/member/vouchers', function () {
-        return view('member.vouchers-v2');
+        return view('member.vouchers-v3');
     })->name('member.vouchers');
 
     // Backward/alternate URL: /member/voucher?status=...
-    Route::get('/member/voucher', function () {
-        return redirect()->route('member.vouchers', request()->query());
-    })->name('member.voucher');
+    // Route::get('/member/voucher', function () {
+    //     return redirect()->route('member.vouchers', request()->query());
+    // })->name('member.voucher');
 
     // Member Activities History
     Route::get('/member/activities', \App\Livewire\Member\Activities::class)
