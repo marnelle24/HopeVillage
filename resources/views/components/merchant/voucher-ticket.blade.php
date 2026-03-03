@@ -71,8 +71,8 @@
                 @endif
             </div>
 
-            <div class="flex items-center justify-between w-full pr-2 gap-3">
-                <div class="flex items-center gap-2 shrink-0">
+            <div class="flex flex-col items-start justify-start w-full pr-2 gap-3">
+                <div class="flex items-center justify-start gap-2 shrink-0 w-full">
                     <span class="text-xs px-2 py-1 rounded-full border border-gray-300 {{ $computedStatusClass }}">
                         {{ $computedStatusLabel }}
                     </span>
@@ -89,9 +89,9 @@
                 </div>
 
                 @if($expiryText)
-                    <p class="text-xs text-gray-500 text-right">
-                        <span class="block text-gray-500 font-normal text-[0.7rem] uppercase">Expiry</span>
-                        <span class="block text-gray-700 font-normal text-[0.6rem] tracking-wide line-clamp-1">{{ $expiryText }}</span>
+                    <p class="flex gap-2 items-center justify-start w-full">
+                        <span class="text-gray-500 font-normal text-[0.7rem] uppercase">Expiry</span>
+                        <span class="text-gray-700 font-normal text-[0.6rem] tracking-wide line-clamp-1">{{ $expiryText }}</span>
                     </p>
                 @endif
             </div>

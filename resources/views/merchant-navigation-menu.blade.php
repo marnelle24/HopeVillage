@@ -184,14 +184,14 @@
 
     <div class="relative">
         <div class="grid grid-cols-3">
-            <a href="{{ route('merchant.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500 {{ request()->routeIs('merchant.dashboard') ? 'text-white bg-orange-500' : 'text-slate-200' }}">
+            <a href="{{ route('merchant.dashboard') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500/20 {{ request()->routeIs('merchant.dashboard') ? 'text-white bg-orange-500' : 'text-slate-200' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.5A2.25 2.25 0 0 0 6.75 21.75h3.75v-4.5A2.25 2.25 0 0 1 12.75 15h-1.5A2.25 2.25 0 0 1 13.5 17.25v4.5h3.75A2.25 2.25 0 0 0 19.5 19.5V9.75" />
                 </svg>
                 <span class="text-[11px] font-semibold">Home</span>
             </a>
 
-            <a href="{{ route('merchant.vouchers.index') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500 {{ request()->routeIs('merchant.vouchers*') ? 'text-white bg-orange-500' : 'text-slate-200' }}">
+            <a href="{{ route('merchant.vouchers.index') }}" class="flex flex-col items-center justify-center py-3 gap-1 hover:bg-orange-500/20 {{ request()->routeIs('merchant.vouchers*') ? 'text-white bg-orange-500' : 'text-slate-200' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75h6m-6 3h6m-6 3h6m-6 3h6M6.75 3h10.5A2.25 2.25 0 0 1 19.5 5.25v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3Z" />
                 </svg>

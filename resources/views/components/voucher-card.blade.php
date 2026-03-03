@@ -90,7 +90,7 @@
                 </span>
             @endif
             <div class="absolute inset-0 bg-linear-to-t z-0 {{ $isExpired ? 'from-gray-700/60 via-gray-200/50 to-gray-700/60' : ($isActive ? 'from-green-800/80 via-green-600/50 to-green-500/40' : ($isPending ? 'from-red-300/50 via-red-200/50 to-red-300/40' : 'from-orange-400/50 via-orange-300/50 to-orange-400/40')) }} transition-all duration-300 rounded-t-2xl"></div>
-            <img src="{{ $imageUrl }}" alt="{{ $voucher->name }}" class="w-full h-42 object-cover object-center border border-gray-300 rounded-t-2xl transition-all duration-300 {{ $isExpired ? 'grayscale opacity-30' : 'opacity-40' }}">
+            <img src="{{ $imageUrl }}" alt="{{ $voucher->name }}" class="w-full h-42 object-cover object-center border border-gray-300 rounded-t-2xl transition-all duration-300 {{ $isExpired ? 'grayscale' : '' }}">
         </div>
     @else
         <div class="relative overflow-hidden flex items-start h-42 shrink-0 bg-linear-to-t {{ $isExpired ? 'from-gray-400/30 via-gray-200/50 to-gray-400/30 grayscale' : ($isActive ? 'from-green-800/40 via-green-100/50 to-green-800/60' : ($isPending ? 'from-red-300/30 via-red-100/50 to-red-300/30' : 'from-orange-400/30 via-orange-100/50 to-orange-400/30')) }}">

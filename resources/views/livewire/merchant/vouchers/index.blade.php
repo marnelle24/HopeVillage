@@ -110,8 +110,11 @@
                                     $isInactive = !$voucher->is_active;
                                     $isDisabled = $isExpired || $isInactive;
                                 @endphp
-                                <div class="shrink-0 w-full {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
+                                <div class="shrink-0 w-full relative {{ $isDisabled ? 'opacity-90 grayscale' : '' }}">
                                     <livewire:merchant.vouchers.card :voucher-code="$voucher->voucher_code" :key="'voucher-' . $voucher->id" />
+                                    @if($isDisabled)
+                                        <div class="absolute inset-0 bg-black/10 rounded-lg z-10 pointer-events-none" aria-hidden="true"></div>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
@@ -135,8 +138,11 @@
                                     $isInactive = !$adminVoucher->is_active;
                                     $isDisabled = $isExpired || $isInactive;
                                 @endphp
-                                <div class="shrink-0 w-full {{ $isDisabled ? 'opacity-60 grayscale' : '' }}">
+                                <div class="shrink-0 w-full relative {{ $isDisabled ? 'opacity-90 grayscale' : '' }}">
                                     <livewire:merchants.voucher-card :voucher-code="$adminVoucher->voucher_code" type="admin" :key="'admin-voucher-' . $adminVoucher->id" />
+                                    @if($isDisabled)
+                                        <div class="absolute inset-0 bg-black/10 rounded-lg z-10 pointer-events-none" aria-hidden="true"></div>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
