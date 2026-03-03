@@ -47,8 +47,8 @@
         : null;
 @endphp
 
-<div class="{{ $isAdmin ? 'bg-teal-50' : 'bg-orange-50' }} rounded-lg border border-gray-200 overflow-hidden shadow-xs w-full">
-    <div class="flex min-h-32">
+<div class="{{ $isAdmin ? 'bg-teal-50' : 'bg-orange-50' }} rounded-lg border border-gray-200 overflow-hidden shadow-xs">
+    <div class="flex min-h-32 w-full">
         <div class="w-[85px] min-w-[85px] {{ $leftBg }} text-white px-2 py-3 flex flex-col items-center justify-center text-center relative">
             <div class="absolute -left-1 top-0 bottom-0 w-2 bg-white mask-[radial-gradient(circle_at_center,transparent_4px,black_5px)] mask-size-[8px_12px] mask-repeat-y"></div>
             <div class="h-8 w-8 rounded-full {{ $leftIconBg }} flex items-center justify-center">
@@ -77,6 +77,12 @@
                         {{ $computedStatusLabel }}
                     </span>
 
+                    @if($voucher->usage_limit)
+                        <span class="ml-auto text-xs text-yellow-700 bg-yellow-100 rounded-full px-2.5 py-1">
+                            {{ $voucher->usage_count }}/{{ $voucher->usage_limit }} used
+                        </span>
+                    @endif
+
                     @isset($actions)
                         {{ $actions }}
                     @endisset
@@ -85,7 +91,7 @@
                 @if($expiryText)
                     <p class="text-xs text-gray-500 text-right">
                         <span class="block text-gray-500 font-normal text-[0.7rem] uppercase">Expiry</span>
-                        <span class="block text-gray-700 font-normal text-[0.8rem] tracking-wide">{{ $expiryText }}</span>
+                        <span class="block text-gray-700 font-normal text-[0.6rem] tracking-wide line-clamp-1">{{ $expiryText }}</span>
                     </p>
                 @endif
             </div>

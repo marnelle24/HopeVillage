@@ -103,7 +103,7 @@
                         <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by you</p>
                     </div>
                     @if ($vouchers->count() > 0)
-                        <div class="grid grid-cols-1 gap-4 items-stretch min-w-max">
+                        <div class="grid grid-cols-1 gap-4 items-stretch">
                             @foreach($vouchers as $voucher)
                                 @php
                                     $isExpired = $voucher->valid_until && $voucher->valid_until->isPast();
@@ -128,7 +128,7 @@
                         <p class="text-gray-600 font-nunito text-sm">Vouchers created and managed by administrator</p>
                     </div>
                     @if ($adminVouchers->count() > 0)
-                        <div class="grid grid-cols-1 gap-4 items-stretch min-w-max">
+                        <div class="grid grid-cols-1 gap-4 items-stretch">
                             @foreach($adminVouchers as $adminVoucher)
                                 @php
                                     $isExpired = $adminVoucher->valid_until && $adminVoucher->valid_until->isPast();
