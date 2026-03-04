@@ -227,6 +227,8 @@ Route::middleware([
     Route::get('/merchant/vouchers/{voucher_code}/edit', \App\Livewire\Merchant\Vouchers\Form::class)->name('merchant.vouchers.edit');
     Route::get('/merchant/vouchers/{voucher_code}', \App\Livewire\Merchant\Vouchers\Profile::class)->name('merchant.vouchers.profile');
 
+    Route::get('/merchant/redemptions', \App\Livewire\Merchant\Redemptions\Index::class)->name('merchant.redemptions.index');
+
     // Points actions (merchant-operated)
     Route::post('/merchant/points/voucher-redeem', [PointsActionsController::class, 'redeemVoucher'])->name('merchant.points.voucher-redeem');
 });
