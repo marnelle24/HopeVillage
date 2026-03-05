@@ -64,13 +64,13 @@
             }
         });
     "
-    class="card card-bordered bg-base-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+    class="card card-bordered bg-gray-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
     @click="window.location.href = '/member/event/{{ $event['event_code'] }}'"
 >
     <div class="card-body flex-row gap-4 p-4">
         <!-- Event Image -->
         <div class="shrink-0">
-            <div class="w-20 h-20 border border-gray-300 rounded-lg bg-base-200 overflow-hidden relative">
+            <div class="w-20 h-20 border border-gray-300 rounded-lg bg-gray-100 overflow-hidden relative">
                 @if($event['thumbnail_url'] ?? null)
                     <img
                         src="{{ $event['thumbnail_url'] }}"

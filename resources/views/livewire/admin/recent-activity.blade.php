@@ -1,4 +1,4 @@
-<div class="card bg-base-100 shadow-lg">
+<div class="card bg-gray-100 shadow-lg">
     <div class="card-body">
         <h2 class="card-title text-success">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-5 h-5 stroke-current">
@@ -8,7 +8,7 @@
         </h2>
         <div class="space-y-3">
             @forelse($recentActivities as $activity)
-                <div class="flex items-start gap-3 p-3 rounded-lg bg-base-200">
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-gray-100">
                     <div class="flex-shrink-0">
                         <div class="avatar placeholder">
                             <div class="bg-primary text-primary-content rounded-full w-10">

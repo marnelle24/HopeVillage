@@ -3,7 +3,7 @@
         @livewire('member.points-header')
     </x-slot>
 
-    <div class="max-w-md mx-auto min-h-screen bg-base-200">
+    <div class="max-w-md mx-auto min-h-screen bg-gray-100/60">
         <div
             class="max-w-7xl mx-auto"
             x-cloak
@@ -90,17 +90,6 @@
                     >
                         <span>All Events</span>
                     </button>
-                    {{-- <button
-                        type="button"
-                        @click="activeCategory = 'upcoming'; tab = 'upcoming'; setTab('upcoming'); setFilter('upcoming')"
-                        :class="tab === 'upcoming' && filter === 'upcoming' ? 'bg-orange-500 shadow-md text-white' : 'border border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white'"
-                        class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 flex items-center gap-2"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                        <span>Upcoming</span>
-                    </button> --}}
                     <button
                         type="button"
                         @click="activeCategory = 'my-events'; tab = 'mine'; setTab('mine')"
@@ -122,8 +111,8 @@
                     x-transition:enter-end="opacity-100"
                     x-transition:leave="transition ease-out duration-300"
                     x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-base-200/10"
+                    x-transition:leave-end="opacity-0"  
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100/60"
                 >
                     <div class="text-center">
                         <span class="loading loading-bars loading-xl text-orange-500"></span>

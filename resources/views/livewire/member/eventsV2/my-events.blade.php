@@ -22,7 +22,7 @@
         x-transition:leave="transition ease-out duration-300"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-base-200/10"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100/60"
     >
         <div class="text-center">
             <span class="loading loading-bars loading-xl text-orange-500"></span>
@@ -135,7 +135,7 @@
 
         <!-- Empty State -->
         @if($attendedEvents->isEmpty() && $joinedEvents->isEmpty() && $interestedEvents->isEmpty() && $favoritedEvents->isEmpty())
-            <div class="card card-bordered border-dashed bg-base-200/50 p-8 text-center">
+            <div class="card card-bordered border-dashed bg-gray-100/60 p-8 text-center">
                 <div class="card-body">
                     <svg class="w-12 h-12 text-base-content/40 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>

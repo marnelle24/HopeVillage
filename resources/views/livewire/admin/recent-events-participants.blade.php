@@ -1,4 +1,4 @@
-<div class="card bg-base-100 shadow-lg">
+<div class="card bg-gray-100 shadow-lg">
     <div class="card-body">
         <div class="flex justify-between items-center mb-4 flex-col md:flex-row gap-4">
             <h2 class="card-title text-secondary">

@@ -29,7 +29,7 @@
         <!-- Styles -->
         @livewireStyles
     </head>
-    <body class="font-sans antialiased bg-[#FAF7F4]">
+    <body class="font-sans antialiased bg-gray-200">
         <x-banner />
 
         <!-- Toast notifications (DaisyUI) -->
@@ -126,11 +126,11 @@
 
         <div class="min-h-screen bg-white {{ auth()->check() && auth()->user()->isAdmin() ? 'pt-20' : '' }}">
             @livewire('navigation-menu')
-
+            
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-white shadow">
-                    <div class="{{ auth()->check() && auth()->user()->isAdmin() ? 'max-w-6xl' : 'max-w-md' }} mx-auto py-6">
+                <header class="bg-white shadow px-4">
+                    <div class="{{ auth()->check() && auth()->user()->isAdmin() ? 'max-w-5xl' : 'max-w-md' }} mx-auto py-6">
                         {{ $header }}
                     </div>
                 </header>

@@ -3,13 +3,12 @@
         @livewire('member.points-header')
     </x-slot>
 
-    <div class="py-10 md:px-0 px-4">
-        <div class="mb-4 flex justify-end">
-            <a href="{{ route('member.events') }}" class="text-sm text-gray-600 hover:text-orange-500">
-                ← Back to Events
-            </a>
-        </div>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="min-h-screen max-w-md mx-auto px-4 sm:px-6 lg:px-8 bg-gray-100">
+            <div class="py-8 flex justify-end">
+                <a href="{{ route('member.events') }}" class="text-sm text-gray-600 hover:text-orange-500">
+                    ← Back to Events
+                </a>
+            </div>
             @if (session()->has('message'))
                 @php
                     $type = session('message_type', 'success');
@@ -59,8 +58,8 @@
                     : false;
             @endphp
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 space-y-6">
+            <div class="grid grid-cols-1 gap-6">
+                <div class="space-y-6">
                     @if(!empty($heroImageUrl ?? null))
                         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
                             <img
@@ -71,32 +70,30 @@
                             >
                         </div>
                     @endif
+                    <div class="space-y-2">
+                        <h2 class="text-2xl font-bold text-gray-800">{{ $event->title }}</h2>
+                        <p class="text-xs text-gray-600 italic">{{ $schedule }}</p>
+                    </div>
 
                     <div class="bg-white border border-gray-200 rounded-xl p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Event Information</h3>
-                        <p class="text-sm text-gray-600">{{ $schedule }}</p>
-
-                        @if($event->description)
-                            <div class="mt-4">
-                                <p class="text-sm font-medium text-gray-700 mb-1">Description</p>
-                                <p class="text-sm text-gray-700 whitespace-pre-line">{{ $event->description }}</p>
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <div class="flex flex-col gap-1">
+                                <span class="font-bold text-xs text-gray-600">Description:</span>
+                                <span>{{ $event->description }}</span>
                             </div>
-                        @endif
-
-                        <div class="mt-4 space-y-2 text-sm text-gray-700">
                             <div>
-                                <span class="font-medium text-gray-600">Location:</span>
+                                <span class="font-bold text-xs text-gray-600">Location:</span>
                                 <span>{{ $location?->name ?? 'Unknown location' }}</span>
                             </div>
                             @if($event->venue)
                                 <div>
-                                    <span class="font-medium text-gray-600">Venue:</span>
+                                    <span class="font-bold text-xs text-gray-600">Venue:</span>
                                     <span>{{ $event->venue }}</span>
                                 </div>
                             @endif
                             @if($location?->address)
                                 <div>
-                                    <span class="font-medium text-gray-600">Address:</span>
+                                    <span class="font-bold text-xs text-gray-600">Address:</span>
                                     <span>
                                         {{ $location->address }}
                                         @if($location->city || $location->province || $location->postal_code)
@@ -120,7 +117,7 @@
                                 @if($event->max_participants && $event->max_participants > 0)
                                     / {{ $event->max_participants }}
                                 @else
-                                    / ∞
+                                    / No limit
                                 @endif
                             </span>
                         </div>
@@ -149,8 +146,6 @@
                     </div>
                 </div>
             </div>
-
-        </div>
     </div>
 
     <script>

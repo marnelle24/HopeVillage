@@ -59,13 +59,13 @@ Route::middleware([
     // 'verified',
     'admin',
 ])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    // Route::get('/admin/dashboard', function () {
+    //     return view('admin.dashboard');
+    // })->name('admin.dashboard');
     
-    Route::get('/admin/dashboard-v2', function () {
+    Route::get('/admin/dashboard', function () {
         return view('admin.dashboard-v2');
-    })->name('admin.dashboard.v2');
+    })->name('admin.dashboard');
     
     // Location CRUD Routes
     Route::get('/admin/locations', \App\Livewire\Locations\Index::class)->name('admin.locations.index');
@@ -164,12 +164,6 @@ Route::middleware([
         return view('member.events');
     })->name('member.events.v1');
 
-    Route::get('/member/vouchers-v1', function () {
-        return view('member.vouchers');
-    })->name('member.vouchers.v1');
-
-    //  ====== end of to be deleted
-
     Route::get('/member/events', function () {
         return view('member.events-v2');
     })->name('member.events');
@@ -178,18 +172,9 @@ Route::middleware([
         return view('member.dashboard-v2');
     })->name('member.dashboard');
 
-    // Route::get('/member/vouchers', function () {
-    //     return view('member.vouchers-v2');
-    // })->name('member.vouchers');
-
     Route::get('/member/vouchers', function () {
         return view('member.vouchers-v3');
     })->name('member.vouchers');
-
-    // Backward/alternate URL: /member/voucher?status=...
-    // Route::get('/member/voucher', function () {
-    //     return redirect()->route('member.vouchers', request()->query());
-    // })->name('member.voucher');
 
     // Member Activities History
     Route::get('/member/activities', \App\Livewire\Member\Activities::class)

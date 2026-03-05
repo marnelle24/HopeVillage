@@ -82,7 +82,7 @@
                     x-transition:leave="transition ease-out duration-300"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-base-200/10"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100/60"
                 >
                     <div class="text-center">
                         <span class="loading loading-bars loading-xl text-orange-500"></span>

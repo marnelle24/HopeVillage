@@ -23,8 +23,8 @@
         }"
         x-cloak
         @keydown.escape.window="if (showNavTour) dismissNavTour()"
-        class="border-b border-gray-100 fixed top-0 left-0 right-0 z-50 transition-shadow shadow-sm duration-300 backdrop-blur-sm bg-gray-100/60"
-        :class="scrolledPast20 ? 'shadow-lg bg-gray-100/60' : 'bg-gray-100'"
+        class="border-b border-gray-100 fixed top-0 left-0 right-0 z-50 transition-shadow shadow-sm duration-300 backdrop-blur-sm"
+        :class="scrolledPast20 ? 'shadow-lg bg-gray-50' : 'bg-gray-100'"
     >
         <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

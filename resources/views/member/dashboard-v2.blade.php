@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="min-h-screen pb-20">
-        <div class="max-w-md mx-auto min-h-screen">
+    {{-- <div class="min-h-screen pb-20"> --}}
+        <div class="max-w-md mx-auto min-h-screen bg-gray-100/60 pb-16">
             <!-- Header Section with Avatar and Greeting -->
             <div class="bg-linear-to-br from-orange-300 to-orange-400 p-6 pb-8 rounded-b-4xl shadow-lg">
                 <div class="flex items-center justify-between animate-fade-in">
@@ -122,7 +122,7 @@
                             @endphp
 
                             <a href="{{ $category['route'] }}" 
-                               class="card bg-base-100 shadow-md hover:shadow-xl border border-base-300 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in"
+                               class="card bg-gray-100 shadow-md hover:shadow-xl border border-base-300 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in"
                                style="animation-delay: {{ ($index + 1) * 50 }}ms">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <div class="{{ $iconColorClass }} mb-1">
@@ -171,7 +171,7 @@
                                 $distance = rand(5, 50);
                             @endphp
                             <div class="carousel-item flex-none w-64 animate-slide-in" style="animation-delay: {{ ($index + 1) * 100 }}ms; scroll-snap-align: start;">
-                                <a href="{{ route('member.events') }}" class="border border-gray-300 card bg-base-100 shadow-lg rounded-2xl hover:shadow-md transition-all duration-300 w-full">
+                                <a href="{{ route('member.events') }}" class="border border-gray-300 card bg-gray-100 shadow-lg rounded-2xl hover:shadow-md transition-all duration-300 w-full">
                                     <figure class="h-40 bg-gray-200 overflow-hidden">
                                         @if($locationImageUrl)
                                             <img src="{{ $locationImageUrl }}" alt="{{ $location->name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
@@ -190,7 +190,7 @@
                                 </a>
                             </div>
                         @empty
-                            <div class="card bg-base-100 shadow-lg rounded-2xl w-64">
+                            <div class="card bg-gray-100 shadow-lg rounded-2xl w-64">
                                 <div class="card-body items-center justify-center h-64">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-base-300 mb-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -204,7 +204,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    {{-- </div> --}}
 
     @if(auth()->user()->qr_code)
         @push('scripts')

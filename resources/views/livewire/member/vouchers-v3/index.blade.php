@@ -20,8 +20,8 @@
     x-init="init()"
     class="space-y-4 pb-24"
 >
-    <div class="sticky top-0 z-10 bg-base-100/95 backdrop-blur-sm py-2">
-        <div class="flex items-center gap-3 overflow-x-auto border-b border-gray-200">
+    <div class="sticky top-0 z-10 backdrop-blur-sm py-2 w-full">
+        <div class="w-full flex justify-evenly items-center gap-3 border-b border-gray-200">
             <button type="button" @click="setTab('active')" class="pb-3 text-xs uppercase tracking-wider whitespace-nowrap transition-colors"
                 :class="tab === 'active' ? 'text-red-600 border-b-2 border-red-600 font-semibold' : 'text-gray-600'">
                 Active ({{ $this->activeItems->count() }})
