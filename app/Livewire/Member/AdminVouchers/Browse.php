@@ -23,6 +23,10 @@ class Browse extends Component
             $this->dispatch('notify', type: 'error', message: 'Admin voucher is not available.');
             return;
         }
+        if (!$adminVoucher->isVisibleToMember($user)) {
+            $this->dispatch('notify', type: 'error', message: 'Admin voucher is not available.');
+            return;
+        }
 
         // Check if already claimed
         if ($user->adminVouchers()->where('admin_vouchers.id', $adminVoucherId)->exists()) {
@@ -64,11 +68,15 @@ class Browse extends Component
 
     public function getActiveAdminVouchersProperty(): Collection
     {
+        $user = auth()->user();
+
         return AdminVoucher::query()
             ->with('merchants')
             ->where('is_active', true)
             ->latest()
-            ->get();
+            ->get()
+            ->filter(fn (AdminVoucher $v) => $v->isVisibleToMember($user))
+            ->values();
     }
 
     public function getClaimableAdminVouchersProperty(): Collection

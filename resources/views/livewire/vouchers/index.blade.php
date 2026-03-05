@@ -147,13 +147,13 @@
                             <a href="{{ route('admin.admin-vouchers.create') }}" class="text-center rounded-full md:block hidden bg-orange-500 hover:bg-orange-600 duration-300 hover:scale-105 text-white font-semibold py-2 px-4">
                                 Add Admin Voucher
                             </a>
-                            <a href="{{ route('admin.admin-vouchers.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 duration-300 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                            <a href="{{ route('admin.admin-vouchers.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 duration-300 hover:scale-105 text-white p-2 rounded-full transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
                             </a>
                         @else
-                            <a href="{{ route('admin.vouchers.create') }}" class="text-center rounded-full md:block hidden bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white font-semibold py-2 px-4">
+                            <a href="{{ route('admin.vouchers.create') }}" class="text-center rounded-full md:block hidden bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white font-semibold py-2 px-4 transition-all duration-300">
                                 Add Voucher
                             </a>
                             <a href="{{ route('admin.vouchers.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">

@@ -23,6 +23,10 @@ class Browse extends Component
             $this->dispatch('notify', type: 'error', message: 'Voucher is not available.');
             return;
         }
+        if (!$voucher->isVisibleToMember($user)) {
+            $this->dispatch('notify', type: 'error', message: 'Voucher is not available.');
+            return;
+        }
 
         // Prevent duplicates (unique constraint on pivot also enforces this).
         if ($user->vouchers()->where('vouchers.id', $voucherId)->exists()) {
@@ -53,6 +57,10 @@ class Browse extends Component
 
         $adminVoucher = AdminVoucher::query()->whereKey($adminVoucherId)->first();
         if (!$adminVoucher || !$adminVoucher->isValid()) {
+            $this->dispatch('notify', type: 'error', message: 'Admin voucher is not available.');
+            return;
+        }
+        if (!$adminVoucher->isVisibleToMember($user)) {
             $this->dispatch('notify', type: 'error', message: 'Admin voucher is not available.');
             return;
         }
@@ -97,11 +105,15 @@ class Browse extends Component
 
     public function getActiveVouchersProperty(): Collection
     {
+        $user = auth()->user();
+
         return Voucher::query()
             ->with('merchant')
             ->where('is_active', true)
             ->latest()
-            ->get();
+            ->get()
+            ->filter(fn (Voucher $v) => $v->isVisibleToMember($user))
+            ->values();
     }
 
     public function getClaimableVouchersProperty(): Collection
@@ -123,11 +135,15 @@ class Browse extends Component
 
     public function getActiveAdminVouchersProperty(): Collection
     {
+        $user = auth()->user();
+
         return AdminVoucher::query()
             ->with('merchants')
             ->where('is_active', true)
             ->latest()
-            ->get();
+            ->get()
+            ->filter(fn (AdminVoucher $v) => $v->isVisibleToMember($user))
+            ->values();
     }
 
     public function getClaimableAdminVouchersProperty(): Collection

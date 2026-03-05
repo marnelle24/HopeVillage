@@ -21,6 +21,7 @@ class Form extends Component
     public $valid_until = '';
     public $usage_limit = '';
     public $is_active = false;
+    public $visibilityToTypeOfWork = [];
     public $showMessage = false;
     public $voucherImage;
     public $existingVoucherImage = null;
@@ -36,6 +37,8 @@ class Form extends Component
         'valid_until' => 'nullable|date|after_or_equal:valid_from',
         'usage_limit' => 'nullable|integer|min:1',
         'is_active' => 'boolean',
+        'visibilityToTypeOfWork' => 'nullable|array',
+        'visibilityToTypeOfWork.*' => 'in:Migrant worker,Migrant domestic worker,Others',
         'voucherImage' => 'nullable|image|max:2048',
     ];
 
@@ -69,11 +72,14 @@ class Form extends Component
             $this->valid_until = $voucher->valid_until ? $voucher->valid_until->format('Y-m-d\TH:i') : '';
             $this->usage_limit = $voucher->usage_limit;
             $this->is_active = (bool) $voucher->is_active;
+            $this->visibilityToTypeOfWork = $voucher->visibility_to_type_of_work ?? config('member.type_of_work_options', ['Migrant worker', 'Migrant domestic worker', 'Others']);
             
             $media = $voucher->getFirstMedia('image');
             if ($media) {
                 $this->existingVoucherImage = $media->getUrl();
             }
+        } else {
+            $this->visibilityToTypeOfWork = config('member.type_of_work_options', ['Migrant worker', 'Migrant domestic worker', 'Others']);
         }
     }
 
@@ -113,6 +119,7 @@ class Form extends Component
             'valid_from' => $this->valid_from ? date('Y-m-d H:i:s', strtotime($this->valid_from)) : null,
             'valid_until' => $this->valid_until ? date('Y-m-d H:i:s', strtotime($this->valid_until)) : null,
             'usage_limit' => $this->usage_limit ?: null,
+            'visibility_to_type_of_work' => $this->visibilityToTypeOfWork ?: [],
         ];
 
         if ($this->voucherCode) {
@@ -173,9 +180,11 @@ class Form extends Component
             'fixed' => 'Fixed Amount',
             'item' => 'Free Item',
         ];
+        $typeOfWorkOptions = config('member.type_of_work_options', ['Migrant worker', 'Migrant domestic worker', 'Others']);
 
         return view('livewire.merchant.vouchers.form', [
             'discountTypes' => $discountTypes,
+            'typeOfWorkOptions' => $typeOfWorkOptions,
         ])->layout('components.layouts.app');
     }
 }

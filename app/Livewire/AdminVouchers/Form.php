@@ -22,6 +22,7 @@ class Form extends Component
     public $usage_limit = '';
     public $is_active = true;
     public $selectedMerchants = [];
+    public $visibilityToTypeOfWork = [];
     public $showMessage = false;
     public $voucherImage;
     public $existingVoucherImage = null;
@@ -37,6 +38,8 @@ class Form extends Component
         'is_active' => 'boolean',
         'selectedMerchants' => 'required|array|min:1',
         'selectedMerchants.*' => 'exists:merchants,id',
+        'visibilityToTypeOfWork' => 'nullable|array',
+        'visibilityToTypeOfWork.*' => 'in:Migrant worker,Migrant domestic worker,Others',
         'voucherImage' => 'nullable|image|max:2048',
     ];
 
@@ -57,7 +60,10 @@ class Form extends Component
             $this->usage_limit = $adminVoucher->usage_limit;
             $this->is_active = $adminVoucher->is_active;
             $this->selectedMerchants = $adminVoucher->merchants()->pluck('merchants.id')->toArray();
+            $this->visibilityToTypeOfWork = $adminVoucher->visibility_to_type_of_work ?? [];
             $this->existingVoucherImage = $adminVoucher->image_url;
+        } else {
+            $this->visibilityToTypeOfWork = [];
         }
     }
 
@@ -79,6 +85,7 @@ class Form extends Component
             'valid_until' => $this->valid_until ? date('Y-m-d H:i:s', strtotime($this->valid_until)) : null,
             'usage_limit' => $this->usage_limit ?: null,
             'is_active' => (bool) ($this->is_active ?? true),
+            'visibility_to_type_of_work' => $this->visibilityToTypeOfWork ?: [],
         ];
 
         if ($this->voucherCode) {
@@ -124,9 +131,11 @@ class Form extends Component
     public function render()
     {
         $merchants = Merchant::orderBy('name')->get();
+        $typeOfWorkOptions = config('member.type_of_work_options', ['Migrant worker', 'Migrant domestic worker', 'Others']);
 
         return view('livewire.admin-vouchers.form', [
             'merchants' => $merchants,
+            'typeOfWorkOptions' => $typeOfWorkOptions,
         ])->layout('components.layouts.app');
     }
 }

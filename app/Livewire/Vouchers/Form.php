@@ -5,9 +5,12 @@ namespace App\Livewire\Vouchers;
 use App\Models\Merchant;
 use App\Models\Voucher;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Form extends Component
 {
+    use WithFileUploads;
+
     public $voucherCode;
     public $voucherId;
     public $merchant_id = '';
@@ -21,7 +24,10 @@ class Form extends Component
     public $valid_until = '';
     public $usage_limit = '';
     public $is_active = true;
+    public $visibilityToTypeOfWork = [];
     public $showMessage = false;
+    public $voucherImage;
+    public $existingVoucherImage = null;
 
     protected $rules = [
         'merchant_id' => 'required|exists:merchants,id',
@@ -35,6 +41,9 @@ class Form extends Component
         'valid_until' => 'nullable|date|after_or_equal:valid_from',
         'usage_limit' => 'nullable|integer|min:1',
         'is_active' => 'boolean',
+        'visibilityToTypeOfWork' => 'nullable|array',
+        'visibilityToTypeOfWork.*' => 'in:Migrant worker,Migrant domestic worker,Others',
+        'voucherImage' => 'nullable|image|max:2048',
     ];
 
     public function mount($voucher_code = null)
@@ -56,6 +65,14 @@ class Form extends Component
             $this->valid_until = $voucher->valid_until ? $voucher->valid_until->format('Y-m-d\TH:i') : '';
             $this->usage_limit = $voucher->usage_limit;
             $this->is_active = $voucher->is_active;
+            $this->visibilityToTypeOfWork = $voucher->visibility_to_type_of_work ?? [];
+
+            $media = $voucher->getFirstMedia('image');
+            if ($media) {
+                $this->existingVoucherImage = $media->getUrl();
+            }
+        } else {
+            $this->visibilityToTypeOfWork = [];
         }
     }
 
@@ -87,6 +104,7 @@ class Form extends Component
             'valid_until' => $this->valid_until ? date('Y-m-d H:i:s', strtotime($this->valid_until)) : null,
             'usage_limit' => $this->usage_limit ?: null,
             'is_active' => $this->is_active,
+            'visibility_to_type_of_work' => $this->visibilityToTypeOfWork ?: [],
         ];
 
         if ($this->voucherCode) {
@@ -98,9 +116,29 @@ class Form extends Component
             $message = 'Voucher created successfully.';
         }
 
+        // Handle voucher image upload
+        if ($this->voucherImage) {
+            $voucher->clearMediaCollection('image');
+            $voucher->addMedia($this->voucherImage->getRealPath())
+                ->usingName($voucher->name . ' - Image')
+                ->toMediaCollection('image');
+        }
+
         session()->flash('message', $message);
         $this->showMessage = true;
         return redirect()->route('admin.vouchers.index');
+    }
+
+    public function removeVoucherImage()
+    {
+        if ($this->voucherCode) {
+            $voucher = Voucher::where('voucher_code', $this->voucherCode)->first();
+            if ($voucher) {
+                $voucher->clearMediaCollection('image');
+                $this->existingVoucherImage = null;
+                $this->dispatch('voucher-image-removed');
+            }
+        }
     }
 
     public function render()
@@ -111,10 +149,12 @@ class Form extends Component
             'fixed' => 'Fixed Amount',
             'item' => 'Free Item',
         ];
+        $typeOfWorkOptions = config('member.type_of_work_options', ['Migrant worker', 'Migrant domestic worker', 'Others']);
 
         return view('livewire.vouchers.form', [
             'merchants' => $merchants,
             'discountTypes' => $discountTypes,
+            'typeOfWorkOptions' => $typeOfWorkOptions,
         ])->layout('components.layouts.app');
     }
 }

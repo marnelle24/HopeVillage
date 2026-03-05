@@ -46,6 +46,10 @@ class Index extends Component
             $this->dispatch('notify', type: 'error', message: 'Voucher is not available.');
             return;
         }
+        if (!$voucher->isVisibleToMember($user)) {
+            $this->dispatch('notify', type: 'error', message: 'Voucher is not available.');
+            return;
+        }
 
         if ($user->vouchers()->where('vouchers.id', $voucherId)->exists()) {
             $this->dispatch('notify', type: 'info', message: 'You already claimed this voucher.');
@@ -73,6 +77,10 @@ class Index extends Component
 
         $adminVoucher = AdminVoucher::query()->whereKey($adminVoucherId)->first();
         if (!$adminVoucher || !$adminVoucher->isValid()) {
+            $this->dispatch('notify', type: 'error', message: 'Admin voucher is not available.');
+            return;
+        }
+        if (!$adminVoucher->isVisibleToMember($user)) {
             $this->dispatch('notify', type: 'error', message: 'Admin voucher is not available.');
             return;
         }
@@ -184,7 +192,7 @@ class Index extends Component
             ->valid()
             ->latest()
             ->get()
-            ->reject(fn (Voucher $voucher) => in_array($voucher->id, $claimedVoucherIds, true))
+            ->reject(fn (Voucher $voucher) => in_array($voucher->id, $claimedVoucherIds, true) || ! $voucher->isVisibleToMember($user))
             ->map(function (Voucher $voucher) {
                 return (object) [
                     'id' => $voucher->id,
@@ -208,7 +216,7 @@ class Index extends Component
             ->valid()
             ->latest()
             ->get()
-            ->reject(fn (AdminVoucher $voucher) => in_array($voucher->id, $claimedAdminVoucherIds, true))
+            ->reject(fn (AdminVoucher $voucher) => in_array($voucher->id, $claimedAdminVoucherIds, true) || ! $voucher->isVisibleToMember($user))
             ->map(function (AdminVoucher $voucher) {
                 return (object) [
                     'id' => $voucher->id,

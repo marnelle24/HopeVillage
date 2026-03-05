@@ -277,6 +277,42 @@
                                     @error('valid_until') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+
+                            <!-- Visible to (Type of Work) -->
+                            <div class="mb-4">
+                                <div class="mb-2 flex gap-1">
+                                    <label class="block text-sm font-medium text-gray-700">
+                                        Visible to (Type of Work)
+                                    </label>
+                                    <p class="text-xs text-gray-500 mt-1">(Select which member types can see this voucher. Leave all unchecked for visible to all.)</p>
+                                </div>
+                                <div class="border border-gray-300 rounded-lg p-4 @error('visibilityToTypeOfWork') border-red-500 @enderror">
+                                    <div class="space-y-2">
+                                        @foreach($typeOfWorkOptions ?? [] as $option)
+                                            <label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                                                <input 
+                                                    type="checkbox" 
+                                                    wire:model.live="visibilityToTypeOfWork"
+                                                    value="{{ $option }}"
+                                                    class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                                >
+                                                <span class="ml-3 text-sm font-medium text-gray-900">{{ $option }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @error('visibilityToTypeOfWork') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                @if(count($visibilityToTypeOfWork ?? []) > 0)
+                                    <span class="text-xs text-gray-500 font-medium mt-2 block">Selected ({{ count($visibilityToTypeOfWork) }}):</span>
+                                    <div class="flex flex-wrap gap-2 mt-1">
+                                        @foreach($visibilityToTypeOfWork ?? [] as $selected)
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 border border-orange-300 text-orange-800 rounded-full text-xs">
+                                                {{ $selected }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
         
                             <!-- Approval Notice -->
                             <div class="mb-10 bg-blue-50 border border-blue-200 rounded-lg p-4">

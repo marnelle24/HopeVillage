@@ -27,6 +27,7 @@ class AdminVoucher extends Model implements HasMedia
         'usage_limit',
         'usage_count',
         'is_active',
+        'visibility_to_type_of_work',
         'created_by',
     ];
 
@@ -40,7 +41,42 @@ class AdminVoucher extends Model implements HasMedia
             'usage_limit' => 'integer',
             'usage_count' => 'integer',
             'is_active' => 'boolean',
+            'visibility_to_type_of_work' => 'array',
         ];
+    }
+
+    /**
+     * Check if this voucher is visible to the given member based on type_of_work.
+     * Null or empty visibility = visible to all. Otherwise, member's type_of_work
+     * must match one of the selected visibility options.
+     * When user is null (guest), only visible if visibility is empty.
+     */
+    public function isVisibleToMember(?User $user): bool
+    {
+        $visibility = $this->visibility_to_type_of_work ?? [];
+        if (empty($visibility)) {
+            return true;
+        }
+
+        if ($user === null) {
+            return false;
+        }
+
+        $memberType = $user->type_of_work;
+        if ($memberType === null || $memberType === '') {
+            // Treat null/empty as "Others" for consistency with registration default
+            return in_array('Others', $visibility, true);
+        }
+
+        if (in_array($memberType, $visibility, true)) {
+            return true;
+        }
+
+        // Custom type: not "Migrant worker" or "Migrant domestic worker"
+        $standardTypes = ['Migrant worker', 'Migrant domestic worker'];
+        $isCustomType = ! in_array($memberType, $standardTypes, true);
+
+        return $isCustomType && in_array('Others', $visibility, true);
     }
 
     public function merchants(): BelongsToMany

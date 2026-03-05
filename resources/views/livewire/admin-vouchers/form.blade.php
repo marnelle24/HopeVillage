@@ -167,15 +167,15 @@
                     </div>
 
                     <!-- Allowed Merchants -->
-                    <div class="mb-4">
-                        <div class="mb-2 flex gap-1">
+                    <div class="mt-8 mb-4">
+                        <div class="mb-2 flex flex-col gap-1">
                             <label class="block text-sm font-medium text-gray-700">
                                 Allowed Merchants <span class="text-red-500">*</span>
                             </label>
                             <p class="text-xs text-gray-500 mt-1">(Select one or more merchants where this voucher can be redeemed)</p>
                         </div>
                         <div class="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto @error('selectedMerchants') border-red-500 @enderror">
-                            <div class="space-y-2 max-h-64 overflow-y-auto">
+                            <div class="space-y-2 overflow-y-auto">
                                 @foreach($merchants as $merchant)
                                     <label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
                                         <input 
@@ -212,9 +212,45 @@
                         @endif
                     </div>
 
+                    <!-- Visible to (Type of Work) -->
+                    <div class="mt-8 mb-4">
+                        <div class="mb-2 flex flex-col gap-1">
+                            <label class="text-sm font-medium text-gray-700">
+                                Make this voucher available to
+                            </label>
+                            <p class="text-xs text-gray-500 mt-1">(Select which member types can see this voucher. Leave all unchecked for visible to all.)</p>
+                        </div>
+                        <div class="border border-gray-300 rounded-lg p-4 @error('visibilityToTypeOfWork') border-red-500 @enderror">
+                            <div class="space-y-2">
+                                @foreach($typeOfWorkOptions ?? [] as $option)
+                                    <label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model.live="visibilityToTypeOfWork"
+                                            value="{{ $option }}"
+                                            class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                        >
+                                        <span class="ml-3 text-sm font-medium text-gray-900">{{ $option }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @error('visibilityToTypeOfWork') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        @if(count($visibilityToTypeOfWork ?? []) > 0)
+                            <span class="text-xs text-gray-500 font-medium mt-2 block">Selected ({{ count($visibilityToTypeOfWork) }}):</span>
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                @foreach($visibilityToTypeOfWork ?? [] as $selected)
+                                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 border border-orange-300 text-orange-800 rounded-full text-xs">
+                                        {{ $selected }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
                     <!-- Valid From and Valid Until -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                        <div class="col-span-2">
                             <label for="valid_from" class="block text-sm font-medium text-gray-700 mb-2">Valid From</label>
                             <div class="relative">
                                 <input 
@@ -231,7 +267,7 @@
                             </div>
                             @error('valid_from') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
-                        <div>
+                        <div class="col-span-2">
                             <label for="valid_until" class="block text-sm font-medium text-gray-700 mb-2">Valid Until</label>
                             <div class="relative">
                                 <input 
@@ -248,21 +284,22 @@
                             </div>
                             @error('valid_until') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
+                        <!-- Usage Limit -->
+                        <div class="col-span-1">
+                            <label for="usage_limit" class="block text-sm font-medium text-gray-700 mb-2">Usage Limit</label>
+                            <input 
+                                placeholder="ex: 100"
+                                type="number" 
+                                id="usage_limit"
+                                wire:model.blur="usage_limit" 
+                                min="1"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-1 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('usage_limit') border-red-500 @enderror"
+                            >
+                            <p class="text-xs text-gray-500 mt-1">Blank for unlimited</p>
+                            @error('usage_limit') <span class="text-red-500 textMaximum-sm">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
-                    <!-- Usage Limit -->
-                    <div class="mb-4">
-                        <label for="usage_limit" class="block text-sm font-medium text-gray-700 mb-2">Usage Limit</label>
-                        <input 
-                            placeholder="Leave empty for unlimited"
-                            type="number" 
-                            id="usage_limit"
-                            wire:model.blur="usage_limit" 
-                            min="1"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-1 text-gray-700 focus:ring-orange-500 focus:border-orange-500 @error('usage_limit') border-red-500 @enderror"
-                        >
-                        @error('usage_limit') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
 
                     <!-- Is Active -->
                     <div class="mb-6">
