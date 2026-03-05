@@ -18,6 +18,16 @@ class AnnouncementLightbox extends Component
         return Announcement::active()
             ->visibleTo(auth()->user())
             ->whereHas('media', fn ($q) => $q->where('collection_name', 'banner'))
+            ->where('published_at', '<=', now())
+            ->where('status', 'published')
+            ->where(function ($query) {
+                $query->whereNotNull('starts_at')
+                    ->orWhere('starts_at', '<=', now());
+            })
+            ->where(function ($query) {
+                $query->whereNotNull('ends_at')
+                    ->orWhere('ends_at', '>=', now());
+            })
             ->latest('published_at')
             ->get();
     }
