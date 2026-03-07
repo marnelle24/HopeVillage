@@ -220,12 +220,14 @@
                         </div>
                         <div class="md:col-span-1">
                             <select
-                                wire:model.live="verifiedFilter"
+                                wire:model.live="typeOfWorkFilter"
                                 class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="all">All Users</option>
-                                <option value="verified">Verified</option>
-                                <option value="unverified">Unverified</option>
+                                <option value="all">All Type of Work</option>
+                                <option value="empty">Empty / Not specified</option>
+                                <option value="Migrant worker">Migrant worker</option>
+                                <option value="Migrant domestic worker">Migrant domestic worker</option>
+                                <option value="Others">Others</option>
                             </select>
                         </div>
                         <div class="md:col-span-1">
@@ -250,8 +252,8 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Member</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">FIN</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Verified</th>
+                                    {{-- <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">FIN</th> --}}
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type of work</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Points</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         <button 
@@ -295,11 +297,25 @@
                                                 </div>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-700 font-mono">{{ $member->fin ?? '-' }}</td>
-                                        <td class="px-6 py-4">
-                                            <span class="px-2 py-1 text-xs font-semibold rounded-lg border {{ $member->is_verified ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200' }}">
-                                                {{ $member->is_verified ? 'Yes' : 'No' }}
-                                            </span>
+                                        {{-- <td class="px-6 py-4 text-sm text-gray-700 font-mono">{{ $member->fin ?? '-' }}</td> --}}
+                                        <td class="px-6 py-4 text-sm text-gray-700">
+                                            @if($member->type_of_work === 'Migrant worker')
+                                                <span class="whitespace-nowrap text-xs bg-blue-300 text-blue-800 border-blue-400 rounded-full px-3 py-2">
+                                                    {{ $member->type_of_work }}
+                                                </span>
+                                            @elseif($member->type_of_work === 'Migrant domestic worker')
+                                                <span class="whitespace-nowrap text-xs bg-rose-300 text-rose-900 border-rose-400 rounded-full px-3 py-2">
+                                                    {{ $member->type_of_work }}
+                                                </span>
+                                            @elseif($member->type_of_work !== null  && $member->type_of_work !== 'Migrant worker' && $member->type_of_work !== 'Migrant domestic worker')
+                                                <span class="whitespace-nowrap text-xs bg-yellow-300 text-yellow-800 border-yellow-400 rounded-full px-3 py-2">
+                                                    {{ $member->type_of_work }}
+                                                </span>
+                                            @elseif($member->type_of_work === null)
+                                                <span class="whitespace-nowrap text-xs bg-gray-300 text-gray-800 border-gray-400 rounded-full px-3 py-2">
+                                                    {{ $member->type_of_work ?? 'N/A' }}
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 text-sm font-semibold text-gray-800">{{ $member->total_points }}</td>
                                         <td class="px-6 py-4 text-sm text-gray-700">

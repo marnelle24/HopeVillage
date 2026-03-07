@@ -121,6 +121,44 @@
                             </div>
                             @if($canAddActivity)
                                 <div>
+                                    <label class="text-sm font-medium text-gray-500">Type of Work</label>
+                                    <div class="mt-1 flex gap-2">
+                                        <select
+                                            wire:model.live="selectedTypeOfWork"
+                                            class="flex-1 px-3 py-2 text-gray-800 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                                        >
+                                            <option value="">— Not set —</option>
+                                            @foreach($typeOfWorkOptions as $option)
+                                                <option value="{{ $option }}">{{ $option }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button
+                                            wire:click="updateTypeOfWork"
+                                            wire:confirm="Are you sure you want to change this member's type of work? This action will be logged."
+                                            class="bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded-md"
+                                            title="Update Type of Work"
+                                        >
+                                            <svg class="size-5" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#ffffff" stroke="#ffffff">
+                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>disk</title> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="work-case" fill="#ffffff" transform="translate(85.333333, 85.333333)"> <path d="M243.498667,1.42108547e-14 L341.333333,97.8346667 L341.333333,341.333333 L1.42108547e-14,341.333333 L1.42108547e-14,1.42108547e-14 L243.498667,1.42108547e-14 Z M213.333333,234.666667 L128,234.666667 L128,298.688 L213.333333,298.688 L213.333333,234.666667 Z M85.3333333,42.6666667 L42.6666667,42.6666667 L42.6666667,298.666667 L85.3333333,298.666667 L85.3333333,192 L256,192 L256,298.666667 L298.666667,298.666667 L298.666667,115.498667 L256,72.8533333 L256,149.333333 L85.3333333,149.333333 L85.3333333,42.6666667 Z M213.333333,42.6666667 L128,42.6666667 L128,106.688 L213.333333,106.688 L213.333333,42.6666667 Z" id="Mask"> </path> </g> </g> </g>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    @if($selectedTypeOfWork === 'Others')
+                                        <div class="mt-2">
+                                            <input
+                                                type="text"
+                                                wire:model="selectedTypeOfWorkCustom"
+                                                placeholder="Specify type of work"
+                                                class="w-full px-3 py-2 text-gray-800 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                                            />
+                                        </div>
+                                    @endif
+                                    <p class="text-xs mt-1 text-gray-500">Only administrators can change type of work</p>
+                                </div>
+                            @endif
+
+                            @if($canAddActivity)
+                                <div>
                                     <label class="text-sm font-medium text-gray-500">User Type</label>
                                     <div class="mt-1 flex gap-2">
                                         <select

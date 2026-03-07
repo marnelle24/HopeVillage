@@ -13,6 +13,8 @@ class Profile extends Component
     public User $member;
     public bool $showMessage = false;
     public ?string $selectedUserType = null;
+    public ?string $selectedTypeOfWork = null;
+    public ?string $selectedTypeOfWorkCustom = null;
 
     public function mount(string $qr_code): void
     {
@@ -20,6 +22,7 @@ class Profile extends Component
         $this->loadMember();
         $this->showMessage = session()->has('message') || session()->has('error');
         $this->selectedUserType = $this->member->user_type;
+        $this->syncTypeOfWorkFromMember();
     }
 
     #[On('activity-updated')]
@@ -55,8 +58,65 @@ class Profile extends Component
             ])
             ->firstOrFail();
         
-        // Sync selected user type with member's current type
+        // Sync selected user type and type of work with member's current values
         $this->selectedUserType = $this->member->user_type;
+        $this->syncTypeOfWorkFromMember();
+    }
+
+    protected function syncTypeOfWorkFromMember(): void
+    {
+        $value = $this->member->type_of_work;
+        if ($value === 'Migrant worker' || $value === 'Migrant domestic worker') {
+            $this->selectedTypeOfWork = $value;
+            $this->selectedTypeOfWorkCustom = null;
+        } elseif ($value) {
+            $this->selectedTypeOfWork = 'Others';
+            $this->selectedTypeOfWorkCustom = $value;
+        } else {
+            $this->selectedTypeOfWork = '';
+            $this->selectedTypeOfWorkCustom = null;
+        }
+    }
+
+    public function updateTypeOfWork(): void
+    {
+        if (!auth()->user()->isAdmin()) {
+            session()->flash('error', 'You do not have permission to change type of work.');
+            $this->showMessage = true;
+            return;
+        }
+
+        $newTypeOfWork = match ($this->selectedTypeOfWork) {
+            '' => null,
+            'Migrant worker', 'Migrant domestic worker' => $this->selectedTypeOfWork,
+            'Others' => trim($this->selectedTypeOfWorkCustom ?? '') ?: null,
+            default => $this->selectedTypeOfWork,
+        };
+
+        $current = $this->member->type_of_work ?? null;
+        if (($newTypeOfWork ?? null) === $current) {
+            session()->flash('error', 'No change detected. Type of work is already set to ' . ($this->member->type_of_work ?? 'N/A') . '.');
+            $this->showMessage = true;
+            return;
+        }
+
+        $oldTypeOfWork = $this->member->type_of_work;
+
+        $this->member->update(['type_of_work' => $newTypeOfWork]);
+
+        Log::info('Type of work changed by administrator', [
+            'admin_id' => auth()->id(),
+            'admin_name' => auth()->user()->name,
+            'target_user_id' => $this->member->id,
+            'target_user_name' => $this->member->name,
+            'old_type_of_work' => $oldTypeOfWork,
+            'new_type_of_work' => $newTypeOfWork,
+            'changed_at' => now()->toIso8601String(),
+        ]);
+
+        session()->flash('message', 'Type of work updated successfully.');
+        $this->showMessage = true;
+        $this->loadMember();
     }
 
     public function updateUserType(): void
@@ -115,10 +175,16 @@ class Profile extends Component
         $this->loadMember(); // Reload member to reflect changes
     }
 
+    public function getTypeOfWorkOptions(): array
+    {
+        return config('member.type_of_work_options', ['Migrant worker', 'Migrant domestic worker', 'Others']);
+    }
+
     public function render()
     {
         return view('livewire.members.profile', [
             'member' => $this->member,
+            'typeOfWorkOptions' => $this->getTypeOfWorkOptions(),
         ])->layout('components.layouts.app');
     }
 }

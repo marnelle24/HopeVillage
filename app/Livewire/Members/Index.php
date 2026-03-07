@@ -16,7 +16,7 @@ class Index extends Component
     use PasswordValidationRules;
 
     public string $search = '';
-    public string $verifiedFilter = 'all'; // all | verified | unverified
+    public string $typeOfWorkFilter = 'all'; // all | Migrant worker | Migrant domestic worker | Others
     public string $userTypeFilter = 'all'; // all | member | merchant_user | admin
     public string $dateSort = 'desc'; // desc | asc
     public bool $showMessage = false;
@@ -55,7 +55,7 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function updatingVerifiedFilter(): void
+    public function updatingTypeOfWorkFilter(): void
     {
         $this->resetPage();
     }
@@ -235,10 +235,13 @@ class Index extends Component
             });
         }
 
-        if ($this->verifiedFilter === 'verified') {
-            $query->where('is_verified', true);
-        } elseif ($this->verifiedFilter === 'unverified') {
-            $query->where('is_verified', false);
+        if ($this->typeOfWorkFilter === 'empty') {
+            $query->whereNull('type_of_work');
+        } elseif ($this->typeOfWorkFilter === 'Others') {
+            $query->whereNotNull('type_of_work')
+                ->whereNotIn('type_of_work', ['Migrant worker', 'Migrant domestic worker']);
+        } elseif ($this->typeOfWorkFilter !== 'all') {
+            $query->where('type_of_work', $this->typeOfWorkFilter);
         }
 
         // Apply date sorting
