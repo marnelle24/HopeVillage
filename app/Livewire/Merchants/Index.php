@@ -11,14 +11,27 @@ class Index extends Component
     use WithPagination;
 
     public $search = '';
+
     public $statusFilter = 'all'; // 'all', 'active', 'inactive', 'pending'
+
     public $showMessage = false;
 
+    public string $activeTab = 'merchants'; // 'merchants' | 'merchant-ledger'
+
     protected $paginationTheme = 'tailwind';
+
+    protected $queryString = [
+        'activeTab' => ['as' => 'tab', 'except' => 'merchants'],
+    ];
 
     public function mount()
     {
         $this->showMessage = session()->has('message');
+
+        $tab = request()->query('tab');
+        if (in_array($tab, ['merchant-ledger', 'merchants'], true)) {
+            $this->activeTab = $tab;
+        }
     }
 
     public function updatingSearch()
@@ -98,6 +111,7 @@ class Index extends Component
         return view('livewire.merchants.index', [
             'merchants' => $merchants,
             'pendingCount' => $pendingCount,
+            'activeTab' => $this->activeTab,
         ])->layout('components.layouts.app');
     }
 }

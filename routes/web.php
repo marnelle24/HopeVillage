@@ -109,6 +109,10 @@ Route::middleware([
     Route::get('/admin/admin-vouchers/{voucher_code}/edit', \App\Livewire\AdminVouchers\Form::class)->name('admin.admin-vouchers.edit');
     Route::get('/admin/admin-vouchers/{voucher_code}/profile', \App\Livewire\AdminVouchers\Profile::class)->name('admin.admin-vouchers.profile');
 
+    // Admin Voucher Ledger – Transaction History PDF (opens in new tab)
+    Route::get('/admin/admin-voucher-ledger/{entry}/transaction-history-pdf', \App\Http\Controllers\AdminVoucherLedgerTransactionHistoryPdfController::class)
+        ->name('admin.admin-voucher-ledger.transaction-history-pdf');
+
     // Point System CRUD Routes
     Route::get('/admin/point-system', \App\Livewire\PointSystem\Index::class)->name('admin.point-system.index');
     Route::get('/admin/point-system/create', \App\Livewire\PointSystem\Form::class)->name('admin.point-system.create');

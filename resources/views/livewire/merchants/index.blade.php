@@ -5,25 +5,54 @@
                 <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight">
                     {{ __('Merchants Management') }}
                 </h2>
-                <a href="{{ route('admin.merchants.create') }}" class="md:block hidden text-orange-500 font-medium hover:text-orange-600 hover:scale-105 transition-all duration-300 py-2 px-4">
-                    <span class="flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                @if ($activeTab === 'merchants')
+                    <a href="{{ route('admin.merchants.create') }}" class="md:block hidden text-orange-500 font-medium hover:text-orange-600 hover:scale-105 transition-all duration-300 py-2 px-4">
+                        <span class="flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Add New Merchant
+                        </span>
+                    </a>
+                    <a href="{{ route('admin.merchants.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
-                        Add New Merchant
-                    </span>
-                </a>
-                <a href="{{ route('admin.merchants.create') }}" class="md:hidden block bg-orange-500 hover:bg-orange-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                </a>
+                    </a>
+                @endif
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <!-- Tabs -->
+    <div class="py-4 md:px-0 px-4">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex gap-6" aria-label="Tabs">
+                    <button
+                        type="button"
+                        wire:click="$set('activeTab', 'merchants')"
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'merchants' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}"
+                    >
+                        Merchants List
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="$set('activeTab', 'merchant-ledger')"
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'merchant-ledger' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}"
+                    >
+                        Admin Voucher Ledger
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="py-8">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            @if ($activeTab === 'merchant-ledger')
+                <livewire:merchants.admin-voucher-ledger />
+            @else
             @if (session()->has('message'))
                 <div 
                     x-data="{ 
@@ -239,6 +268,7 @@
             <div class="mt-6 md:px-0 px-4">
                 {{ $merchants->links() }}
             </div>
+            @endif
         </div>
     </div>
 </div>
