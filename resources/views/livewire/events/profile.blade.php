@@ -278,7 +278,7 @@
                             <div>
                                 <label class="text-sm font-medium text-gray-500">Registrations</label>
                                 <p class="text-2xl font-bold text-gray-900">
-                                    {{ $event->registrations->count() }}
+                                    {{ $event->registrations()->where('status', 'attended')->count() }}
                                     @if($event->max_participants)
                                         / {{ $event->max_participants }}
                                     @endif

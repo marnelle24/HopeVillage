@@ -5,7 +5,7 @@
             <span class="text-sm md:text-base font-bold text-gray-500">
                 Total Participants:
                 <span class="text-xl font-bold text-gray-900 ml-1">
-                    {{ $event->registrations()->count() }}
+                    {{ $registrations->total() }}
                 </span>
             </span>
         </div>
