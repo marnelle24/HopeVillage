@@ -209,7 +209,7 @@
             <!-- Search and Filter -->
             @if(!$showPasswordReset)
                 <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 md:mx-0 mx-4 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div class="md:col-span-3">
                             <input
                                 type="text"
@@ -223,23 +223,34 @@
                                 wire:model.live="typeOfWorkFilter"
                                 class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="all">All Type of Work</option>
+                                <option value="all">Work Type</option>
                                 <option value="empty">Empty / Not specified</option>
                                 <option value="Migrant worker">Migrant worker</option>
                                 <option value="Migrant domestic worker">Migrant domestic worker</option>
                                 <option value="Others">Others</option>
                             </select>
                         </div>
-                        <div class="md:col-span-1">
+                        <div class="md:col-span-2 flex flex-wrap gap-2 items-center">
                             <select
-                                wire:model.live="userTypeFilter"
-                                class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                wire:model.live="pointsSort"
+                                class="flex-1 min-w-0 px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="all">All User Types</option>
-                                <option value="member">Member</option>
-                                <option value="merchant_user">Merchant User</option>
-                                <option value="admin">Admin</option>
+                                <option value="default">Sort by Date</option>
+                                <option value="highest">Sort by Points: Highest to lowest</option>
+                                <option value="lowest">Sort by Points: Lowest to highest</option>
+                                <option value="top_20">Sort by Points: Top 20</option>
+                                <option value="top_50">Sort by Points: Top 50</option>
                             </select>
+                            <button
+                                type="button"
+                                wire:click="exportToCsv"
+                                class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-full transition-colors whitespace-nowrap"
+                            >
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                                Export to CSV
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -273,7 +284,6 @@
                                             @endif
                                         </button>
                                     </th>
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">&nbsp;</th>
                                     <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
                                 </tr>
                             </thead>
@@ -325,28 +335,6 @@
                                                 </span>
                                                 <span class="text-xs text-gray-500">
                                                     {{ $member->created_at ? $member->created_at->format('g:i A') : '' }}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 text-right">
-                                            <div class="text-xs text-gray-600">
-                                                @php 
-                                                    $userType = $member->user_type;
-                                                    $userTypeClass = match($userType) {
-                                                        'admin' => 'bg-blue-100 text-blue-800 border-blue-200',
-                                                        'member' => 'bg-gray-100 text-gray-800 border-gray-200',
-                                                        'merchant_user' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
-                                                        default => 'bg-gray-100 text-gray-800 border-gray-200',
-                                                    };
-                                                    $userTypeText = match($userType) {
-                                                        'admin' => 'Administrator',
-                                                        'member' => 'Member',
-                                                        'merchant_user' => 'Merchant',
-                                                        default => $userType,
-                                                    };
-                                                @endphp
-                                                <span class="px-2 py-1 text-xs font-semibold rounded-lg border {{ $userTypeClass }}">
-                                                    {{ $userTypeText }}
                                                 </span>
                                             </div>
                                         </td>
@@ -453,7 +441,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500">
+                                        <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
                                             No members found.
                                         </td>
                                     </tr>

@@ -4,8 +4,10 @@ namespace App\Livewire\Members;
 
 use App\Actions\Fortify\PasswordValidationRules;
 use App\Models\User;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,8 +19,9 @@ class Index extends Component
 
     public string $search = '';
     public string $typeOfWorkFilter = 'all'; // all | Migrant worker | Migrant domestic worker | Others
-    public string $userTypeFilter = 'all'; // all | member | merchant_user | admin
+    public string $userTypeFilter = 'member'; // kept for Livewire state compatibility; list always shows members only
     public string $dateSort = 'desc'; // desc | asc
+    public string $pointsSort = 'default'; // default | highest | lowest | top_20 | top_50
     public bool $showMessage = false;
     
     // Password reset properties
@@ -60,7 +63,7 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function updatingUserTypeFilter(): void
+    public function updatingPointsSort(): void
     {
         $this->resetPage();
     }
@@ -216,14 +219,50 @@ class Index extends Component
         return $this->redirect(route('admin.members.index'), navigate: true);
     }
 
-    public function render()
+    public function exportToCsv()
     {
-        $query = User::query();
+        $members = $this->buildMembersQuery()->get();
+        $filename = 'members-' . now()->format('Y-m-d-His') . '.csv';
 
-        // Apply user type filter
-        if ($this->userTypeFilter !== 'all') {
-            $query->where('user_type', $this->userTypeFilter);
-        }
+        return Response::streamDownload(function () use ($members) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Name',
+                'Email',
+                'WhatsApp',
+                'FIN',
+                'Type of Work',
+                'Points',
+                'Date Registered',
+            ]);
+
+            foreach ($members as $member) {
+                fputcsv($handle, [
+                    $member->name ?? '',
+                    $member->email ?? '',
+                    $member->whatsapp_number ?? '',
+                    $member->fin ?? '',
+                    $member->type_of_work ?? 'N/A',
+                    $member->total_points ?? 0,
+                    $member->created_at?->format('d M Y g:i A') ?? 'N/A',
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    /**
+     * @return Builder<User>
+     */
+    private function buildMembersQuery(): Builder
+    {
+        $query = User::query()
+            ->where('user_type', 'member');
 
         if ($this->search !== '') {
             $s = '%' . $this->search . '%';
@@ -244,14 +283,30 @@ class Index extends Component
             $query->where('type_of_work', $this->typeOfWorkFilter);
         }
 
-        // Apply date sorting
-        if ($this->dateSort === 'asc') {
-            $query->orderBy('created_at', 'asc');
+        if ($this->pointsSort === 'highest') {
+            $query->orderByDesc('total_points');
+        } elseif ($this->pointsSort === 'lowest') {
+            $query->orderBy('total_points', 'asc');
+        } elseif ($this->pointsSort === 'top_20') {
+            $topIds = (clone $query)->orderByDesc('total_points')->limit(20)->pluck('id');
+            $query->whereIn('id', $topIds)->orderByDesc('total_points');
+        } elseif ($this->pointsSort === 'top_50') {
+            $topIds = (clone $query)->orderByDesc('total_points')->limit(50)->pluck('id');
+            $query->whereIn('id', $topIds)->orderByDesc('total_points');
         } else {
-            $query->orderByDesc('created_at');
+            if ($this->dateSort === 'asc') {
+                $query->orderBy('created_at', 'asc');
+            } else {
+                $query->orderByDesc('created_at');
+            }
         }
 
-        $members = $query->paginate(10);
+        return $query;
+    }
+
+    public function render()
+    {
+        $members = $this->buildMembersQuery()->paginate(10);
 
         $selectedUser = null;
         if ($this->showPasswordReset && $this->selectedUserId) {
