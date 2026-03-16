@@ -90,7 +90,7 @@
                                             @foreach(\App\Livewire\Raffle\RouletteV2::TYPE_OF_WORK_OPTIONS as $option)
                                                 <label class="flex items-center gap-2 my-2" x-bind:class="isSpinning ? 'opacity-50 cursor-not-allowed' : ''">
                                                     <input type="checkbox" wire:model.live="selectedTypeOfWork" value="{{ $option }}" class="rounded border-gray-300 text-indigo-600 focus:ring-orange-500 p-2" x-bind:disabled="isSpinning || $wire.typeOfWorkAll">
-                                                    <span class="text-sm text-gray-700 text-nowrap capitalize">{{ $option }}</span>
+                                                    <span class="text-sm text-nowrap capitalize truncate" x-bind:class="$wire.typeOfWorkAll ? 'opacity-40 text-gray-400' : 'opacity-100 text-gray-700'">{{ $option }}</span>
                                                 </label>
                                             @endforeach
                                         </div>
@@ -152,12 +152,26 @@
                                                     $itemValue = is_string($item) ? $item : (string) $item;
                                                     // Check if this entry is a winner
                                                     $winnerInfo = collect($winners)->firstWhere('value', $itemValue);
+
+                                                    $top20Label = \App\Livewire\Raffle\RouletteV2::TYPE_OF_WORK_OPTIONS[0];
+                                                    $isTop20Mode = $source === 'event_attendees'
+                                                        && in_array($top20Label, $selectedTypeOfWork ?? [], true);
                                                 @endphp
                                                 <tr class="hover:bg-gray-50 {{ $winnerInfo ? 'bg-gray-100' : '' }}">
                                                     {{-- <td class="px-3 py-1.5 text-xs text-gray-500">{{ $index + 1 }}</td> --}}
                                                     <td class="px-3 py-1.5 text-xs text-gray-700">
                                                         <div class="flex items-center gap-2">
-                                                            <span>{{ $itemValue }}</span>
+                                                            @if($isTop20Mode)
+                                                                <span>
+                                                                    {{ $itemValue }}
+                                                                    @if(!empty($top20PointsByQr[$itemValue] ?? null))
+                                                                        ({{ $top20PointsByQr[$itemValue] }} pts)
+                                                                    @endif
+                                                                </span>
+                                                            @else
+                                                                <span>{{ $itemValue }}</span>
+                                                            @endif
+
                                                             @if($winnerInfo)
                                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{  $winnerInfo['place'] == 1 ? 'text-green-500 bg-green-100' : ($winnerInfo['place'] == 2 ? 'text-teal-500 bg-teal-100' : ($winnerInfo['place'] == 3 ? 'text-yellow-500 bg-yellow-100' : 'text-orange-500 bg-orange-100'))}}">
                                                                     {{ $winnerInfo['place'] ?? '' }}{{ isset($winnerInfo['place']) && $winnerInfo['place'] == 1 ? 'st' : (isset($winnerInfo['place']) && $winnerInfo['place'] == 2 ? 'nd' : (isset($winnerInfo['place']) && $winnerInfo['place'] == 3 ? 'rd' : 'th')) }} Place

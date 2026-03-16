@@ -24,6 +24,7 @@ class RouletteV2 extends Component
 
     /** Fixed type of work options to display as checkboxes (excluding "All"). */
     public const TYPE_OF_WORK_OPTIONS = [
+        'Top 20 highest points attendees',
         'Migrant worker',
         'Migrant domestic worker',
         'Others',
@@ -31,6 +32,9 @@ class RouletteV2 extends Component
 
     /** @var array<int, string> */
     public array $entries = [];
+
+    /** @var array<string, int> Map of QR code => total_points for top 20 mode */
+    public array $top20PointsByQr = [];
 
     public ?string $winner = null;
     public ?int $winnerIndex = null;
@@ -131,6 +135,7 @@ class RouletteV2 extends Component
         $this->resetValidation();
         $this->resetWinners();
         $this->entries = [];
+        $this->top20PointsByQr = [];
 
         if ($this->source === 'range') {
             $this->validate([
@@ -195,11 +200,48 @@ class RouletteV2 extends Component
                 'selectedEventId' => ['required', 'integer'],
             ]);
 
+            $top20Label = self::TYPE_OF_WORK_OPTIONS[0];
+            $isTop20Selected = in_array($top20Label, $this->selectedTypeOfWork, true);
+
             $query = EventRegistration::query()
                 ->where('event_id', $this->selectedEventId)
                 ->where('status', 'attended')
                 ->whereNotNull('user_id')
-                ->with('user:id,qr_code,type_of_work');
+                ->with('user:id,qr_code,type_of_work,total_points');
+
+            if ($isTop20Selected) {
+                $registrations = $query
+                    ->whereHas('user', fn ($q) => $q->whereNotNull('total_points'))
+                    ->get()
+                    ->sortByDesc(fn (EventRegistration $r) => $r->user?->total_points ?? 0)
+                    ->take(20);
+
+                $qrCodes = $registrations
+                    ->map(fn (EventRegistration $r) => $r->user?->qr_code)
+                    ->filter(fn ($qrCode) => is_string($qrCode) && trim($qrCode) !== '')
+                    ->map(fn ($qrCode) => strtoupper(trim($qrCode)))
+                    ->unique()
+                    ->values();
+
+                $this->entries = $qrCodes->all();
+
+                $this->top20PointsByQr = $registrations
+                    ->mapWithKeys(function (EventRegistration $r) {
+                        $qr = $r->user?->qr_code;
+                        if (!is_string($qr) || trim($qr) === '') {
+                            return [];
+                        }
+
+                        $normalizedQr = strtoupper(trim($qr));
+                        $points = (int) ($r->user?->total_points ?? 0);
+
+                        return [$normalizedQr => $points];
+                    })
+                    ->toArray();
+
+                $this->dispatch('entries-loaded');
+                return;
+            }
 
             if (!$this->typeOfWorkAll && !empty($this->selectedTypeOfWork)) {
                 $query->whereHas('user', fn ($q) => $q->whereIn('type_of_work', $this->selectedTypeOfWork));
