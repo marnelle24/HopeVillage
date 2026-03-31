@@ -185,6 +185,6 @@ class Form extends Component
         return view('livewire.merchant.vouchers.form', [
             'discountTypes' => $discountTypes,
             'typeOfWorkOptions' => $typeOfWorkOptions,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

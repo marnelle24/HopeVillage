@@ -193,6 +193,6 @@ class Roulette extends Component
 
     public function render()
     {
-        return view('livewire.raffle.roulette')->layout('components.layouts.app');
+        return view('livewire.raffle.roulette')->layout('layouts.app');
     }
 }

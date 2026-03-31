@@ -146,7 +146,7 @@ class Form extends Component
 
     public function render()
     {
-        return view('livewire.locations.form')->layout('components.layouts.app');
+        return view('livewire.locations.form')->layout('layouts.app');
     }
 }
 

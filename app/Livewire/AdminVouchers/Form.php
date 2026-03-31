@@ -136,7 +136,7 @@ class Form extends Component
         return view('livewire.admin-vouchers.form', [
             'merchants' => $merchants,
             'typeOfWorkOptions' => $typeOfWorkOptions,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

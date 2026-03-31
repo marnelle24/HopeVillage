@@ -185,7 +185,7 @@ class Profile extends Component
         return view('livewire.members.profile', [
             'member' => $this->member,
             'typeOfWorkOptions' => $this->getTypeOfWorkOptions(),
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

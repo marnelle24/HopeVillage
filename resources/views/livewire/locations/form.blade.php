@@ -1,16 +1,21 @@
 <div>
-    <x-slot name="header">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    {{ $locationId ? __('Edit Location') : __('Create Location') }}
-                </h2>
-                <a href="{{ route('admin.locations.index') }}" class="text-gray-600 hover:text-gray-900">
-                    ← Back to Locations
-                </a>
+    @php
+        $requiredPermission = $locationId ? 'location.edit' : 'location.create';
+    @endphp
+
+    @if (Illuminate\Support\Facades\Gate::allows($requiredPermission))
+        <x-slot name="header">
+            <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center">
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                        {{ $locationId ? __('Edit Location') : __('Create Location') }}
+                    </h2>
+                    <a href="{{ route('admin.locations.index') }}" class="text-gray-600 hover:text-gray-900">
+                        ← Back to Locations
+                    </a>
+                </div>
             </div>
-        </div>
-    </x-slot>
+        </x-slot>
 
         <div class="py-12">
             <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
@@ -293,6 +298,9 @@
                 {{-- </div> --}}
             </div>
         </div>
+    @else
+        @php abort(403, 'Unauthorized.'); @endphp
+    @endif
 </div>
 
 @push('scripts')

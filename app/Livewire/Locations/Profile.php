@@ -32,6 +32,6 @@ class Profile extends Component
         return view('livewire.locations.profile', [
             'location' => $this->location,
             'qrCodeImage' => $qrCodeImage,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

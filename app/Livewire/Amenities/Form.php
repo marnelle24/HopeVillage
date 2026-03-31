@@ -164,6 +164,6 @@ class Form extends Component
         return view('livewire.amenities.form', [
             'locations' => $locations,
             'types' => $types,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

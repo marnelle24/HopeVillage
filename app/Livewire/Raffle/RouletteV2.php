@@ -12,6 +12,7 @@ class RouletteV2 extends Component
     public string $source = 'range'; // range | members_fin | members_qr_code | event_attendees
 
     public ?int $rangeStart = 1;
+
     public ?int $rangeEnd = 10;
 
     public ?int $selectedEventId = null;
@@ -24,7 +25,7 @@ class RouletteV2 extends Component
 
     /** Fixed type of work options to display as checkboxes (excluding "All"). */
     public const TYPE_OF_WORK_OPTIONS = [
-        'Top 20 highest points attendees',
+        'Highest points - Top 20%',
         'Migrant worker',
         'Migrant domestic worker',
         'Others',
@@ -37,7 +38,9 @@ class RouletteV2 extends Component
     public array $top20PointsByQr = [];
 
     public ?string $winner = null;
+
     public ?int $winnerIndex = null;
+
     public ?array $latestWinner = null; // Store latest winner with member details
 
     /** @var array<int, array{place:int,value:string,member:array|null}> */
@@ -103,7 +106,7 @@ class RouletteV2 extends Component
             $this->selectedTypeOfWork = [];
             $this->resetWinners();
             $this->loadEntries();
-        } elseif ($this->source === 'event_attendees' && !$this->selectedEventId) {
+        } elseif ($this->source === 'event_attendees' && ! $this->selectedEventId) {
             $this->entries = [];
             $this->typeOfWorkAll = true;
             $this->selectedTypeOfWork = [];
@@ -125,6 +128,11 @@ class RouletteV2 extends Component
     public function updatedSelectedTypeOfWork(): void
     {
         if ($this->source === 'event_attendees' && $this->selectedEventId) {
+            $top20Label = self::TYPE_OF_WORK_OPTIONS[0];
+            if (in_array($top20Label, $this->selectedTypeOfWork, true)) {
+                // When Top 20% is selected, clear other selections
+                $this->selectedTypeOfWork = [$top20Label];
+            }
             $this->resetWinners();
             $this->loadEntries();
         }
@@ -145,12 +153,14 @@ class RouletteV2 extends Component
 
             if ($this->rangeStart > $this->rangeEnd) {
                 $this->addError('rangeEnd', 'End must be greater than or equal to start.');
+
                 return;
             }
 
             $count = ($this->rangeEnd - $this->rangeStart) + 1;
             if ($count > 500) {
                 $this->addError('rangeEnd', 'Range is too large (max 500).');
+
                 return;
             }
 
@@ -160,6 +170,7 @@ class RouletteV2 extends Component
                 ->all();
 
             $this->dispatch('entries-loaded');
+
             return;
         }
 
@@ -176,6 +187,7 @@ class RouletteV2 extends Component
                 ->all();
 
             $this->dispatch('entries-loaded');
+
             return;
         }
 
@@ -192,6 +204,7 @@ class RouletteV2 extends Component
                 ->all();
 
             $this->dispatch('entries-loaded');
+
             return;
         }
 
@@ -210,11 +223,15 @@ class RouletteV2 extends Component
                 ->with('user:id,qr_code,type_of_work,total_points');
 
             if ($isTop20Selected) {
+
+                $desiredPercentage = 0.2; // 20% of the result
                 $registrations = $query
                     ->whereHas('user', fn ($q) => $q->whereNotNull('total_points'))
                     ->get()
-                    ->sortByDesc(fn (EventRegistration $r) => $r->user?->total_points ?? 0)
-                    ->take(20);
+                    ->sortByDesc(fn (EventRegistration $r) => $r->user?->total_points ?? 0);
+
+                $takeCount = (int) ceil($registrations->count() * $desiredPercentage);
+                $registrations = $registrations->take($takeCount);
 
                 $qrCodes = $registrations
                     ->map(fn (EventRegistration $r) => $r->user?->qr_code)
@@ -228,7 +245,7 @@ class RouletteV2 extends Component
                 $this->top20PointsByQr = $registrations
                     ->mapWithKeys(function (EventRegistration $r) {
                         $qr = $r->user?->qr_code;
-                        if (!is_string($qr) || trim($qr) === '') {
+                        if (! is_string($qr) || trim($qr) === '') {
                             return [];
                         }
 
@@ -240,10 +257,11 @@ class RouletteV2 extends Component
                     ->toArray();
 
                 $this->dispatch('entries-loaded');
+
                 return;
             }
 
-            if (!$this->typeOfWorkAll && !empty($this->selectedTypeOfWork)) {
+            if (! $this->typeOfWorkAll && ! empty($this->selectedTypeOfWork)) {
                 $query->whereHas('user', fn ($q) => $q->whereIn('type_of_work', $this->selectedTypeOfWork));
             }
 
@@ -258,6 +276,7 @@ class RouletteV2 extends Component
             $this->entries = $qrCodes->all();
 
             $this->dispatch('entries-loaded');
+
             return;
         }
     }
@@ -271,6 +290,7 @@ class RouletteV2 extends Component
 
         if (count($availableEntries) === 0) {
             $this->addError('entries', 'No entries available.');
+
             return;
         }
 
@@ -281,6 +301,7 @@ class RouletteV2 extends Component
 
         if ($this->winner === null) {
             $this->addError('entries', 'Failed to select winner.');
+
             return;
         }
 
@@ -296,19 +317,20 @@ class RouletteV2 extends Component
     {
         // Get winner values
         $winnerValues = collect($this->winners)->pluck('value')->toArray();
-        
+
         // Get rejected values (ensure they are strings)
         $rejectedValues = collect($this->rejected)
             ->map(function ($value) {
                 return is_string($value) ? $value : (string) $value;
             })
             ->toArray();
-        
+
         // Filter out entries that are already winners or rejected
         return collect($this->entries)
             ->filter(function ($entry) use ($winnerValues, $rejectedValues) {
                 $entryStr = (string) $entry;
-                return !in_array($entryStr, $winnerValues, true) && !in_array($entryStr, $rejectedValues, true);
+
+                return ! in_array($entryStr, $winnerValues, true) && ! in_array($entryStr, $rejectedValues, true);
             })
             ->values()
             ->all();
@@ -317,52 +339,52 @@ class RouletteV2 extends Component
     public function onSpinComplete($winnerIndex): void
     {
         $this->winnerIndex = $winnerIndex;
-        
+
         // Use the winner value that was already determined in spin() method
         // If not set, fallback to getting from entries array (shouldn't happen normally)
         if ($this->winner === null) {
             $this->winner = $this->entries[$winnerIndex] ?? null;
         }
-        
+
         // Validate winner is not null
         if ($this->winner === null) {
             return;
         }
-        
+
         // Ensure winner is a string
         $winnerValue = is_string($this->winner) ? $this->winner : (string) $this->winner;
-        
+
         // Validate winner value is not empty
         if (trim($winnerValue) === '') {
             return;
         }
-        
+
         // Check if this winner already exists in the winners array to prevent duplicates
         $existingWinner = collect($this->winners)->firstWhere('value', $winnerValue);
         if ($existingWinner !== null) {
             // Winner already exists, don't add duplicate
             return;
         }
-        
+
         // Fetch member details based on entry source
         $memberDetails = $this->getMemberDetails($winnerValue);
-        
+
         // Add winner to winners array
         $place = count($this->winners) + 1;
-        
+
         $winnerData = [
             'place' => $place,
             'value' => $winnerValue,
             'member' => $memberDetails,
         ];
-        
+
         $this->winners[] = $winnerData;
         $this->latestWinner = $winnerData; // Store for modal display
-        
+
         // Dispatch event to open winner modal
         // Don't update wheel yet - wait for modal to close
         $this->dispatch('show-winner-modal');
-        
+
         // Also dispatch browser event as fallback
         $this->dispatch('show-winner-modal-browser');
     }
@@ -372,7 +394,7 @@ class RouletteV2 extends Component
         // Update entries to exclude winners
         $availableEntries = $this->getAvailableEntries();
         $this->entries = $availableEntries;
-        
+
         // Dispatch event to reinitialize wheel with updated entries
         $this->dispatch('entries-loaded');
     }
@@ -402,7 +424,7 @@ class RouletteV2 extends Component
                 ->first();
         }
 
-        if (!$user) {
+        if (! $user) {
             return null;
         }
 
@@ -424,7 +446,7 @@ class RouletteV2 extends Component
 
     private function getEntryType(): string
     {
-        return match($this->source) {
+        return match ($this->source) {
             'members_qr_code' => 'qr_code',
             'members_fin' => 'fin',
             'event_attendees' => 'qr_code',
@@ -446,13 +468,14 @@ class RouletteV2 extends Component
             if ($winnerValue !== null) {
                 // Add to rejected array
                 $this->rejected[] = $this->latestWinner['value'];
-                
+
                 // Remove from winners array
                 $this->winners = collect($this->winners)
                     ->reject(fn ($winner) => ($winner['value'] ?? '') === $winnerValue)
                     ->values()
                     ->map(function ($winner, $index) {
                         $winner['place'] = $index + 1;
+
                         return $winner;
                     })
                     ->all();
@@ -470,7 +493,7 @@ class RouletteV2 extends Component
 
         // Dispatch event to update wheel with entries excluding rejected values
         $this->dispatch('entries-loaded');
-        
+
         // Trigger a new spin after a short delay to allow wheel to update
         // Use JavaScript to handle the delay and spin
         $this->dispatch('trigger-respin');
@@ -487,7 +510,6 @@ class RouletteV2 extends Component
 
     public function render()
     {
-        return view('livewire.raffle.roulette-v2')->layout('components.layouts.app');
+        return view('livewire.raffle.roulette-v2')->layout('layouts.app');
     }
 }
-

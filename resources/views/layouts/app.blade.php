@@ -124,7 +124,7 @@
             </template>
         </div>
 
-        <div class="min-h-screen bg-white {{ auth()->check() && auth()->user()->isAdmin() ? 'pt-20' : '' }}">
+        <div class="min-h-screen bg-gray-50 {{ auth()->check() && auth()->user()->isAdmin() ? 'pt-16' : '' }}">
             @livewire('navigation-menu')
             
             <!-- Page Heading -->
@@ -137,7 +137,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="{{ auth()->check() && auth()->user()->isMember() ? 'pb-24 sm:pb-0' : '' }}">
+            <main class="{{ auth()->check() && auth()->user()->isMember() ? 'pb-16 sm:pb-0' : '' }}">
                 {{ $slot }}
             </main>
         </div>

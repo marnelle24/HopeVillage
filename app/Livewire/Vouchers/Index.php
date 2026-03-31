@@ -200,7 +200,7 @@ class Index extends Component
             'adminVouchers' => collect(),
             'groupedAdminVouchers' => collect(),
             'merchants' => $merchants,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 
     protected function renderAdminVouchers()
@@ -250,7 +250,7 @@ class Index extends Component
             'groupedVouchers' => collect(),
             'groupedAdminVouchers' => $groupedAdminVouchers,
             'merchants' => $merchants,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 
     protected function getVoucherStatus($voucher)

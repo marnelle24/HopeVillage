@@ -93,7 +93,15 @@ class Index extends Component
 
     public function save()
     {
+
         if ($this->settingId) {
+
+            if(!auth()->user()->can('settings.edit')) 
+            {
+                session()->flash('error', 'You do not have permission to edit this setting.');
+                $this->showMessage = true;
+                return;
+            }
             // For edit mode, validate all fields except key (key is disabled)
             $this->validate([
                 'name' => 'required|string|max:255',
@@ -111,6 +119,13 @@ class Index extends Component
             ]);
             $message = 'Setting updated successfully.';
         } else {
+
+            if(!auth()->user()->can('settings.create')) 
+            {
+                session()->flash('error', 'You do not have permission to create this setting.');
+                $this->showMessage = true;
+                return;
+            }
             // For create mode, validate all fields
             $this->validate();
             
@@ -167,6 +182,6 @@ class Index extends Component
 
         return view('livewire.settings.index', [
             'settings' => $settings,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

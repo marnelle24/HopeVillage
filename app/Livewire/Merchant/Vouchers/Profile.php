@@ -76,6 +76,6 @@ class Profile extends Component
             'claimedMembers' => $this->claimedMembers,
             'redeemedMembers' => $this->redeemedMembers,
             'qrCodeImage' => $qrCodeImage,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

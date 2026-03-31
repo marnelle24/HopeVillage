@@ -66,7 +66,7 @@ class Index extends Component
 
         return view('livewire.admin-vouchers.index', [
             'adminVouchers' => $adminVouchers,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

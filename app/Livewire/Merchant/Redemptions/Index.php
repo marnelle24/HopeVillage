@@ -127,6 +127,6 @@ class Index extends Component
             'merchantRedemptions' => $merchantRedemptions,
             'adminRedemptions' => $adminRedemptions,
             'merchant' => $merchant,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

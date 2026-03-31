@@ -1,4 +1,12 @@
 <div>
+    @php
+        $isEditing = filled($eventId);
+        $canManageEvent = $isEditing
+            ? auth()->user()?->can('event.edit')
+            : auth()->user()?->can('event.create');
+    @endphp
+
+    @if($canManageEvent)
     <x-slot name="header">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
@@ -281,4 +289,7 @@
             </form>
         </div>
     </div>
+    @else
+        @php abort(403, 'Unauthorized.'); @endphp
+    @endif
 </div>

@@ -122,7 +122,7 @@
                             @endphp
 
                             <a href="{{ $category['route'] }}" 
-                               class="card bg-gray-100 shadow-md hover:shadow-xl border border-base-300 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in"
+                               class="card bg-white shadow-md hover:shadow-xl border border-base-300 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in"
                                style="animation-delay: {{ ($index + 1) * 50 }}ms">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <div class="{{ $iconColorClass }} mb-1">

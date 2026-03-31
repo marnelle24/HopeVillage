@@ -40,6 +40,6 @@ class Profile extends Component
         return view('livewire.merchants.profile', [
             'merchant' => $this->merchant,
             'qrCodeImage' => $qrCodeImage,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

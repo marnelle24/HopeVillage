@@ -185,39 +185,59 @@
                     <x-responsive-nav-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard') || request()->routeIs('admin.dashboard.v2')">
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations*')">
-                        {{ __('Locations') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events*')">
-                        {{ __('Events') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.members.index') }}" :active="request()->routeIs('admin.members.index') || request()->routeIs('admin.members.profile')">
-                        {{ __('Members') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
-                        {{ __('Activities') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
-                        {{ __('Vouchers') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants*')">
-                        {{ __('Merchants') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.point-system.index') }}" :active="request()->routeIs('admin.point-system*')">
-                        {{ __('Point System') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
-                        {{ __('Lucky Draw') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.news.index') }}" :active="request()->routeIs('admin.news*')">
-                        {{ __('News') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.news-categories.index') }}" :active="request()->routeIs('admin.news-categories*')">
-                        {{ __('News Categories') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link href="{{ route('admin.announcements.index') }}" :active="request()->routeIs('admin.announcements*')">
-                        {{ __('Announcements') }}
-                    </x-responsive-nav-link>
+                    @can('location.view')
+                        <x-responsive-nav-link href="{{ route('admin.locations.index') }}" :active="request()->routeIs('admin.locations*')">
+                            {{ __('Locations') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('event.view')
+                        <x-responsive-nav-link href="{{ route('admin.events.index') }}" :active="request()->routeIs('admin.events*')">
+                            {{ __('Events') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('member.view')
+                        <x-responsive-nav-link href="{{ route('admin.members.index') }}" :active="request()->routeIs('admin.members.index') || request()->routeIs('admin.members.profile')">
+                            {{ __('Members') }}
+                        </x-responsive-nav-link>
+                        <x-responsive-nav-link href="{{ route('admin.members.activities') }}" :active="request()->routeIs('admin.members.activities')">
+                            {{ __('Activities') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('voucher.view')
+                        <x-responsive-nav-link href="{{ route('admin.vouchers.index') }}" :active="request()->routeIs('admin.vouchers*')">
+                            {{ __('Vouchers') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('merchant.view')
+                        <x-responsive-nav-link href="{{ route('admin.merchants.index') }}" :active="request()->routeIs('admin.merchants*')">
+                            {{ __('Merchants') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('point-system.view')
+                        <x-responsive-nav-link href="{{ route('admin.point-system.index') }}" :active="request()->routeIs('admin.point-system*')">
+                            {{ __('Point System') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('can_manage_lucky_draw')
+                        <x-responsive-nav-link href="{{ route('admin.raffle') }}" :active="request()->routeIs('admin.raffle')">
+                            {{ __('Lucky Draw') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('news.view')
+                        <x-responsive-nav-link href="{{ route('admin.news.index') }}" :active="request()->routeIs('admin.news.index') || request()->routeIs('admin.news.create') || request()->routeIs('admin.news.edit') || request()->routeIs('admin.news.profile')">
+                            {{ __('News') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('news-category.view')
+                        <x-responsive-nav-link href="{{ route('admin.news-categories.index') }}" :active="request()->routeIs('admin.news-categories*')">
+                            {{ __('News Categories') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('announcement.view')
+                        <x-responsive-nav-link href="{{ route('admin.announcements.index') }}" :active="request()->routeIs('admin.announcements*')">
+                            {{ __('Announcements') }}
+                        </x-responsive-nav-link>
+                    @endcan
                 </nav>
 
                 <!-- Sidebar footer (user & settings) -->
@@ -230,9 +250,11 @@
                         <x-responsive-nav-link href="{{ route('profile.show') }}">
                             {{ __('Profile') }}
                         </x-responsive-nav-link>
-                        <x-responsive-nav-link href="{{ route('admin.settings.index') }}">
-                            {{ __('Settings') }}
-                        </x-responsive-nav-link>
+                        @can('settings.view')
+                            <x-responsive-nav-link href="{{ route('admin.settings.index') }}">
+                                {{ __('Settings') }}
+                            </x-responsive-nav-link>
+                        @endcan
                         <x-responsive-nav-link href="{{ route('admin.api-documentation.index') }}">
                             {{ __('API Documentation') }}
                         </x-responsive-nav-link>

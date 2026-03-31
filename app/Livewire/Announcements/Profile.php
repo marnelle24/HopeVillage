@@ -21,6 +21,6 @@ class Profile extends Component
     {
         return view('livewire.announcements.profile', [
             'announcement' => $this->announcement,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

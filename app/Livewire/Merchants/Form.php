@@ -139,6 +139,6 @@ class Form extends Component
 
     public function render()
     {
-        return view('livewire.merchants.form')->layout('components.layouts.app');
+        return view('livewire.merchants.form')->layout('layouts.app');
     }
 }

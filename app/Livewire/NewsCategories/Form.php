@@ -64,6 +64,6 @@ class Form extends Component
 
     public function render()
     {
-        return view('livewire.news-categories.form')->layout('components.layouts.app');
+        return view('livewire.news-categories.form')->layout('layouts.app');
     }
 }

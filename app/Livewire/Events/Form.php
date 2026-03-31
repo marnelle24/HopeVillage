@@ -139,6 +139,6 @@ class Form extends Component
     {
         return view('livewire.events.form', [
             'location' => $this->location,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

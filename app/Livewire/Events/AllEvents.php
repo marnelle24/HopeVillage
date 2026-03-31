@@ -88,6 +88,6 @@ class AllEvents extends Component
         return view('livewire.events.all-events', [
             'events' => $events,
             'locations' => $locations,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

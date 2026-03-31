@@ -128,6 +128,6 @@ class Form extends Component
 
         return view('livewire.news.form', [
             'categories' => $categories,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

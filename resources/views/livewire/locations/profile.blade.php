@@ -1,20 +1,21 @@
 <div>
-    <x-slot name="header">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex md:flex-row flex-col md:gap-0 gap-4 md:justify-between justify-center items-center">
-                <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight text-center md:text-left">
-                    {{ $location->name }} - Profile
-                </h2>
-                <div class="flex gap-2">
-                    <a href="{{ route('admin.locations.index') }}" class="text-orange-600 md:text-base text-sm hover:text-orange-700 font-normal py-2 px-4 rounded-full">
-                        ← Back to Locations
-                    </a>
+    @can('location.profile')
+        <x-slot name="header">
+            <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+                <div class="flex md:flex-row flex-col md:gap-0 gap-4 md:justify-between justify-center items-center">
+                    <h2 class="font-semibold md:text-xl text-2xl text-gray-800 leading-tight text-center md:text-left">
+                        {{ $location->name }} - Profile
+                    </h2>
+                    <div class="flex gap-2">
+                        <a href="{{ route('admin.locations.index') }}" class="text-orange-600 md:text-base text-sm hover:text-orange-700 font-normal py-2 px-4 rounded-full">
+                            ← Back to Locations
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </x-slot>
+        </x-slot>
 
-    <div class="py-12">
+        <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 md:mx-0 mx-4">
                 <!-- Left Column - Location Details -->
@@ -733,5 +734,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    @else
+        @php abort(403, 'Unauthorized.'); @endphp
+    @endcan
 </div>

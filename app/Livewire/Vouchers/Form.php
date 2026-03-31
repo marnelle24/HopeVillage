@@ -155,6 +155,6 @@ class Form extends Component
             'merchants' => $merchants,
             'discountTypes' => $discountTypes,
             'typeOfWorkOptions' => $typeOfWorkOptions,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

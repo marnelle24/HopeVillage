@@ -1,24 +1,32 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between w-full max-w-6xl mx-auto">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Admin Dashboard') }}
-            </h2>
-            <div class="badge badge-success badge-lg gap-2 drop-shadow py-2 px-4 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                Administrator
+            <div class="flex items-center gap-2">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ __('Admin Dashboard') }}
+                </h2>
+                <div class="badge bg-green-600 text-white border-none badge-lg gap-2 drop-shadow py-2 px-4 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Administrator
+                </div>
             </div>
+            <a href="{{ route('admin.user-permissions') }}" class="bg-yellow-600 text-white px-3 py-2 rounded-full flex items-center gap-2 transition-all duration-300 hover:bg-yellow-700 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                User Permissions
+            </a>
         </div>
     </x-slot>
 
     <div class="pt-14 pb-24 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-5xl mx-auto">
             <!-- Welcome Section -->
             <div class="mb-6">
-                <h1 class="text-2xl font-bold text-base-content">Welcome back, {{ auth()->user()->name }}!</h1>
-                <p class="text-base-content/60 mt-1">Here's what's happening with your community today.</p>
+                <h1 class="text-2xl font-bold text-gray-800">Welcome back, {{ auth()->user()->name }}!</h1>
+                <p class="text-gray-600 mt-1">Here's what's happening with your community today.</p>
             </div>
 
             <!-- Stats Cards Grid -->

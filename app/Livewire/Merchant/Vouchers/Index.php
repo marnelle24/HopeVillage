@@ -108,6 +108,6 @@ class Index extends Component
             'vouchers' => $vouchers,
             'adminVouchers' => $adminVouchers,
             'merchant' => $merchant,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

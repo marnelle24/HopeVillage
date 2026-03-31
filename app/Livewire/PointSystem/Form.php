@@ -178,7 +178,7 @@ class Form extends Component
             'activityTypes' => $activityTypes,
             'locations' => $locations,
             'amenities' => $amenities,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

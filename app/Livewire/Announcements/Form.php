@@ -133,6 +133,6 @@ class Form extends Component
 
     public function render()
     {
-        return view('livewire.announcements.form')->layout('components.layouts.app');
+        return view('livewire.announcements.form')->layout('layouts.app');
     }
 }

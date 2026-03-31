@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\PasswordResetController;
-use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\PointsActionsController;
+use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\SingpassController;
 use App\Http\Controllers\VerificationCodeController;
 use App\Http\Controllers\WhatsAppValidationController;
@@ -39,13 +39,14 @@ Route::middleware([
     Route::get('/verify-account', [VerificationCodeController::class, 'show'])->name('verification.code.show');
     Route::post('/verify-account', [VerificationCodeController::class, 'verify'])->name('verification.code.verify');
     Route::post('/verify-account/resend', [VerificationCodeController::class, 'resend'])->name('verification.code.resend');
-    
+
     // QR Code route - Available to all authenticated users (admin, merchant_user, member)
     Route::get('/qr-code/full', [QrCodeController::class, 'fullSize'])->name('qr-code.full');
-    
+
     // User points endpoint for real-time updates
     Route::get('/api/user/points', function (Request $request) {
         $user = $request->user();
+
         return response()->json([
             'total_points' => $user->total_points ?? 0,
         ]);
@@ -62,29 +63,29 @@ Route::middleware([
     // Route::get('/admin/dashboard', function () {
     //     return view('admin.dashboard');
     // })->name('admin.dashboard');
-    
+
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard-v2');
     })->name('admin.dashboard');
-    
+
     // Location CRUD Routes
     Route::get('/admin/locations', \App\Livewire\Locations\Index::class)->name('admin.locations.index');
     Route::get('/admin/locations/create', \App\Livewire\Locations\Form::class)->name('admin.locations.create');
     Route::get('/admin/locations/{location_code}/edit', \App\Livewire\Locations\Form::class)->name('admin.locations.edit');
     Route::get('/admin/locations/{location_code}', \App\Livewire\Locations\Profile::class)->name('admin.locations.profile');
-    
+
     // Event CRUD Routes
     Route::get('/admin/events', \App\Livewire\Events\AllEvents::class)->name('admin.events.index');
     Route::get('/admin/events/{event_code}', \App\Livewire\Events\Profile::class)->name('admin.events.profile');
     Route::get('/admin/locations/{location_code}/events', \App\Livewire\Events\Index::class)->name('admin.locations.events.index');
     Route::get('/admin/locations/{location_code}/events/create', \App\Livewire\Events\Form::class)->name('admin.locations.events.create');
     Route::get('/admin/locations/{location_code}/events/{id}/edit', \App\Livewire\Events\Form::class)->name('admin.locations.events.edit');
-    
+
     // Amenity CRUD Routes
     Route::get('/admin/amenities', \App\Livewire\Amenities\Index::class)->name('admin.amenities.index');
     Route::get('/admin/amenities/create', \App\Livewire\Amenities\Form::class)->name('admin.amenities.create');
     Route::get('/admin/amenities/{id}/edit', \App\Livewire\Amenities\Form::class)->name('admin.amenities.edit');
-    
+
     // Members
     Route::get('/admin/members', \App\Livewire\Members\Index::class)->name('admin.members.index');
     Route::get('/admin/members/activities', \App\Livewire\Members\Activities::class)->name('admin.members.activities');
@@ -96,7 +97,7 @@ Route::middleware([
     Route::get('/admin/merchants/create', \App\Livewire\Merchants\Form::class)->name('admin.merchants.create');
     Route::get('/admin/merchants/{merchant_code}/edit', \App\Livewire\Merchants\Form::class)->name('admin.merchants.edit');
     Route::get('/admin/merchants/{merchant_code}', \App\Livewire\Merchants\Profile::class)->name('admin.merchants.profile');
-    
+
     // Voucher CRUD Routes
     Route::get('/admin/vouchers', \App\Livewire\Vouchers\Index::class)->name('admin.vouchers.index');
     Route::get('/admin/vouchers/create', \App\Livewire\Vouchers\Form::class)->name('admin.vouchers.create');
@@ -148,6 +149,9 @@ Route::middleware([
     // Points actions (admin-operated)
     Route::post('/admin/points/location-entry', [PointsActionsController::class, 'locationEntry'])->name('admin.points.location-entry');
     Route::post('/admin/points/event-attend', [PointsActionsController::class, 'attendEvent'])->name('admin.points.event-attend');
+
+    // Admin user permissions management
+    Route::get('/admin/user-permissions', \App\Livewire\Admin\UserPermissions::class)->name('admin.user-permissions');
 });
 
 // Member Dashboard - Only accessible by member users
@@ -186,7 +190,7 @@ Route::middleware([
 
     Route::get('/member/event/{event_code}', \App\Livewire\Member\Events\Profile::class)
         ->name('member.events.profile');
-    
+
     // Referral System
     Route::get('/member/referral-system', \App\Livewire\Member\ReferralSystem::class)
         ->name('member.referral-system');
@@ -194,7 +198,7 @@ Route::middleware([
     // News (published by admin)
     Route::get('/member/news', \App\Livewire\Member\News\Index::class)->name('member.news');
     Route::get('/member/news/{slug}', \App\Livewire\Member\News\Profile::class)->name('member.news.profile');
-    
+
     // QR Code routes
     Route::get('/member/qr-code', [QrCodeController::class, 'show'])->name('member.qr-code');
 });
@@ -209,7 +213,7 @@ Route::middleware([
     Route::get('/merchant/dashboard', function () {
         return view('merchant.dashboard');
     })->name('merchant.dashboard');
-    
+
     // Merchant Voucher CRUD Routes
     Route::get('/merchant/vouchers', \App\Livewire\Merchant\Vouchers\Index::class)->name('merchant.vouchers.index');
     Route::get('/merchant/vouchers/create', \App\Livewire\Merchant\Vouchers\Form::class)->name('merchant.vouchers.create');

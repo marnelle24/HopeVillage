@@ -64,7 +64,7 @@ class Index extends Component
 
         return view('livewire.locations.index', [
             'locations' => $locations,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

@@ -109,7 +109,7 @@ class Activities extends Component
         return view('livewire.members.activities', [
             'activities' => $activities,
             'activityTypes' => $activityTypes,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

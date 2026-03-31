@@ -50,6 +50,6 @@ class Index extends Component
 
         return view('livewire.news-categories.index', [
             'categories' => $categories,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

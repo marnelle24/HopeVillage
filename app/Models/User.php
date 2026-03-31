@@ -14,6 +14,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -21,7 +22,9 @@ class User extends Authenticatable
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+
     use HasProfilePhoto;
+    use HasRoles;
     use HasTeams;
     use Notifiable;
     use SoftDeletes;
@@ -175,17 +178,19 @@ class User extends Authenticatable
         $default = $this->defaultMerchant();
         if ($default) {
             // Update current_merchant_id to default if not set
-            if (!$this->current_merchant_id) {
+            if (! $this->current_merchant_id) {
                 $this->update(['current_merchant_id' => $default->id]);
             }
+
             return $default;
         }
 
         // Last resort: first merchant
         $first = $this->merchants()->first();
-        if ($first && !$this->current_merchant_id) {
+        if ($first && ! $this->current_merchant_id) {
             $this->update(['current_merchant_id' => $first->id]);
         }
+
         return $first;
     }
 
@@ -195,10 +200,13 @@ class User extends Authenticatable
         if ($this->merchants()->where('merchants.id', $merchantId)->exists()) {
             $this->update(['current_merchant_id' => $merchantId]);
             session(['current_merchant_id' => $merchantId]);
+
             return true;
         }
+
         return false;
     }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
@@ -250,10 +258,10 @@ class User extends Authenticatable
      */
     public function getReferralLinkAttribute(): string
     {
-        if (!$this->qr_code) {
+        if (! $this->qr_code) {
             return '';
         }
-        
-        return url('/register?ref=' . $this->qr_code);
+
+        return url('/register?ref='.$this->qr_code);
     }
 }

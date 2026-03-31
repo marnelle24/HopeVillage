@@ -316,7 +316,7 @@ class Index extends Component
         return view('livewire.members.index', [
             'members' => $members,
             'selectedUser' => $selectedUser,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

@@ -60,6 +60,6 @@ class Index extends Component
 
         return view('livewire.announcements.index', [
             'announcements' => $announcements,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

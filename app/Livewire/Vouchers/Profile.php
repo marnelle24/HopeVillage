@@ -27,6 +27,6 @@ class Profile extends Component
     {
         return view('livewire.vouchers.profile', [
             'voucher' => $this->voucher,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

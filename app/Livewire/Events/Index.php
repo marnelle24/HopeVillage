@@ -70,6 +70,6 @@ class Index extends Component
         return view('livewire.events.index', [
             'events' => $events,
             'location' => $this->location,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

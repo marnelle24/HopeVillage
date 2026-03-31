@@ -93,7 +93,7 @@ class Index extends Component
         return view('livewire.point-system.index', [
             'configs' => $configs,
             'activityTypes' => $activityTypes,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
 

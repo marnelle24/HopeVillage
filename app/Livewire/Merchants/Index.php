@@ -112,6 +112,6 @@ class Index extends Component
             'merchants' => $merchants,
             'pendingCount' => $pendingCount,
             'activeTab' => $this->activeTab,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

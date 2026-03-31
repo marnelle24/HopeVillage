@@ -77,6 +77,6 @@ class Index extends Component
         return view('livewire.news.index', [
             'news' => $news,
             'categories' => $categories,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }

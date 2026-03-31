@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.6.4",
         "spatie/laravel-medialibrary": "^11.17",
+        "spatie/laravel-permission": "^6.25",
         "web-token/jwt-framework": "^4.1",
         "web-token/jwt-signature-algorithm-ecdsa": "^2.2"
     },

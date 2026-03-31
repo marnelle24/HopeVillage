@@ -32,6 +32,6 @@ class Profile extends Component
         return view('livewire.events.profile', [
             'event' => $this->event,
             'qrCodeImage' => $qrCodeImage,
-        ])->layout('components.layouts.app');
+        ])->layout('layouts.app');
     }
 }
