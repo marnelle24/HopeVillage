@@ -16,6 +16,10 @@
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('hv-logo.png') }}">
         <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('hv-logo.png') }}">
         <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('hv-logo.png') }}">
+        @if (file_exists(public_path('build/manifest.webmanifest')))
+            <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
+            <meta name="theme-color" content="#facc15">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

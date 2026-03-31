@@ -10,6 +10,30 @@
             $lang = request()->get('lang', 'en');
         @endphp
 
+        <p class="my-4 text-left text-sm text-gray-500">
+            @if (request()->routeIs('register'))
+                @if(request()->get('lang') === 'bang')
+                    ইতিমধ্যে একটি অ্যাকাউন্ট আছে? <a href="{{ route('login') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">সাইন ইন</a>
+                @elseif(request()->get('lang') === 'zh')
+                    已有账户? <a href="{{ route('login') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">登录</a>
+                @elseif(request()->get('lang') === 'ta')
+                    இதில் ஒரு கணக்கு இருக்கிறதா? <a href="{{ route('login') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">புகுபதிகை</a>
+                @else
+                    Already have an account? <a href="{{ route('login') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">Sign In</a>
+                @endif
+            @else
+                @if(request()->get('lang') === 'bang')
+                    একটি অ্যাকাউন্ট না আছে? <a href="{{ route('register') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">সাইন আপ</a>
+                @elseif(request()->get('lang') === 'zh')
+                    没有账户? <a href="{{ route('register') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">注册</a>
+                @elseif(request()->get('lang') === 'ta')
+                    ஒரு கணக்கு இல்லை? <a href="{{ route('register') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">பதிவுசெய்யவும்</a>
+                @else
+                    Don't have an account? <a href="{{ route('register') }}{{ request()->get('lang') ? '?lang=' . request()->get('lang') : '' }}" class="text-orange-500 hover:text-orange-600 font-semibold">Sign Up</a>
+                @endif
+            @endif
+        </p>
+
         <form method="POST" action="{{ route('register') }}" x-data="{ submitting: false }" @submit="submitting = true">
             @csrf
 
@@ -426,200 +450,200 @@
     </x-authentication-card>
 
     @push('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/css/intlTelInput.css">
-    <style>
-        .iti {
-            width: 100%;
-        }
-        .iti__flag-container {
-            z-index: 10;
-        }
-        /* Ensure the input takes full width when separateDialCode is true */
-        .iti__selected-flag {
-            z-index: 4;
-            padding: 0 8px 0 8px;
-        }
-        /* Make the dial code more visible */
-        .iti__selected-dial-code {
-            font-weight: 600;
-            color: #374151;
-            padding: 0 4px;
-        }
-        /* Ensure dial code is visible in dropdown */
-        .iti__country-list .iti__dial-code {
-            color: #6b7280;
-            margin-left: 6px;
-        }
-        /* Show dial code prominently in selected flag area */
-        .iti__flag-container + .iti__selected-dial-code {
-            display: inline-block !important;
-        }
-        /* Disable dropdown when only one country is available */
-        .iti--single-country .iti__selected-flag {
-            pointer-events: none;
-            cursor: default;
-            border-top-left-radius: 32px;
-            border-bottom-left-radius: 32px;
-            color:#fff;
-            background: #ffc28b;
-        }
-        .iti--single-country .iti__flag-container {
-            pointer-events: none;
-            cursor: default;
-        }
-    </style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/css/intlTelInput.css">
+        <style>
+            .iti {
+                width: 100%;
+            }
+            .iti__flag-container {
+                z-index: 10;
+            }
+            /* Ensure the input takes full width when separateDialCode is true */
+            .iti__selected-flag {
+                z-index: 4;
+                padding: 0 8px 0 8px;
+            }
+            /* Make the dial code more visible */
+            .iti__selected-dial-code {
+                font-weight: 600;
+                color: #374151;
+                padding: 0 4px;
+            }
+            /* Ensure dial code is visible in dropdown */
+            .iti__country-list .iti__dial-code {
+                color: #6b7280;
+                margin-left: 6px;
+            }
+            /* Show dial code prominently in selected flag area */
+            .iti__flag-container + .iti__selected-dial-code {
+                display: inline-block !important;
+            }
+            /* Disable dropdown when only one country is available */
+            .iti--single-country .iti__selected-flag {
+                pointer-events: none;
+                cursor: default;
+                border-top-left-radius: 32px;
+                border-bottom-left-radius: 32px;
+                color:#fff;
+                background: #ffc28b;
+            }
+            .iti--single-country .iti__flag-container {
+                pointer-events: none;
+                cursor: default;
+            }
+        </style>
     @endpush
 
     @push('scripts')
-    @if(config('services.recaptcha.site_key'))
-        <!-- Google reCAPTCHA -->
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    @endif
-    
-    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/js/intlTelInput.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.querySelector('#whatsapp_number');
-            if (!input) return;
+        @if(config('services.recaptcha.site_key'))
+            <!-- Google reCAPTCHA -->
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        @endif
+        
+        <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/js/intlTelInput.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const input = document.querySelector('#whatsapp_number');
+                if (!input) return;
 
-            const iti = window.intlTelInput(input, {
-                initialCountry: "sg", // Singapore as default
-                onlyCountries: ["sg"], // Only allow Singapore country code
-                separateDialCode: true,
-                showSelectedDialCode: true,
-                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/js/utils.js",
-            });
+                const iti = window.intlTelInput(input, {
+                    initialCountry: "sg", // Singapore as default
+                    onlyCountries: ["sg"], // Only allow Singapore country code
+                    separateDialCode: true,
+                    showSelectedDialCode: true,
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.7/build/js/utils.js",
+                });
 
-            // Disable dropdown since only Singapore is available
-            const itiContainer = input.closest('.iti');
-            const flagContainer = itiContainer.querySelector('.iti__selected-flag');
-            
-            // Add class to indicate single country mode
-            itiContainer.classList.add('iti--single-country');
-            
-            // Prevent dropdown from opening by blocking click events
-            if (flagContainer) {
-                flagContainer.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }, true);
+                // Disable dropdown since only Singapore is available
+                const itiContainer = input.closest('.iti');
+                const flagContainer = itiContainer.querySelector('.iti__selected-flag');
                 
-                // Also prevent mousedown which might trigger the dropdown
-                flagContainer.addEventListener('mousedown', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }, true);
-            }
-
-            // Set initial value if there's an old input
-            @if(old('whatsapp_number'))
-                const oldValue = "{{ old('whatsapp_number') }}";
-                if (oldValue) {
-                    iti.setNumber(oldValue);
-                }
-            @endif
-
-            // Update hidden country code field and form field on change
-            function updateCountryCode() {
-                const countryData = iti.getSelectedCountryData();
+                // Add class to indicate single country mode
+                itiContainer.classList.add('iti--single-country');
                 
-                if (countryData) {
-                    const dialCode = '+' + countryData.dialCode;
-                    document.getElementById('country_code').value = dialCode;
-                    // Ensure dial code is visible
-                    const selectedFlag = input.parentElement.querySelector('.iti__selected-flag');
-                    if (selectedFlag) {
-                        const dialCodeElement = selectedFlag.querySelector('.iti__selected-dial-code');
-                        if (dialCodeElement) {
-                            dialCodeElement.textContent = dialCode;
-                        }
-                    }
-                    // Update the main input to include full number with country code if number exists
-                    const currentValue = input.value.replace(/^\+?\d+\s*/, ''); // Remove any existing country code
-                    if (currentValue) {
-                        const fullNumber = iti.getNumber();
-
-                        console.log(fullNumber);
-
-                        if (fullNumber) {
-                            input.value = fullNumber;
-                        }
-                    }
-                }
-            }
-
-            // Initialize country code display on load
-            updateCountryCode();
-
-            input.addEventListener('countrychange', updateCountryCode);
-            input.addEventListener('input', function() {
-                // Validate phone number format on input
-                if (iti.isValidNumber()) {
-                    input.classList.remove('border-red-500');
-                    input.classList.add('border-green-500');
-                    updateCountryCode();
-                } else if (input.value.length > 0) {
-                    input.classList.remove('border-green-500');
-                    input.classList.add('border-red-500');
-                } else {
-                    input.classList.remove('border-red-500', 'border-green-500');
-                }
-            });
-
-
-            // Before form submit, ensure the full number with country code is set
-            const form = input.closest('form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    const fullNumber = iti.getNumber();
-                    if (fullNumber && iti.isValidNumber()) {
-                        input.value = fullNumber;
-                        updateCountryCode();
-                    } else {
+                // Prevent dropdown from opening by blocking click events
+                if (flagContainer) {
+                    flagContainer.addEventListener('click', function(e) {
                         e.preventDefault();
-                        alert('Please enter a valid phone number.');
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
                         return false;
+                    }, true);
+                    
+                    // Also prevent mousedown which might trigger the dropdown
+                    flagContainer.addEventListener('mousedown', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        return false;
+                    }, true);
+                }
+
+                // Set initial value if there's an old input
+                @if(old('whatsapp_number'))
+                    const oldValue = "{{ old('whatsapp_number') }}";
+                    if (oldValue) {
+                        iti.setNumber(oldValue);
+                    }
+                @endif
+
+                // Update hidden country code field and form field on change
+                function updateCountryCode() {
+                    const countryData = iti.getSelectedCountryData();
+                    
+                    if (countryData) {
+                        const dialCode = '+' + countryData.dialCode;
+                        document.getElementById('country_code').value = dialCode;
+                        // Ensure dial code is visible
+                        const selectedFlag = input.parentElement.querySelector('.iti__selected-flag');
+                        if (selectedFlag) {
+                            const dialCodeElement = selectedFlag.querySelector('.iti__selected-dial-code');
+                            if (dialCodeElement) {
+                                dialCodeElement.textContent = dialCode;
+                            }
+                        }
+                        // Update the main input to include full number with country code if number exists
+                        const currentValue = input.value.replace(/^\+?\d+\s*/, ''); // Remove any existing country code
+                        if (currentValue) {
+                            const fullNumber = iti.getNumber();
+
+                            console.log(fullNumber);
+
+                            if (fullNumber) {
+                                input.value = fullNumber;
+                            }
+                        }
+                    }
+                }
+
+                // Initialize country code display on load
+                updateCountryCode();
+
+                input.addEventListener('countrychange', updateCountryCode);
+                input.addEventListener('input', function() {
+                    // Validate phone number format on input
+                    if (iti.isValidNumber()) {
+                        input.classList.remove('border-red-500');
+                        input.classList.add('border-green-500');
+                        updateCountryCode();
+                    } else if (input.value.length > 0) {
+                        input.classList.remove('border-green-500');
+                        input.classList.add('border-red-500');
+                    } else {
+                        input.classList.remove('border-red-500', 'border-green-500');
                     }
                 });
-            }
-        });
 
-        // Password visibility toggle functions
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-            const eyeOffIcon = document.getElementById('eyeOffIcon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('hidden');
-                eyeOffIcon.classList.add('hidden');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.add('hidden');
-                eyeOffIcon.classList.remove('hidden');
-            }
-        }
 
-        function togglePasswordConfirmationVisibility() {
-            const passwordInput = document.getElementById('password_confirmation');
-            const eyeIcon = document.getElementById('eyeIconConfirmation');
-            const eyeOffIcon = document.getElementById('eyeOffIconConfirmation');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('hidden');
-                eyeOffIcon.classList.add('hidden');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.add('hidden');
-                eyeOffIcon.classList.remove('hidden');
+                // Before form submit, ensure the full number with country code is set
+                const form = input.closest('form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        const fullNumber = iti.getNumber();
+                        if (fullNumber && iti.isValidNumber()) {
+                            input.value = fullNumber;
+                            updateCountryCode();
+                        } else {
+                            e.preventDefault();
+                            alert('Please enter a valid phone number.');
+                            return false;
+                        }
+                    });
+                }
+            });
+
+            // Password visibility toggle functions
+            function togglePasswordVisibility() {
+                const passwordInput = document.getElementById('password');
+                const eyeIcon = document.getElementById('eyeIcon');
+                const eyeOffIcon = document.getElementById('eyeOffIcon');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    eyeIcon.classList.remove('hidden');
+                    eyeOffIcon.classList.add('hidden');
+                } else {
+                    passwordInput.type = 'password';
+                    eyeIcon.classList.add('hidden');
+                    eyeOffIcon.classList.remove('hidden');
+                }
             }
-        }
-    </script>
+
+            function togglePasswordConfirmationVisibility() {
+                const passwordInput = document.getElementById('password_confirmation');
+                const eyeIcon = document.getElementById('eyeIconConfirmation');
+                const eyeOffIcon = document.getElementById('eyeOffIconConfirmation');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    eyeIcon.classList.remove('hidden');
+                    eyeOffIcon.classList.add('hidden');
+                } else {
+                    passwordInput.type = 'password';
+                    eyeIcon.classList.add('hidden');
+                    eyeOffIcon.classList.remove('hidden');
+                }
+            }
+        </script>
     @endpush
 </x-guest-layout>

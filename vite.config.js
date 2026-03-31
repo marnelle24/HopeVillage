@@ -1,5 +1,17 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import { VitePWA } from 'vite-plugin-pwa';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/** Laravel Vite uses publicDir: false; PWA still needs stable precache revisions for files in public/. */
+function publicAssetRevision(filename) {
+    return createHash('md5').update(readFileSync(resolve(__dirname, 'public', filename))).digest('hex');
+}
 
 const ngrokDomain = process.env.VITE_HMR_HOST || process.env.APP_URL?.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const isNgrok = ngrokDomain?.includes('ngrok');
@@ -31,6 +43,83 @@ export default defineConfig({
             ],
             refresh: true,
             detectTls: isNgrok ? ngrokDomain : undefined,
+        }),
+        VitePWA({
+            // Emit SW at site root so scope "/" is valid (Laravel uses base "/build/" for assets).
+            filename: '../sw.js',
+            scope: '/',
+            registerType: 'autoUpdate',
+            injectRegister: false,
+            includeManifestIcons: false,
+            manifest: {
+                name: 'Hope Village',
+                short_name: 'Hope Village',
+                description:
+                    'A community hub for migrants community in Singapore — brought to you by Hope Initiative Alliance in partnership with Advancer IFM and other supporting partners.',
+                theme_color: '#facc15',
+                background_color: '#e5e7eb',
+                display: 'standalone',
+                start_url: '/',
+                scope: '/',
+                icons: [
+                    {
+                        src: '/hv-logo.png',
+                        sizes: '192x192',
+                        type: 'image/png',
+                        purpose: 'any',
+                    },
+                    {
+                        src: '/hv-logo.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                        purpose: 'any',
+                    },
+                    {
+                        src: '/hv-logo.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                        purpose: 'maskable',
+                    },
+                ],
+            },
+            workbox: {
+                // SW is emitted at /sw.js; precache entries are relative to public/build and must stay under /build/.
+                modifyURLPrefix: {
+                    'assets/': 'build/assets/',
+                },
+                additionalManifestEntries: [
+                    { url: '/offline.html', revision: publicAssetRevision('offline.html') },
+                    { url: '/hv-logo.png', revision: publicAssetRevision('hv-logo.png') },
+                ],
+                navigateFallback: '/offline.html',
+                navigateFallbackDenylist: [
+                    /^\/livewire/,
+                    /^\/sanctum/,
+                    /^\/broadcasting/,
+                    /^\/api\//,
+                ],
+                runtimeCaching: [
+                    {
+                        urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'google-fonts-cache',
+                            expiration: {
+                                maxEntries: 20,
+                                maxAgeSeconds: 60 * 60 * 24 * 365,
+                            },
+                            cacheableResponse: {
+                                statuses: [0, 200],
+                            },
+                        },
+                    },
+                ],
+                skipWaiting: true,
+                clientsClaim: true,
+            },
+            devOptions: {
+                enabled: false,
+            },
         }),
         suppressCssWarnings(),
     ],
