@@ -139,8 +139,10 @@
                         </div>
                         <br />
                         <div class="bg-white shadow-md rounded-lg p-6 max-h-full overflow-y-auto">
-                            <div class="text-sm text-gray-700 mb-3">
-                                <span class="font-semibold">Total Entries:</span> {{ count($entries) }}
+                            <div class="text-sm text-gray-700 mb-3 space-y-1">
+                                <div>
+                                    <span class="font-semibold">Total Entries:</span> {{ count($entries) }}
+                                </div>
                             </div>
                             
                             @if(count($entries) > 0)
@@ -220,7 +222,7 @@
                                 <div class="relative w-full max-w-2xl" style="aspect-ratio: 1;">
                                     <!-- Pointer -->
                                     <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20">
-                                        <div class="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-orange-500"></div>
+                                        <div class="w-0 h-0 border-l-12 border-r-12 border-t-20 border-l-transparent border-r-transparent border-t-orange-500"></div>
                                     </div>
 
                                     <!-- Wheel Container -->
@@ -239,8 +241,9 @@
                                     </div>
                                 </div>
 
-                                <p class="mt-6 text-xs text-gray-500 text-center">
+                                <p class="mt-6 text-xs text-gray-500 text-center max-w-xl mx-auto">
                                     Tip: For "Event attendees", only registrations with status <span class="font-mono">attended</span> are included.
+                                    Confirmed winners are stored in this browser and excluded from later draws for this event until <span class="font-semibold">event end</span>.
                                 </p>
                             </div>
                         @else
@@ -256,7 +259,95 @@
                             </div>
                         @endif
 
-                        @if(count($winners) > 0)
+                        @if($source === 'event_attendees' && $selectedEventId)
+                            <div
+                                class="mt-6"
+                                wire:key="stored-raffle-winners-{{ $selectedEventId }}"
+                                x-data="{
+                                    items: [],
+                                    load() {
+                                        if ($wire.source !== 'event_attendees' || !$wire.selectedEventId) {
+                                            this.items = [];
+                                            return;
+                                        }
+                                        this.items = hopeVillageReadStoredWinnersFromLocalStorage($wire.selectedEventId);
+                                    },
+                                    clearStoredWinners() {
+                                        const eventId = $wire.selectedEventId;
+                                        if (!eventId) return;
+
+                                        const ok = window.confirm(
+                                            'Reset Winners will CLEAR the locally saved winners for this event on this browser. Continue?'
+                                        );
+                                        if (!ok) return;
+
+                                        try {
+                                            const key = hopeVillageRaffleStorageKey(eventId);
+                                            localStorage.removeItem(key);
+                                        } catch (e) {}
+
+                                        // Clear the current session wheel exclusions too.
+                                        $wire.clearWinners();
+                                        $wire.syncPersistedExcludedFromClient([]);
+
+                                        this.items = [];
+                                        hopeVillageRaffleStoredWinnersRefresh();
+                                    }
+                                }"
+                                x-init="load()"
+                                @raffle-stored-winners-refresh.window="load()"
+                            >
+                                <div class="bg-white shadow-md rounded-lg p-6" x-show="items.length > 0">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-lg font-bold text-gray-900 mb-4">
+                                            Raffle Winners (<span x-text="items.length"></span>)
+                                        </h3>
+                                        <button
+                                            type="button"
+                                            x-show="items.length > 0"
+                                            @click="clearStoredWinners()"
+                                            class="mt-2 text-sm text-red-500 hover:text-red-800 transition-all duration-300 cursor-pointer bg-red-50 border border-red-100 px-2 py-1 rounded-lg"
+                                        >
+                                            Reset Winners
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2 mb-4">
+                                        List shows confirmed winners saved in this browser for this event. Reset clears the current session wheel only; stored winners stay excluded until event end or site data is cleared.
+                                    </p>
+                                    <div class="space-y-2 text-xs">
+                                        <template x-for="(row, idx) in items" :key="(row.qr_code || '') + '-' + (row.winner)">
+                                            <div class="flex items-start gap-4 border-b border-gray-200 pb-2">
+                                                <span
+                                                    class="text-gray-700 text-md font-semibold flex items-center gap-2 border rounded-lg px-2 py-1 shrink-0"
+                                                    :class="{
+                                                        'border-green-400 bg-green-100': row.winner == 1,
+                                                        'border-teal-400 bg-teal-100': row.winner == 2,
+                                                        'border-yellow-400 bg-yellow-100': row.winner == 3,
+                                                        'border-orange-300 bg-orange-100': row.winner > 3
+                                                    }"
+                                                >
+                                                    <svg height="20px" width="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xml:space="preserve" fill="#000000">
+                                                        <g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g>
+                                                            <path style="fill:#FFEA8A;" d="M512,120.242c0-17.11-13.92-31.03-31.03-31.03c-17.11,0-31.03,13.92-31.03,31.03 c0,8.555,3.48,16.313,9.098,21.931l-94.431,94.433l-90.909-90.909c8.048-5.612,13.334-14.921,13.334-25.454 c0-17.11-13.92-31.03-31.03-31.03s-31.03,13.92-31.03,31.03c0,10.533,5.286,19.842,13.334,25.454l-90.909,90.909l-94.431-94.433 c5.618-5.618,9.098-13.376,9.098-21.931c0-17.11-13.92-31.03-31.03-31.03S0,103.132,0,120.242c0,14.428,9.911,26.551,23.273,30.009 v272.536h465.455V150.252C502.089,146.794,512,134.67,512,120.242z"></path>
+                                                            <path style="fill:#FFDB2D;" d="M480.97,89.212c-17.11,0-31.03,13.92-31.03,31.03c0,8.555,3.48,16.313,9.098,21.931l-94.431,94.433 l-90.909-90.909c8.048-5.612,13.334-14.921,13.334-25.454c0-17.11-13.92-31.03-31.03-31.03v333.576h232.727V150.252 C502.089,146.794,512,134.67,512,120.242C512,103.132,498.08,89.212,480.97,89.212z"></path>
+                                                        </g>
+                                                    </svg>
+                                                    <span x-text="'Winner #' + row.winner"></span>
+                                                </span>
+                                                <div class="min-w-0">
+                                                    <span class="text-gray-600 text-md break-all font-mono" x-text="row.qr_code"></span>
+                                                    <div class="text-gray-700 mt-1" x-show="row.name">
+                                                        <div class="text-xl font-bold" x-text="row.name"></div>
+                                                        <div class="text-gray-500 text-sm" x-show="row.email_address" x-text="row.email_address"></div>
+                                                        <div class="text-gray-500 text-sm" x-show="row.whatsapp_number" x-text="row.whatsapp_number"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif(count($winners) > 0)
                             <div class="mt-6">
                                 <div class="bg-white shadow-md rounded-lg p-6">
                                     <div class="flex items-center justify-between">
@@ -331,9 +422,17 @@
                     const modal = document.getElementById('winner-modal');
                     if (modal) {
                         modal.close();
-                        // Update wheel after modal closes
                         setTimeout(() => {
-                            $wire.updateWheelAfterModalClose();
+                            $wire.updateWheelAfterModalClose(false);
+                        }, 100);
+                    }
+                },
+                closeModalConfirm() {
+                    const modal = document.getElementById('winner-modal');
+                    if (modal) {
+                        modal.close();
+                        setTimeout(() => {
+                            $wire.updateWheelAfterModalClose(true);
                         }, 100);
                     }
                 },
@@ -362,15 +461,6 @@
                     }, 200);
                 });
                 
-                // Listen for dialog close event (for form dialog close)
-                if (modal) {
-                    modal.addEventListener('close', () => {
-                        // Update wheel after modal closes
-                        setTimeout(() => {
-                            $wire.updateWheelAfterModalClose();
-                        }, 100);
-                    });
-                }
             "
             class="modal"
             @click.away="closeModal()"
@@ -455,7 +545,8 @@
                         Redraw
                     </button>
                     <button 
-                        @click="closeModal()"
+                        type="button"
+                        @click="closeModalConfirm()"
                         class="bg-orange-500 hover:bg-orange-600 transition-all duration-300 cursor-pointer text-lg flex-1 text-white px-4 py-2 rounded-full font-bold border-none"
                     >
                         Confirm Winner
@@ -472,6 +563,139 @@
 </div>
 
 <script>
+    function hopeVillageRaffleStorageKey(eventId) {
+        return 'hopevillage_event_raffle_winners_' + eventId;
+    }
+
+    /** @returns {Array<{winner:number,name:string,qr_code:string,whatsapp_number:string,email_address:string}>} */
+    function hopeVillageReadStoredWinnersFromLocalStorage(eventId) {
+        if (!eventId) {
+            return [];
+        }
+        const key = hopeVillageRaffleStorageKey(eventId);
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) {
+                return [];
+            }
+            const data = JSON.parse(raw);
+            const eventEnd = data && data.event_end ? new Date(data.event_end) : null;
+            if (eventEnd && !isNaN(eventEnd.getTime()) && Date.now() > eventEnd.getTime()) {
+                return [];
+            }
+            return Array.isArray(data.winners) ? data.winners : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function hopeVillageRaffleStoredWinnersRefresh() {
+        window.dispatchEvent(new CustomEvent('raffle-stored-winners-refresh'));
+    }
+
+    function hopeVillageSyncExcludedFromLocalStorage($wire) {
+        const eventId = $wire.selectedEventId;
+        if (!eventId) {
+            return Promise.resolve();
+        }
+        const key = hopeVillageRaffleStorageKey(eventId);
+        let raw = null;
+        try {
+            raw = localStorage.getItem(key);
+        } catch (e) {
+            return $wire.syncPersistedExcludedFromClient([]);
+        }
+        if (!raw) {
+            return $wire.syncPersistedExcludedFromClient([]);
+        }
+        let data;
+        try {
+            data = JSON.parse(raw);
+        } catch (e) {
+            return $wire.syncPersistedExcludedFromClient([]);
+        }
+        const eventEnd = data && data.event_end ? new Date(data.event_end) : null;
+        if (eventEnd && !isNaN(eventEnd.getTime()) && Date.now() > eventEnd.getTime()) {
+            try {
+                localStorage.removeItem(key);
+            } catch (e2) {}
+            return $wire.syncPersistedExcludedFromClient([]);
+        }
+        const winners = Array.isArray(data.winners) ? data.winners : [];
+        const qrs = winners
+            .map(function (w) {
+                return String(w.qr_code || '').toUpperCase().trim();
+            })
+            .filter(Boolean);
+        return $wire.syncPersistedExcludedFromClient(qrs);
+    }
+
+    function hopeVillagePersistWinnerToLocalStorage(payload) {
+        const eventId = payload.eventId;
+        if (!eventId) {
+            return;
+        }
+        const key = hopeVillageRaffleStorageKey(eventId);
+        let data = { event_end: payload.eventEnd || '', event_qr_code: payload.eventQrCode || '', winners: [] };
+        try {
+            const existing = localStorage.getItem(key);
+            if (existing) {
+                const parsed = JSON.parse(existing);
+                if (parsed && typeof parsed === 'object') {
+                    data.event_end = parsed.event_end || data.event_end;
+                    data.event_qr_code = parsed.event_qr_code || data.event_qr_code;
+                    data.winners = Array.isArray(parsed.winners) ? parsed.winners : [];
+                }
+            }
+        } catch (e) {}
+
+        data.event_end = payload.eventEnd || data.event_end;
+        data.event_qr_code = payload.eventQrCode || data.event_qr_code;
+
+        const qrNorm = String(payload.qrCode || '').toUpperCase().trim();
+        if (!qrNorm) {
+            return;
+        }
+
+        const already = data.winners.some(function (w) {
+            return String(w.qr_code || '').toUpperCase().trim() === qrNorm;
+        });
+        if (!already) {
+            const nums = data.winners.map(function (w) {
+                return parseInt(w.winner, 10) || 0;
+            });
+            const nextWinner = (nums.length ? Math.max.apply(null, nums) : 0) + 1;
+            data.winners.push({
+                winner: nextWinner,
+                name: payload.name || '',
+                qr_code: qrNorm,
+                whatsapp_number: payload.whatsappNumber || '',
+                email_address: payload.emailAddress || '',
+            });
+        }
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+        } catch (e) {}
+        hopeVillageRaffleStoredWinnersRefresh();
+    }
+
+    document.addEventListener('livewire:init', function () {
+        Livewire.on('raffle-persist-winner', function (payload) {
+            hopeVillagePersistWinnerToLocalStorage(payload);
+        });
+        Livewire.on('raffle-url-update', function (payload) {
+            const params = payload?.params || {};
+            const qs = new URLSearchParams(params).toString();
+            const nextUrl = window.location.pathname + (qs ? `?${qs}` : '');
+            try {
+                window.history.replaceState({}, '', nextUrl);
+            } catch (e) {}
+        });
+        Livewire.hook('message.processed', function () {
+            hopeVillageRaffleStoredWinnersRefresh();
+        });
+    });
+
     function initRaffleWheelContainer($wire, $watch, $dispatch) {
         let wheelInitialized = false;
         let lastEntriesHash = '';
@@ -588,17 +812,25 @@
         // Listen for explicit entries-loaded event from Livewire
         // This is called when modal closes - exclude winners now
         Livewire.on('entries-loaded', () => {
-            const entries = $wire.entries;
-            if (entries && entries.length > 0 && window.RaffleWheel) {
-                const currentHash = getEntriesHash(entries);
-                // Force reinitialize when entries are explicitly loaded (after modal closes)
-                // Now exclude winners since modal is closed
-                if (currentHash !== lastEntriesHash) {
-                    setTimeout(() => {
-                        initWheel(entries, true, true); // Exclude winners after modal closes
-                    }, 100);
+            const run = async () => {
+                if ($wire.source === 'event_attendees' && $wire.selectedEventId) {
+                    try {
+                        await hopeVillageSyncExcludedFromLocalStorage($wire);
+                    } catch (e) {
+                        console.warn('Raffle localStorage sync failed', e);
+                    }
                 }
-            }
+                const entries = $wire.entries;
+                if (entries && entries.length > 0 && window.RaffleWheel) {
+                    const currentHash = getEntriesHash(entries);
+                    if (currentHash !== lastEntriesHash) {
+                        setTimeout(() => {
+                            initWheel(entries, true, true); // Exclude winners after modal closes
+                        }, 100);
+                    }
+                }
+            };
+            run();
         });
         
         // Listen for trigger-respin event to spin after wheel is updated

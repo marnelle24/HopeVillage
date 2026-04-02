@@ -34,6 +34,12 @@ class RouletteV2 extends Component
     /** @var array<int, string> */
     public array $entries = [];
 
+    /**
+     * Full pool snapshot for the current `source` (excluding persisted exclusions for event attendees).
+     * Used to restore `$entries` after winners/rejected are cleared.
+     */
+    public array $baseEntries = [];
+
     /** @var array<string, int> Map of QR code => total_points for top 20 mode */
     public array $top20PointsByQr = [];
 
@@ -49,11 +55,132 @@ class RouletteV2 extends Component
     /** @var array<int, array{place:int,value:string,member:array|null}> */
     public array $rejected = [];
 
-    /** @var array<int, array{id:int,title:string,attendee_count:int}> */
+    /** QR codes excluded from the pool (localStorage sync + confirm) for event attendees. */
+    public array $persistedExcludedQrs = [];
+
+    /** Full attendee QR list before persisted exclusions; used when re-applying exclusions. */
+    protected array $rawEventAttendeeEntries = [];
+
+    public ?string $selectedEventEndIso = null;
+
+    public ?string $selectedEventQrCode = null;
+
+    /** @var array<int, array{id:int,title:string,attendee_count:int,end_date_iso:?string,event_qr_code:?string}> */
     public array $events = [];
+
+    private function applyQueryParamsToState(): void
+    {
+        $type = request()->query('type');
+        $eventId = request()->query('event_id');
+        $entrySource = request()->query('entry_source');
+
+        if (! is_string($type) || trim($type) === '') {
+            return;
+        }
+
+        $type = trim($type);
+
+        if ($type === 'number_range') {
+            $this->source = 'range';
+
+            return;
+        }
+
+        if ($type === 'fin-nirc') {
+            $this->source = 'members_fin';
+
+            return;
+        }
+
+        if ($type === 'qr_code') {
+            $this->source = 'members_qr_code';
+
+            return;
+        }
+
+        if ($type === 'event_attendees') {
+            $this->source = 'event_attendees';
+            $this->selectedEventId = is_numeric($eventId) ? (int) $eventId : null;
+
+            // Default behavior: "all" => include all type_of_work values.
+            if (! is_string($entrySource) || trim($entrySource) === '' || $entrySource === 'all') {
+                $this->typeOfWorkAll = true;
+                $this->selectedTypeOfWork = [];
+
+                return;
+            }
+
+            $slugToLabel = [
+                'top20' => self::TYPE_OF_WORK_OPTIONS[0] ?? 'Highest points - Top 20%',
+                'migrant_worker' => 'Migrant worker',
+                'migrant_domestic_worker' => 'Migrant domestic worker',
+                'others' => 'Others',
+            ];
+
+            $label = $slugToLabel[$entrySource] ?? null;
+            if (! $label) {
+                // Unknown entry_source => fall back to all.
+                $this->typeOfWorkAll = true;
+                $this->selectedTypeOfWork = [];
+
+                return;
+            }
+
+            $this->typeOfWorkAll = false;
+            $this->selectedTypeOfWork = [$label];
+        }
+    }
+
+    private function getEntrySourceSlugForCurrentState(): string
+    {
+        if ($this->typeOfWorkAll || empty($this->selectedTypeOfWork)) {
+            return 'all';
+        }
+
+        $label = $this->selectedTypeOfWork[0] ?? null;
+        if ($label === self::TYPE_OF_WORK_OPTIONS[0]) {
+            return 'top20';
+        }
+        if ($label === 'Migrant worker') {
+            return 'migrant_worker';
+        }
+        if ($label === 'Migrant domestic worker') {
+            return 'migrant_domestic_worker';
+        }
+        if ($label === 'Others') {
+            return 'others';
+        }
+
+        return 'all';
+    }
+
+    private function dispatchRaffleUrlUpdate(): void
+    {
+        $params = [];
+
+        if ($this->source === 'range') {
+            $params['type'] = 'number_range';
+        } elseif ($this->source === 'members_fin') {
+            $params['type'] = 'fin-nirc';
+        } elseif ($this->source === 'members_qr_code') {
+            $params['type'] = 'qr_code';
+        } elseif ($this->source === 'event_attendees') {
+            $params['type'] = 'event_attendees';
+            $params['event_id'] = $this->selectedEventId;
+            $params['entry_source'] = $this->getEntrySourceSlugForCurrentState();
+        }
+
+        $params = collect($params)
+            ->filter(fn ($v) => $v !== null && $v !== '')
+            ->all();
+
+        $this->dispatch('raffle-url-update', params: $params);
+    }
 
     public function mount(): void
     {
+        $this->applyQueryParamsToState();
+
         $attendeeFilter = fn ($q) => $q->where('status', 'attended')->whereNotNull('user_id');
 
         $this->events = Event::query()
@@ -62,21 +189,39 @@ class RouletteV2 extends Component
             ->whereHas('registrations', $attendeeFilter)
             ->withCount(['registrations as attendee_count' => $attendeeFilter])
             ->orderByDesc('start_date')
-            ->get(['id', 'title'])
+            ->get(['id', 'title', 'end_date', 'event_code'])
             ->map(fn (Event $e) => [
                 'id' => $e->id,
                 'title' => $e->title,
                 'attendee_count' => (int) $e->attendee_count,
+                'end_date_iso' => $e->end_date?->toIso8601String(),
+                'event_qr_code' => (string) ($e->event_code ?? ''),
             ])
             ->all();
 
+        if ($this->source === 'event_attendees' && ! $this->selectedEventId) {
+            // Avoid validation error when someone visits ?type=event_attendees without event_id.
+            $this->entries = [];
+            $this->dispatchRaffleUrlUpdate();
+
+            return;
+        }
+
         $this->loadEntries();
+        $this->dispatchRaffleUrlUpdate();
     }
 
     public function updatedSource(): void
     {
         $this->resetWinners();
+        if ($this->source !== 'event_attendees') {
+            $this->persistedExcludedQrs = [];
+            $this->rawEventAttendeeEntries = [];
+            $this->selectedEventEndIso = null;
+            $this->selectedEventQrCode = null;
+        }
         $this->loadEntries();
+        $this->dispatchRaffleUrlUpdate();
     }
 
     public function updatedRangeStart(): void
@@ -104,14 +249,22 @@ class RouletteV2 extends Component
         if ($this->source === 'event_attendees' && $this->selectedEventId) {
             $this->typeOfWorkAll = true;
             $this->selectedTypeOfWork = [];
+            $this->persistedExcludedQrs = [];
+            $this->rawEventAttendeeEntries = [];
             $this->resetWinners();
             $this->loadEntries();
         } elseif ($this->source === 'event_attendees' && ! $this->selectedEventId) {
             $this->entries = [];
             $this->typeOfWorkAll = true;
             $this->selectedTypeOfWork = [];
+            $this->persistedExcludedQrs = [];
+            $this->rawEventAttendeeEntries = [];
+            $this->selectedEventEndIso = null;
+            $this->selectedEventQrCode = null;
             $this->resetWinners();
         }
+
+        $this->dispatchRaffleUrlUpdate();
     }
 
     public function updatedTypeOfWorkAll(): void
@@ -122,6 +275,10 @@ class RouletteV2 extends Component
             }
             $this->resetWinners();
             $this->loadEntries();
+        }
+
+        if ($this->source === 'event_attendees') {
+            $this->dispatchRaffleUrlUpdate();
         }
     }
 
@@ -136,6 +293,10 @@ class RouletteV2 extends Component
             $this->resetWinners();
             $this->loadEntries();
         }
+
+        if ($this->source === 'event_attendees') {
+            $this->dispatchRaffleUrlUpdate();
+        }
     }
 
     public function loadEntries(): void
@@ -143,6 +304,7 @@ class RouletteV2 extends Component
         $this->resetValidation();
         $this->resetWinners();
         $this->entries = [];
+        $this->baseEntries = [];
         $this->top20PointsByQr = [];
 
         if ($this->source === 'range') {
@@ -169,6 +331,8 @@ class RouletteV2 extends Component
                 ->values()
                 ->all();
 
+            $this->baseEntries = $this->entries;
+
             $this->dispatch('entries-loaded');
 
             return;
@@ -185,6 +349,8 @@ class RouletteV2 extends Component
                 ->unique()
                 ->values()
                 ->all();
+
+            $this->baseEntries = $this->entries;
 
             $this->dispatch('entries-loaded');
 
@@ -203,6 +369,8 @@ class RouletteV2 extends Component
                 ->values()
                 ->all();
 
+            $this->baseEntries = $this->entries;
+
             $this->dispatch('entries-loaded');
 
             return;
@@ -212,6 +380,12 @@ class RouletteV2 extends Component
             $this->validate([
                 'selectedEventId' => ['required', 'integer'],
             ]);
+
+            $eventMeta = Event::query()
+                ->whereKey($this->selectedEventId)
+                ->first(['id', 'end_date', 'event_code']);
+            $this->selectedEventEndIso = $eventMeta?->end_date?->toIso8601String() ?? '';
+            $this->selectedEventQrCode = (string) ($eventMeta?->event_code ?? '');
 
             $top20Label = self::TYPE_OF_WORK_OPTIONS[0];
             $isTop20Selected = in_array($top20Label, $this->selectedTypeOfWork, true);
@@ -240,7 +414,8 @@ class RouletteV2 extends Component
                     ->unique()
                     ->values();
 
-                $this->entries = $qrCodes->all();
+                $this->rawEventAttendeeEntries = $qrCodes->all();
+                $this->applyPersistedExclusionsToEventEntries();
 
                 $this->top20PointsByQr = $registrations
                     ->mapWithKeys(function (EventRegistration $r) {
@@ -273,12 +448,49 @@ class RouletteV2 extends Component
                 ->unique()
                 ->values();
 
-            $this->entries = $qrCodes->all();
+            $this->rawEventAttendeeEntries = $qrCodes->all();
+            $this->applyPersistedExclusionsToEventEntries();
 
             $this->dispatch('entries-loaded');
 
             return;
         }
+    }
+
+    /**
+     * Called from JS after reading localStorage so server-side spin excludes prior winners.
+     */
+    public function syncPersistedExcludedFromClient(array $qrCodes): void
+    {
+        $normalized = collect($qrCodes)
+            ->map(fn ($q) => is_string($q) ? strtoupper(trim($q)) : '')
+            ->filter(fn ($q) => $q !== '')
+            ->unique()
+            ->take(2000)
+            ->values()
+            ->all();
+
+        $this->persistedExcludedQrs = $normalized;
+
+        if ($this->source === 'event_attendees' && $this->selectedEventId) {
+            $this->applyPersistedExclusionsToEventEntries();
+        }
+    }
+
+    private function applyPersistedExclusionsToEventEntries(): void
+    {
+        if ($this->source !== 'event_attendees' || $this->rawEventAttendeeEntries === []) {
+            return;
+        }
+
+        $exclude = array_flip($this->persistedExcludedQrs);
+        $this->entries = collect($this->rawEventAttendeeEntries)
+            ->filter(fn ($e) => ! isset($exclude[(string) $e]))
+            ->values()
+            ->all();
+
+        // Keep the base snapshot in sync with persisted exclusions.
+        $this->baseEntries = $this->entries;
     }
 
     public function spin(): void
@@ -325,12 +537,18 @@ class RouletteV2 extends Component
             })
             ->toArray();
 
-        // Filter out entries that are already winners or rejected
+        $persisted = ($this->source === 'event_attendees' && $this->persistedExcludedQrs !== [])
+            ? $this->persistedExcludedQrs
+            : [];
+
+        // Filter out entries that are already winners, rejected, or persisted (event attendees)
         return collect($this->entries)
-            ->filter(function ($entry) use ($winnerValues, $rejectedValues) {
+            ->filter(function ($entry) use ($winnerValues, $rejectedValues, $persisted) {
                 $entryStr = (string) $entry;
 
-                return ! in_array($entryStr, $winnerValues, true) && ! in_array($entryStr, $rejectedValues, true);
+                return ! in_array($entryStr, $winnerValues, true)
+                    && ! in_array($entryStr, $rejectedValues, true)
+                    && ! in_array($entryStr, $persisted, true);
             })
             ->values()
             ->all();
@@ -389,8 +607,34 @@ class RouletteV2 extends Component
         $this->dispatch('show-winner-modal-browser');
     }
 
-    public function updateWheelAfterModalClose(): void
+    public function updateWheelAfterModalClose(bool $persistConfirmedEventWinner = false): void
     {
+        if ($persistConfirmedEventWinner && $this->source === 'event_attendees' && $this->latestWinner !== null) {
+            $qr = strtoupper(trim((string) ($this->latestWinner['value'] ?? '')));
+            if ($qr !== '') {
+                $this->persistedExcludedQrs = collect($this->persistedExcludedQrs)
+                    ->push($qr)
+                    ->map(fn ($q) => strtoupper(trim((string) $q)))
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->all();
+                $this->applyPersistedExclusionsToEventEntries();
+
+                $member = $this->latestWinner['member'] ?? null;
+                $this->dispatch(
+                    'raffle-persist-winner',
+                    eventId: $this->selectedEventId,
+                    eventEnd: $this->selectedEventEndIso ?? '',
+                    eventQrCode: $this->selectedEventQrCode ?? '',
+                    qrCode: $qr,
+                    name: is_array($member) ? (string) ($member['name'] ?? '') : '',
+                    whatsappNumber: is_array($member) ? (string) ($member['whatsapp_number'] ?? '') : '',
+                    emailAddress: is_array($member) ? (string) ($member['email'] ?? '') : '',
+                );
+            }
+        }
+
         // Update entries to exclude winners
         $availableEntries = $this->getAvailableEntries();
         $this->entries = $availableEntries;
@@ -458,6 +702,8 @@ class RouletteV2 extends Component
     public function clearWinners(): void
     {
         $this->resetWinners();
+        $this->entries = $this->baseEntries;
+        $this->dispatch('entries-loaded');
     }
 
     public function reSpin(): void

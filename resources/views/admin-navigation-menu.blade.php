@@ -146,7 +146,7 @@
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
                 x-cloak
-                class="fixed inset-0 z-[100]"
+                class="fixed inset-0 z-100"
                 style="display: none;"
                 aria-hidden="true"
             >
@@ -159,7 +159,7 @@
 
                 <!-- Sidebar panel (slide from right; always visible when wrapper is open) -->
                 <div
-                    class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto z-[101] transform transition-transform duration-300 ease-out"
+                    class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto z-101 transform transition-transform duration-300 ease-out"
                     :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full'"
                     role="dialog"
                     aria-label="{{ __('Admin navigation') }}"
