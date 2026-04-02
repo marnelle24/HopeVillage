@@ -27,3 +27,5 @@ yarn-error.log
 /.cursor
 .DS_Store
 /.DS_Store
+
+/artisan-command-tools
