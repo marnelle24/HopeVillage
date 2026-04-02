@@ -4,7 +4,6 @@ namespace App\Livewire\Merchant;
 
 use App\Models\Merchant;
 use App\Models\User;
-use App\Rules\ValidRecaptcha;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -17,29 +16,46 @@ class Apply extends Component
     use WithFileUploads;
 
     public $name = '';
+
     public $description = '';
+
     public $contact_name = '';
+
     public $phone = '';
+
     public $email = '';
+
     public $unitNumber = '';
+
     public $address = '7 Kaki Bukit Avenue 3';
+
     public $city = 'Singapore';
+
     public $province = '';
+
     public $postal_code = '415814';
+
     public $website = '';
+
     public $logo;
+
     public $password = '';
+
     public $password_confirmation = '';
+
     public $terms = false;
+
     public $showSuccess = false;
+
     public $isSubmitting = false;
+
     public $gRecaptchaResponse = '';
 
     protected function rules()
     {
         // Normalize phone number before validation
         $this->normalizePhone();
-        
+
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -69,7 +85,7 @@ class Apply extends Component
                 'confirmed',
             ],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
-            'gRecaptchaResponse' => config('services.recaptcha.secret_key') ? ['required', new ValidRecaptcha()] : ['nullable'],
+            'gRecaptchaResponse' => config('services.recaptcha.secret_key') ? ['required'] : ['nullable'],
         ];
     }
 
@@ -99,10 +115,10 @@ class Apply extends Component
         if ($propertyName === 'phone') {
             $this->normalizePhone();
         }
-        
+
         $this->validateOnly($propertyName);
     }
-    
+
     /**
      * Normalize phone number to always include +65 country code
      */
@@ -111,37 +127,37 @@ class Apply extends Component
         if (empty($this->phone)) {
             return;
         }
-        
+
         // Remove all non-digit characters except +
         $normalized = preg_replace('/[^\d+]/', '', trim($this->phone));
-        
+
         // Extract digits only for processing
         $digitsOnly = preg_replace('/\D/', '', $normalized);
-        
+
         // If doesn't start with +, add +65
-        if (!str_starts_with($normalized, '+')) {
+        if (! str_starts_with($normalized, '+')) {
             // Check if it already starts with 65 (without +)
             if (str_starts_with($digitsOnly, '65') && strlen($digitsOnly) > 2) {
                 // Remove the leading 65 and add +65
                 $localNumber = substr($digitsOnly, 2);
-                $this->phone = '+65' . $localNumber;
+                $this->phone = '+65'.$localNumber;
             } else {
                 // Just add +65 prefix
-                $this->phone = '+65' . $digitsOnly;
+                $this->phone = '+65'.$digitsOnly;
             }
         } else {
             // Already has +, ensure it's properly formatted
             // If it starts with +65, keep it
             if (str_starts_with($normalized, '+65')) {
                 $this->phone = $normalized;
-            } elseif (str_starts_with($normalized, '+') && !str_starts_with($normalized, '+65')) {
+            } elseif (str_starts_with($normalized, '+') && ! str_starts_with($normalized, '+65')) {
                 // Has + but different country code, replace with +65
                 $localNumber = preg_replace('/\D/', '', substr($normalized, 1));
                 // If local number starts with 65, remove it
                 if (str_starts_with($localNumber, '65') && strlen($localNumber) > 2) {
                     $localNumber = substr($localNumber, 2);
                 }
-                $this->phone = '+65' . $localNumber;
+                $this->phone = '+65'.$localNumber;
             } else {
                 $this->phone = $normalized;
             }
@@ -156,19 +172,19 @@ class Apply extends Component
         // Generate email: user-uuid@hopevillage.sg
         do {
             $uuid = explode('-', Str::uuid()->toString())[0];
-            $email = 'user-' . $uuid . '@hopevillage.sg';
+            $email = 'user-'.$uuid.'@hopevillage.sg';
         } while (User::where('email', $email)->exists());
-        
+
         return $email;
     }
 
     public function submit()
     {
         $this->isSubmitting = true;
-        
+
         // Normalize phone number before validation
         $this->normalizePhone();
-        
+
         try {
             $this->validate();
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -178,13 +194,13 @@ class Apply extends Component
             $this->isSubmitting = false;
             throw $e;
         }
-        
+
         // Minimum 2 second delay
         sleep(2);
 
         $addressToSave = trim($this->address ?? '');
-        if (!empty(trim($this->unitNumber ?? ''))) {
-            $addressToSave = trim($addressToSave . ' #' . trim($this->unitNumber));
+        if (! empty(trim($this->unitNumber ?? ''))) {
+            $addressToSave = trim($addressToSave.' #'.trim($this->unitNumber));
         }
 
         $merchant = Merchant::create([
@@ -204,20 +220,20 @@ class Apply extends Component
         // Handle logo upload
         if ($this->logo) {
             $merchant->addMedia($this->logo->getPathname())
-                ->usingName($merchant->name . ' - Logo')
+                ->usingName($merchant->name.' - Logo')
                 ->usingFileName($this->logo->getClientOriginalName())
                 ->toMediaCollection('logo');
         }
 
         // Generate email if not provided
-        $userEmail = !empty(trim($this->email ?? '')) 
-            ? trim($this->email) 
+        $userEmail = ! empty(trim($this->email ?? ''))
+            ? trim($this->email)
             : $this->generateUserRandomEmail();
 
         // Create or get merchant user by phone number
         $user = User::where('whatsapp_number', $this->phone)->first();
-        
-        if (!$user) {
+
+        if (! $user) {
             // Create new user with provided password
             $user = User::create([
                 'name' => $this->contact_name,
@@ -233,7 +249,7 @@ class Apply extends Component
             if (empty($user->email) || str_ends_with($user->email, '@hopevillage.sg')) {
                 $user->update(['email' => $userEmail]);
             }
-            
+
             // Update user type if not already merchant_user
             if ($user->user_type !== 'merchant_user') {
                 $user->update(['user_type' => 'merchant_user']);
@@ -241,10 +257,10 @@ class Apply extends Component
         }
 
         // Attach user to merchant if not already attached
-        if (!$merchant->users()->where('user_id', $user->id)->exists()) {
+        if (! $merchant->users()->where('user_id', $user->id)->exists()) {
             // Check if this is the user's first merchant
             $isFirstMerchant = $user->merchants()->count() === 0;
-            
+
             $merchant->users()->attach($user->id, [
                 'is_default' => $isFirstMerchant,
             ]);
@@ -275,9 +291,6 @@ class Apply extends Component
             'gRecaptchaResponse',
         ]);
         $this->resetErrorBag();
-        
-        // Reset reCAPTCHA widget
-        $this->dispatch('reset-recaptcha');
 
         $this->showSuccess = true;
         $this->isSubmitting = false;

@@ -475,10 +475,21 @@
 
         document.addEventListener('livewire:init', () => {
             Livewire.on('reset-recaptcha', () => {
-                if (typeof grecaptcha !== 'undefined') {
-                    grecaptcha.reset();
-                    @this.set('gRecaptchaResponse', '');
+                if (typeof grecaptcha === 'undefined') {
+                    return;
                 }
+                // Only reset when the widget is still mounted; after success the form is
+                // removed and grecaptcha.reset() throws "No reCAPTCHA clients exist."
+                const widget = document.querySelector('#recaptcha-container .g-recaptcha');
+                if (!widget) {
+                    return;
+                }
+                try {
+                    grecaptcha.reset();
+                } catch (e) {
+                    // Widget torn down between check and reset
+                }
+                @this.set('gRecaptchaResponse', '');
             });
         });
     </script>
