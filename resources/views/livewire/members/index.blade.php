@@ -379,7 +379,7 @@
                                                     x-transition:leave-end="transform opacity-0 scale-95"
                                                     x-cloak
                                                     :style="`position: fixed; top: ${position.top}px; right: ${position.right}px;`"
-                                                    class="w-52 z-[9999] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                    class="w-52 z-9999 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                                 >
                                                     <div class="py-1" role="menu" aria-orientation="vertical">
                                                         @can('member.profile')
