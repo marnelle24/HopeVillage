@@ -155,7 +155,7 @@
         x-transition.opacity
         x-cloak
         @click.away="settingsOpen = false"
-        class="absolute right-0 bottom-full w-1/2 pl-4 pr-0 z-99999"
+        class="absolute right-0 bottom-full w-1/2 pl-4 pr-0 z-[99999]"
         style="display: none;"
     >
         <div class="bg-white border border-gray-200 rounded-t-xl shadow-lg overflow-hidden">
