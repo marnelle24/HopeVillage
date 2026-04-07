@@ -129,7 +129,7 @@
                         @if(!$event->location->deleted_at)
                             <div class="bg-white group overflow-hidden shadow-md flex flex-col rounded-t-2xl group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative">
                                 <a href="{{ route('admin.events.profile', $event->event_code) }}" class="absolute inset-0 z-0"></a>
-                                <div class="w-full {{ $thumbnailHeight }} border border-gray-300 rounded-t-2xl relative z-10">
+                                <div class="w-full {{ $thumbnailHeight }} border border-gray-300 rounded-t-2xl">
                                     @if($event->thumbnail_url)
                                         <img src="{{ $event->thumbnail_url }}" alt="{{ $event->title }}" class="w-full {{ $thumbnailHeight }} border-b border-gray-300 object-cover rounded-t-2xl">
                                     @else
@@ -140,7 +140,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="p-4 flex flex-col h-full group-hover:bg-orange-50 transition-all duration-300 relative z-10">
+                                <div class="p-4 flex flex-col h-full group-hover:bg-orange-50 transition-all duration-300">
                                     <a href="{{ route('admin.events.profile', $event->event_code) }}" class="flex-1">
                                         <h3 class="group-hover:text-orange-400 transition-colors duration-300 md:text-lg text-xl font-bold text-gray-900 mb-2 line-clamp-2 cursor-pointer">{{ $event->title }}</h3>
                                         <table class="w-full">
@@ -203,7 +203,7 @@
                                                 <a 
                                                     href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" 
                                                     title="Edit Event"
-                                                    class="bg-blue-700/60 hover:bg-sky-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200 relative z-20">
+                                                    class="bg-blue-700/60 hover:bg-sky-600 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                                     </svg>
@@ -214,7 +214,7 @@
                                                     wire:click="delete({{ $event->id }})" 
                                                     title="Delete Event"
                                                     wire:confirm="Are you sure you want to delete this event?"
-                                                    class="bg-red-600/60 hover:bg-red-700 hover:scale-105 text-white p-2 rounded-full transition-all duration-200 relative z-20">
+                                                    class="bg-red-600/60 hover:bg-red-700 hover:scale-105 text-white p-2 rounded-full transition-all duration-200">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                                     </svg>
