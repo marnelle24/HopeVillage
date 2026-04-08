@@ -91,13 +91,13 @@ export default defineConfig({
                     { url: '/offline.html', revision: publicAssetRevision('offline.html') },
                     { url: '/hv-logo.png', revision: publicAssetRevision('hv-logo.png') },
                 ],
-                navigateFallback: '/offline.html',
-                navigateFallbackDenylist: [
-                    /^\/livewire/,
-                    /^\/sanctum/,
-                    /^\/broadcasting/,
-                    /^\/api\//,
-                ],
+                // navigateFallback: '/offline.html',
+                // navigateFallbackDenylist: [
+                //     /^\/livewire/,
+                //     /^\/sanctum/,
+                //     /^\/broadcasting/,
+                //     /^\/api\//,
+                // ],
                 runtimeCaching: [
                     {
                         urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
