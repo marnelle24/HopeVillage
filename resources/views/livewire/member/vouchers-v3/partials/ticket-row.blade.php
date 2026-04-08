@@ -98,7 +98,7 @@
                         <button
                             type="button"
                             wire:click="showClaimedQr('{{ $item->voucher_code }}', '{{ $item->type }}')"
-                            class="py-2 px-4 rounded-full border {{ $btnBorder }} text-xs font-semibold shadow-sm"
+                            class="py-2 px-4 rounded-full border {{ $btnBorder }} text-xs font-semibold shadow-sm bg-orange-400 text-white"
                         >
                             Use Now
                         </button>
@@ -114,7 +114,7 @@
                 </div>
                 @if($tab !== 'redeemed' && !empty($item->valid_until))
                     <p class="text-xs text-gray-500 text-right">
-                        <span class="block text-gray-500 font-normal text-[0.55rem] uppercase">Expiry</span>
+                        <span class="block text-gray-500 font-normal text-[0.55rem] uppercase">Expiration Date</span>
                         <span class="block text-gray-700 font-normal text-[0.6rem] tracking-wide">{{ \Carbon\Carbon::parse($item->valid_until)->format('d M Y g:i A') }}</span>
                     </p>
                 @endif

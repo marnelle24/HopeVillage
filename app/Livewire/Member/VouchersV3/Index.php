@@ -251,6 +251,7 @@ class Index extends Component
         $merchantItems = $user->vouchers()
             ->with('merchant')
             ->wherePivot('status', 'claimed')
+            ->where('vouchers.valid_until', '>=', now())
             ->latest('user_voucher.claimed_at')
             ->get()
             ->map(function (Voucher $voucher) {
@@ -271,6 +272,7 @@ class Index extends Component
         $adminItems = $user->adminVouchers()
             ->with('merchants')
             ->wherePivot('status', 'claimed')
+            ->where('admin_vouchers.valid_until', '>=', now())
             ->latest('user_admin_voucher.claimed_at')
             ->get()
             ->map(function (AdminVoucher $voucher) {
