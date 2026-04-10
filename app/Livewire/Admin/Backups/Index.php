@@ -4,7 +4,6 @@ namespace App\Livewire\Admin\Backups;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class Index extends Component
@@ -54,21 +53,23 @@ class Index extends Component
     {
         abort_unless(auth()->user()?->can('can_backup_database'), 403, 'Unauthorized.');
 
-        if (! Storage::disk('local')->exists($path)) {
+        $disk = $this->backupDisk();
+
+        if (! $disk->exists($path)) {
             $this->dispatch('notify', type: 'error', message: 'Backup file no longer exists.');
 
             return null;
         }
 
         return response()->download(
-            Storage::disk('local')->path($path),
+            $disk->path($path),
             basename($path)
         );
     }
 
     protected function loadBackups(): void
     {
-        $disk = Storage::disk('local');
+        $disk = $this->backupDisk();
 
         $directory = $this->backupDirectory();
 
@@ -93,9 +94,15 @@ class Index extends Component
 
     protected function backupDirectory(): string
     {
-        $backupName = (string) config('backup.backup.name', 'laravel-backup');
+        // Must match Spatie BackupDestination: files live under config('backup.backup.name'), not a slug.
+        return (string) config('backup.backup.name', 'laravel-backup');
+    }
 
-        return Str::slug($backupName);
+    protected function backupDisk()
+    {
+        $diskName = (string) config('backup.backup.destination.disks.0', 'backups');
+
+        return Storage::disk($diskName);
     }
 
     public function render()
