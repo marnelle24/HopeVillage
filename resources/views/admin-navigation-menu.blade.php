@@ -1,12 +1,8 @@
     <nav
         x-data="{
             sidebarOpen: false,
-            showNavTour: false,
             scrolledPast20: false,
             init() {
-                if (typeof localStorage !== 'undefined' && localStorage.getItem('hopevillage_admin_nav_tour_seen') !== '1') {
-                    this.showNavTour = true;
-                }
                 const checkScroll = () => {
                     const scrollable = document.documentElement.scrollHeight - window.innerHeight;
                     this.scrolledPast20 = scrollable > 0 && window.scrollY >= scrollable * 0.2;
@@ -16,15 +12,19 @@
                 return () => window.removeEventListener('scroll', checkScroll);
             },
             dismissNavTour() {
-                if (typeof localStorage !== 'undefined') localStorage.setItem('hopevillage_admin_nav_tour_seen', '1');
-                this.showNavTour = false;
+                this.$store.adminNavTour.dismiss();
                 this.$nextTick(() => this.$refs.menuButton?.focus());
             }
         }"
         x-cloak
-        @keydown.escape.window="if (showNavTour) dismissNavTour()"
-        class="border-b border-gray-100 fixed top-0 left-0 right-0 z-[9] transition-shadow shadow-sm duration-300 backdrop-blur-sm"
-        :class="scrolledPast20 ? 'shadow-lg bg-gray-50' : 'bg-gray-100'"
+        @keydown.escape.window="if ($store.adminNavTour.show) dismissNavTour()"
+        class="border-b border-gray-100 fixed top-0 left-0 right-0 transition-shadow shadow-sm duration-300 backdrop-blur-sm"
+        :class="{
+            'shadow-lg bg-gray-50': scrolledPast20,
+            'bg-gray-100': !scrolledPast20,
+            'z-[100]': $store.adminNavTour.show,
+            'z-[9]': !$store.adminNavTour.show,
+        }"
     >
         <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,7 +80,7 @@
                     <!-- Tour callout: points to hamburger (first-time admin) -->
                     <div class="relative flex items-center">
                         <div
-                            x-show="showNavTour"
+                            x-show="$store.adminNavTour.show"
                             x-cloak
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 scale-95"
@@ -88,7 +88,7 @@
                             x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-full mr-2 top-[75px] -translate-y-1/2 w-64 max-w-[calc(100vw-8rem)] rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
+                            class="absolute right-full mr-2 top-[80px] -translate-y-1/2 z-[110] w-64 max-w-[calc(100vw-8rem)] rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
                             style="display: none;"
                             role="status"
                             aria-live="polite"
@@ -121,16 +121,6 @@
                             </svg>
                         </button>
                     </div>
-                    {{-- Tour overlay: dark background, hidden when user presses Got it (teleported to body so it covers full viewport) --}}
-                    <template x-teleport="body">
-                        <div
-                            x-show="showNavTour"
-                            x-cloak
-                            class="absolute inset-0 bg-black/50 z-40"
-                            aria-hidden="true"
-                            style="display: none;"
-                        ></div>
-                    </template>
                 </div>
             </div>
         </div>
