@@ -88,16 +88,11 @@ export default defineConfig({
                     'assets/': 'build/assets/',
                 },
                 additionalManifestEntries: [
-                    { url: '/offline.html', revision: publicAssetRevision('offline.html') },
                     { url: '/hv-logo.png', revision: publicAssetRevision('hv-logo.png') },
                 ],
-                // navigateFallback: '/offline.html',
-                // navigateFallbackDenylist: [
-                //     /^\/livewire/,
-                //     /^\/sanctum/,
-                //     /^\/broadcasting/,
-                //     /^\/api\//,
-                // ],
+                // Plugin default is "index.html" (SPA). Laravel is server-rendered; that breaks navigations.
+                // Falsy value omits NavigationRoute in generated sw.js (workbox sw-template).
+                navigateFallback: null,
                 runtimeCaching: [
                     {
                         urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,

@@ -125,6 +125,9 @@ Route::middleware([
     // API Documentation
     Route::get('/admin/api-documentation', \App\Livewire\ApiDocumentation\Index::class)->name('admin.api-documentation.index');
 
+    // Database Backups
+    Route::get('/admin/backups', \App\Livewire\Admin\Backups\Index::class)->name('admin.backups.index');
+
     // Raffle / Roulette
     Route::get('/admin/raffle-v1', \App\Livewire\Raffle\Roulette::class)->name('admin.raffle.v1');
     Route::get('/admin/raffle', \App\Livewire\Raffle\RouletteV2::class)->name('admin.raffle');

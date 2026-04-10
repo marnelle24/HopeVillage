@@ -23,7 +23,7 @@
         }"
         x-cloak
         @keydown.escape.window="if (showNavTour) dismissNavTour()"
-        class="border-b border-gray-100 fixed top-0 left-0 right-0 z-40 transition-shadow shadow-sm duration-300 backdrop-blur-sm"
+        class="border-b border-gray-100 fixed top-0 left-0 right-0 z-[9] transition-shadow shadow-sm duration-300 backdrop-blur-sm"
         :class="scrolledPast20 ? 'shadow-lg bg-gray-50' : 'bg-gray-100'"
     >
         <!-- Primary Navigation Menu -->
@@ -159,7 +159,7 @@
 
                 <!-- Sidebar panel (slide from right; always visible when wrapper is open) -->
                 <div
-                    class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto z-[9999] transform transition-transform duration-300 ease-out"
+                    class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto z-[99999] transform transition-transform duration-300 ease-out"
                     :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full'"
                     role="dialog"
                     aria-label="{{ __('Admin navigation') }}"
@@ -236,6 +236,11 @@
                     @can('announcement.view')
                         <x-responsive-nav-link href="{{ route('admin.announcements.index') }}" :active="request()->routeIs('admin.announcements*')">
                             {{ __('Announcements') }}
+                        </x-responsive-nav-link>
+                    @endcan
+                    @can('can_backup_database')
+                        <x-responsive-nav-link href="{{ route('admin.backups.index') }}" :active="request()->routeIs('admin.backups*')">
+                            {{ __('Backups') }}
                         </x-responsive-nav-link>
                     @endcan
                 </nav>

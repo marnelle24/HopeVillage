@@ -66,6 +66,12 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            'dump' => [
+                'dump_binary_path' => env('MYSQL_DUMP_BINARY_PATH'),
+                'use_single_transaction' => true,
+                'skip_lock_tables' => true,
+                'add_extra_option' => '--no-tablespaces',
+            ],
             'options' => $mysqlSslCaAttribute !== null ? array_filter([
                 $mysqlSslCaAttribute => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
@@ -86,6 +92,12 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            'dump' => [
+                'dump_binary_path' => env('MYSQL_DUMP_BINARY_PATH'),
+                'use_single_transaction' => true,
+                'skip_lock_tables' => true,
+                'add_extra_option' => '--no-tablespaces',
+            ],
             'options' => $mysqlSslCaAttribute !== null ? array_filter([
                 $mysqlSslCaAttribute => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],

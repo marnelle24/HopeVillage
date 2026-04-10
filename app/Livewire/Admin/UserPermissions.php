@@ -66,6 +66,7 @@ class UserPermissions extends Component
         'can_add_activity_manually' => 'Can add activity manually',
         'can_update_work_type' => 'Can update work type of the member',
         'can_update_user_type' => 'Can update user type of the user',
+        'can_backup_database' => 'Can create database backup files',
     ];
 
     public ?string $saveSuccessMessage = null;

@@ -68,7 +68,7 @@ class RecentEventsParticipants extends Component
         foreach ($events->reverse() as $event) {
             // Truncate event title to 3 words max
             $words = explode(' ', $event->title);
-            if (count($words) > 7) {
+            if (count($words) > 5) {
                 $labels[] = implode(' ', array_slice($words, 0, 3)) . '...';
             } else {
                 $labels[] = $event->title;
