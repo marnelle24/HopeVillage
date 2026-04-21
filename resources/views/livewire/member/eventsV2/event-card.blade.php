@@ -194,7 +194,7 @@
                         <span x-show="!interestedLoading" x-cloak>{{ $interestedLabel }}</span>
                         <span x-show="interestedLoading" x-cloak x-text="registrationStatus === 'interested' ? 'Liking...' : 'Unliking...'"></span>
                     </button>
-                    <button
+                    {{-- <button
                         type="button"
                         @click.stop="confirmRegister()"
                         :disabled="joinLoading"
@@ -224,7 +224,7 @@
                         </svg>
                         <span x-show="!joinLoading" x-cloak>{{ $registerLabel }}</span>
                         <span x-show="joinLoading" x-cloak x-text="registrationStatus === 'registered' ? 'Registering...' : 'Unregistering...'"></span>
-                    </button>
+                    </button> --}}
                 </div>
             @endif
         </div>
