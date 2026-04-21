@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Services\PointsService;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class EventCard extends Component
@@ -25,10 +26,7 @@ class EventCard extends Component
     {
         $user = auth()->user();
 
-        $event = Event::query()
-            ->where('status', 'published')
-            ->whereHas('location', fn ($q) => $q->whereNull('deleted_at'))
-            ->findOrFail($this->event['id']);
+        $event = $this->resolvePublishedEvent();
 
         try {
             $registration = EventRegistration::firstOrCreate(
@@ -50,101 +48,68 @@ class EventCard extends Component
                         'status' => 'favorited',
                         'registered_at' => now(),
                     ]);
-                    session()->flash('message', 'Event added to favorites.');
-                    session()->flash('message_type', 'success');
-                    $this->dispatch('notify', type: 'success', message: 'Event added to favorites.');
+                    $this->notify('success', 'Event added to favorites.');
                 } else {
-                    session()->flash('message', 'Event is already in your favorites.');
-                    session()->flash('message_type', 'info');
-                    $this->dispatch('notify', type: 'info', message: 'Event is already in your favorites.');
+                    $this->notify('info', 'Event is already in your favorites.');
                 }
             } else {
-                session()->flash('message', 'Event added to favorites.');
-                session()->flash('message_type', 'success');
-                $this->dispatch('notify', type: 'success', message: 'Event added to favorites.');
+                $this->notify('success', 'Event added to favorites.');
             }
         } catch (QueryException) {
-            session()->flash('message', 'Unable to add event to favorites.');
-            session()->flash('message_type', 'error');
-            $this->dispatch('notify', type: 'error', message: 'Unable to add event to favorites.');
+            $this->notify('error', 'Unable to add event to favorites.');
         }
 
-        // Refresh the event data for this card
-        $this->refreshEventData();
-
-        $this->dispatch('event-updated', status: $this->event['registration_status'] ?? null);
-        
-        // Refresh parent component if in my-events
-        if ($this->isMyEvents) {
-            $this->dispatch('refresh-my-events');
-        }
+        $this->dispatchCardRefreshEvents();
     }
 
     public function markInterested(): void
     {
         $user = auth()->user();
 
-        $event = Event::query()
-            ->where('status', 'published')
-            ->whereHas('location', fn ($q) => $q->whereNull('deleted_at'))
-            ->findOrFail($this->event['id']);
+        $event = $this->resolvePublishedEvent();
 
         try {
-            $registration = EventRegistration::where('user_id', $user->id)
-                ->where('event_id', $event->id)
-                ->first();
+            $liked = DB::transaction(function () use ($user, $event): bool {
+                $registration = EventRegistration::where('user_id', $user->id)
+                    ->where('event_id', $event->id)
+                    ->lockForUpdate()
+                    ->first();
 
-            // Toggle: if already interested, remove it (delete registration)
-            if ($registration && $registration->status === 'interested') {
-                $registration->delete();
-                session()->flash('message', 'Removed from liked events.');
-                session()->flash('message_type', 'success');
-                $this->dispatch('notify', type: 'success', message: 'Removed from liked events.');
-            } else {
-                // Create or update to interested status
-                if ($registration) {
-                    $registration->update([
-                        'status' => 'interested',
-                        'registered_at' => now(),
-                    ]);
-                } else {
-                    EventRegistration::create([
+                // Toggle: if already interested, remove it (delete registration)
+                if ($registration?->status === 'interested') {
+                    $registration->delete();
+                    return false;
+                }
+
+                EventRegistration::updateOrCreate(
+                    [
                         'user_id' => $user->id,
                         'event_id' => $event->id,
+                    ],
+                    [
                         'type' => 'app',
                         'status' => 'interested',
                         'registered_at' => now(),
-                    ]);
-                }
-                session()->flash('message', 'Event liked.');
-                session()->flash('message_type', 'success');
-                $this->dispatch('notify', type: 'success', message: 'Event liked.');
-            }
+                    ]
+                );
+
+                return true;
+            });
+
+            $message = $liked ? 'Event liked.' : 'Removed from liked events.';
+            $this->notify('success', $message);
         } catch (QueryException) {
-            session()->flash('message', 'Unable to update like status.');
-            session()->flash('message_type', 'error');
-            $this->dispatch('notify', type: 'error', message: 'Unable to update like status.');
+            $this->notify('error', 'Unable to update like status.');
         }
 
-        // Refresh the event data for this card
-        $this->refreshEventData();
-
-        $this->dispatch('event-updated', status: $this->event['registration_status'] ?? null);
-        
-        // Refresh parent component if in my-events
-        if ($this->isMyEvents) {
-            $this->dispatch('refresh-my-events');
-        }
+        $this->dispatchCardRefreshEvents();
     }
 
     public function join(): void
     {
         $user = auth()->user();
 
-        $event = Event::query()
-            ->where('status', 'published')
-            ->whereHas('location', fn ($q) => $q->whereNull('deleted_at'))
-            ->findOrFail($this->event['id']);
+        $event = $this->resolvePublishedEvent();
 
         try {
             $registration = EventRegistration::where('user_id', $user->id)
@@ -162,9 +127,7 @@ class EventCard extends Component
                 if ($event->max_participants && $event->max_participants > 0) {
                     $current = $event->registrations()->where('status', 'registered')->count();
                     if ($current >= $event->max_participants) {
-                        session()->flash('message', 'This event is already full.');
-                        session()->flash('message_type', 'error');
-                        $this->dispatch('notify', type: 'error', message: 'This event is already full.');
+                        $this->notify('error', 'This event is already full.');
                         return;
                     }
                 }
@@ -191,21 +154,37 @@ class EventCard extends Component
                     app(PointsService::class)->awardEventJoin($user, $event);
                 }
 
-                session()->flash('message', 'Successfully registered for the event.');
-                session()->flash('message_type', 'success');
-                $this->dispatch('notify', type: 'success', message: 'Successfully registered for the event.');
+                $this->notify('success', 'Successfully registered for the event.');
             }
         } catch (QueryException) {
-            session()->flash('message', 'Unable to update registration.');
-            session()->flash('message_type', 'error');
-            $this->dispatch('notify', type: 'error', message: 'Unable to update registration.');
+            $this->notify('error', 'Unable to update registration.');
         }
 
+        $this->dispatchCardRefreshEvents();
+    }
+
+    protected function resolvePublishedEvent(): Event
+    {
+        return Event::query()
+            ->where('status', 'published')
+            ->whereHas('location', fn ($q) => $q->whereNull('deleted_at'))
+            ->findOrFail($this->event['id']);
+    }
+
+    protected function notify(string $type, string $message): void
+    {
+        session()->flash('message', $message);
+        session()->flash('message_type', $type);
+        $this->dispatch('notify', type: $type, message: $message);
+    }
+
+    protected function dispatchCardRefreshEvents(): void
+    {
         // Refresh the event data for this card
         $this->refreshEventData();
 
         $this->dispatch('event-updated', status: $this->event['registration_status'] ?? null);
-        
+
         // Refresh parent component if in my-events
         if ($this->isMyEvents) {
             $this->dispatch('refresh-my-events');
