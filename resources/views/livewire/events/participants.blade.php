@@ -1,13 +1,25 @@
 <div>
     <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 mt-12">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <h3 class="text-xl font-semibold text-gray-800">Recorded Participants</h3>
-            <span class="text-sm md:text-base font-bold text-gray-500">
-                Total Participants:
-                <span class="text-xl font-bold text-gray-900 ml-1">
-                    {{ $registrations->total() }}
+            <div class="flex flex-col gap-1">
+                <h3 class="text-xl font-semibold text-gray-800">Recorded Participants</h3>
+                <span class="text-sm text-gray-500">
+                    Total Attendance:
+                    <span class="text-lg font-bold text-gray-900">
+                        {{ $registrations->total() }}
+                    </span>
                 </span>
-            </span>
+            </div>
+            {{-- i want to add a feature where attended participants can be exported as CSV --}}
+            <button
+                wire:click="exportCsv"
+                class="flex items-center text-xs cursor-pointer gap-1 px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Export as CSV
+            </button>
         </div>
 
         <!-- Search and Filter -->
@@ -26,12 +38,12 @@
                         wire:model.live="statusFilter"
                         class="w-full px-4 py-2 border text-gray-700 border-gray-500 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                     >
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="registered">Registered</option>
+                        <option value="all">All</option>
+                        {{-- <option value="pending">Pending</option> --}}
+                        <option value="registered" disabled>Registered Only</option>
                         <option value="attended">Attended</option>
-                        <option value="cancelled">Cancelled</option>
-                        <option value="no_show">No Show</option>
+                        {{-- <option value="cancelled">Cancelled</option> --}}
+                        {{-- <option value="no_show">No Show</option> --}}
                     </select>
                 </div>
             </div>
@@ -88,24 +100,35 @@
                                             {{ $registration->user->name ?? 'N/A' }}
                                         </div>
                                         @if($registration->user)
-                                            <div class="text-xs text-gray-500">
+                                            <div class="text-xs text-gray-500 flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                                </svg>
                                                 {{ $registration->user->email ?? '' }}
                                             </div>
-                                            @if($registration->user->qr_code)
-                                                <div class="text-xs text-gray-400">
-                                                    QR Code: {{ $registration->user->qr_code }}
+                                            @if($registration->user->whatsapp_number)
+                                                <div class="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                                                    </svg>
+                                                    {{ $registration->user->whatsapp_number ?? '' }}
                                                 </div>
                                             @endif
+                                            {{-- @if($registration->user->qr_code)
+                                                <div class="text-xs text-gray-400 mt-1">
+                                                    QR Code: {{ $registration->user->qr_code }}
+                                                </div>
+                                            @endif --}}
                                         @endif
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     <div class="flex flex-col gap-1">
                                         <span class="text-gray-600 font-medium text-md">
-                                            {{ $registration->registered_at->format('d M Y') }}
+                                            {{ $registration->user->created_at->format('d M Y') }}
                                         </span>
                                         <div class="text-gray-400 text-sm">
-                                            {{ $registration->registered_at->format('h:i A') }}
+                                            {{ $registration->user->created_at->format('h:i A') }}
                                         </div>
                                     </div>
                                 </td>

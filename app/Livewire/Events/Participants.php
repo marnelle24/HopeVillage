@@ -4,6 +4,7 @@ namespace App\Livewire\Events;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
+use Illuminate\Support\Facades\Response;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,7 +15,7 @@ class Participants extends Component
     public $eventCode;
     public $event;
     public $search = '';
-    public $statusFilter = 'all';
+    public $statusFilter = 'attended';
     public $registeredDateSort = 'desc';
 
     protected $paginationTheme = 'tailwind';
@@ -46,9 +47,49 @@ class Participants extends Component
         $this->resetPage();
     }
 
+    public function exportCsv()
+    {
+        $attendedRegistrations = EventRegistration::query()
+            ->where('event_id', $this->event->id)
+            ->where('status', 'attended')
+            ->with('user')
+            ->orderByDesc('attended_at')
+            ->get();
+
+        $filename = 'event-attendees-' . ($this->event->event_code ?? $this->event->id) . '-' . now()->format('Y-m-d-His') . '.csv';
+
+        return Response::streamDownload(function () use ($attendedRegistrations) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'name',
+                'whatsapp_number',
+                'event_name',
+                'status',
+                'date_time',
+            ]);
+
+            foreach ($attendedRegistrations as $registration) {
+                fputcsv($handle, [
+                    $registration->user?->name ?? '',
+                    $registration->user?->whatsapp_number ?? '',
+                    $this->event->title ?? '',
+                    $registration->status ?? '',
+                    $registration->attended_at?->format('Y-m-d H:i:s') ?? '',
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
     public function render()
     {
         $query = EventRegistration::where('event_id', $this->event->id)
+            ->where('status', 'attended')
             ->with('user');
 
         // Apply search filter
@@ -62,9 +103,9 @@ class Participants extends Component
         }
 
         // Apply status filter
-        if ($this->statusFilter !== 'all') {
-            $query->where('status', $this->statusFilter);
-        }
+        // if ($this->statusFilter !== 'all') {
+        //     $query->where('status', $this->statusFilter);
+        // }
 
         // Apply registered date sorting
         $orderByColumn = $this->registeredDateSort === 'asc' ? 'asc' : 'desc';

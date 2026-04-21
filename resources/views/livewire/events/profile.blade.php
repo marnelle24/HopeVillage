@@ -277,7 +277,7 @@
                             
                             <div class="space-y-4">
                                 <div>
-                                    <label class="text-sm font-medium text-gray-500">Registrations</label>
+                                    <label class="text-sm font-medium text-gray-500">Attended Participants</label>
                                     <p class="text-2xl font-bold text-gray-900">
                                         {{ $event->registrations()->where('status', 'attended')->count() }}
                                         @if($event->max_participants)
