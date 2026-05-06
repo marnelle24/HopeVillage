@@ -83,13 +83,13 @@
                 @elseif($error)
                 <!-- Error Message -->
                 <div class="text-center py-8 w-full">
-                    <div class="flex items-center justify-center mb-4">
-                        <svg class="w-16 h-16 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {{-- <div class="flex items-center justify-center mb-4">
+                        <svg class="w-16 h-16 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                    </div>
-                    <p class="text-2xl text-red-800 font-bold mb-4">FAIL</p>
-                    <p class="text-sm text-red-700 px-4">{{ $error }}</p>
+                    </div> --}}
+                    <p class="text-2xl text-green-800 font-bold mb-4">Attendance already captured</p>
+                    {{-- <p class="text-sm text-green-700 px-4">{{ $error }}</p> --}}
                     
                     <!-- Action Buttons -->
                     <div class="mt-6">

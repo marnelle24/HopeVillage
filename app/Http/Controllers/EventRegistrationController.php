@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\ActivityType;
+use App\Models\MemberActivity;
 use App\Models\User;
+use App\Services\PointsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -115,19 +118,63 @@ class EventRegistrationController extends Controller
                     }
                 }
 
+                $attendActivityType = ActivityType::where('name', PointsService::ACTIVITY_EVENT_ATTEND)->first();
+                if (! $attendActivityType) {
+                    throw new \RuntimeException('Member attend event activity type is not configured.');
+                }
+
+                $memberActivity = MemberActivity::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'activity_type_id' => $attendActivityType->id,
+                        'event_id' => $event->id,
+                    ],
+                    [
+                        'location_id' => $event->location_id,
+                        'amenity_id' => null,
+                        'activity_time' => now(),
+                        'description' => "Member attend event at {$event->title}",
+                        'metadata' => [
+                            'scanned_at' => now()->toIso8601String(),
+                            'event_code' => $event->event_code,
+                            'event_id' => $event->id,
+                            'qr_code' => $user->qr_code,
+                            'device_info' => $request->header('User-Agent'),
+                            'access_type' => 'external_scanner',
+                            'ip_address' => $request->ip(),
+                        ],
+                    ]
+                );
+
+                if ($memberActivity->wasRecentlyCreated) {
+                    app(PointsService::class)->award(
+                        user: $user,
+                        activityName: PointsService::ACTIVITY_EVENT_ATTEND,
+                        description: 'Member attended event',
+                        locationId: $event->location_id,
+                        memberActivityId: $memberActivity->id,
+                    );
+                }
+
+                $alreadyLogged = ! $memberActivity->wasRecentlyCreated;
+
                 Log::info('Event registration scanned via external scanner', [
                     'member_fin' => $user->fin,
                     'qr_code' => $user->qr_code,
                     'event_code' => $event->event_code,
                     'event_id' => $event->id,
                     'registration_id' => $registration->id,
+                    'member_activity_id' => $memberActivity->id,
+                    'already_attended_logged' => $alreadyLogged,
                     'device_info' => $request->header('User-Agent'),
                     'ip_address' => $request->ip(),
                 ]);
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Member attendance recorded successfully',
+                    'message' => $alreadyLogged
+                        ? 'Member attendance was already recorded for this event'
+                        : 'Member attendance recorded successfully',
                     'data' => [
                         'member' => [
                             'fin' => $user->fin,
@@ -145,8 +192,12 @@ class EventRegistrationController extends Controller
                             'type' => $registration->type,
                             'attended_at' => $registration->attended_at->toIso8601String(),
                         ],
+                        'activity' => [
+                            'id' => $memberActivity->id,
+                            'already_logged' => $alreadyLogged,
+                        ],
                     ],
-                ], 201);
+                ], $alreadyLogged ? 200 : 201);
             });
         } catch (\Exception $e) {
             Log::error('Failed to record event registration', [

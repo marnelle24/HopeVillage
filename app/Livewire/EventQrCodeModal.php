@@ -137,67 +137,16 @@ class EventQrCodeModal extends Component
         $this->success = false;
         $this->successMessage = null;
 
-        try 
-        {
-            // After granting the points for attend event. 
-            // Check if member has a recent entry at this location within the time gap in the settings
-            $timeGapSeconds = (int) Setting::get('entry_time_gap', 3600);
-            $timeGapAgo = now()->subSeconds($timeGapSeconds);
-            
-            $recentEntry = MemberActivity::where('user_id', $user->id)
-                ->where('location_id', $this->event->location_id)
-                ->whereHas('activityType', function($query) {
-                    $query->where('name', 'ENTRY');
-                })
-                ->where('activity_time', '>=', $timeGapAgo)
-                ->exists();
-            
-            if (!$recentEntry) 
-            {
-                $activityType = ActivityType::where('name', 'ENTRY')->first();
-                if ($activityType) {
-                    // Create member activity record
-                    $memberActivity = MemberActivity::create([
-                        'user_id' => $user->id,
-                        'activity_type_id' => $activityType->id,
-                        'location_id' => $this->event->location_id,
-                        'amenity_id' => null,
-                        'activity_time' => now(),
-                        'description' => "Member Re-ENTRY to event {$this->event->title}",
-                        'metadata' => [
-                            'scanned_at' => now()->toIso8601String(),
-                            'qr_code' => $user->qr_code,
-                            'event_code' => $this->event->event_code,
-                            'device_info' => request()->header('User-Agent'),
-                            'access_type' => 'built_in_scanner',
-                            'ip_address' => request()->ip(),
-                        ],
-                    ]);
-                    
-                    // Award points for RE-ENTRY activity
-                    app(PointsService::class)->award(
-                        user: $user,
-                        activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
-                        description: "Member Re-ENTRY to event {$this->event->title} - entry_time_gap lapses",
-                        locationId: $this->event->location_id,
-                        memberActivityId: $memberActivity->id,
-                    );
-                }
-            }
+        try {
+            $attendActivityCreated = false;
+            $pointsBefore = (int) $user->total_points;
+            $pointsAwarded = 0;
 
-
-            DB::transaction(function () use ($user) 
-            {
-                // Check if member has already attended this event
-                $existingRegistration = EventRegistration::where('user_id', $user->id)
-                    ->where('event_id', $this->event->id)
-                    ->where('status', 'attended')
-                    ->first();
-                
-                if ($existingRegistration) {
-                    $this->error = 'You have already attended this event.';
-                    $this->processing = false;
-                    return;
+            DB::transaction(function () use ($user, &$attendActivityCreated) {
+                // Find ATTEND activity type (do not create)
+                $attendActivityType = ActivityType::where('name', 'member_attend_event')->first();
+                if (! $attendActivityType) {
+                    throw new \RuntimeException('Member attend event activity type is not configured. Please contact an administrator.');
                 }
 
                 // Find or create event registration
@@ -221,67 +170,118 @@ class EventQrCodeModal extends Component
                     ]);
                 }
 
-                // Find ATTEND activity type (do not create)
-                $activityType = ActivityType::where('name', 'member_attend_event')->first();
-                if (! $activityType) {
-                    $this->error = 'Member attend event activity type is not configured. Please contact an administrator.';
-                    $this->processing = false;
+                // Create event attendance activity exactly once per member+event.
+                $attendActivity = MemberActivity::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'activity_type_id' => $attendActivityType->id,
+                        'event_id' => $this->event->id,
+                    ],
+                    [
+                        'location_id' => $this->event->location_id,
+                        'amenity_id' => null,
+                        'activity_time' => now(),
+                        'description' => "Member attend event at {$this->event->title}",
+                        'metadata' => [
+                            'scanned_at' => now()->toIso8601String(),
+                            'event_code' => $this->event->event_code,
+                            'event_id' => $this->event->id,
+                            'qr_code' => $user->qr_code,
+                            'device_info' => request()->header('User-Agent'),
+                            'access_type' => 'built_in_scanner',
+                            'ip_address' => request()->ip(),
+                        ],
+                    ]
+                );
+
+                if (! $attendActivity->wasRecentlyCreated) {
                     return;
                 }
 
-                // Create member activity record
-                $memberActivity = MemberActivity::create([
+                $attendActivityCreated = true;
+
+                // Award points for ATTEND activity once.
+                app(PointsService::class)->award(
+                    user: $user,
+                    activityName: PointsService::ACTIVITY_EVENT_ATTEND,
+                    description: 'Member attended event',
+                    locationId: $this->event->location_id,
+                    memberActivityId: $attendActivity->id,
+                );
+
+                // Check if member has a recent entry at this location within the configured time gap.
+                $timeGapSeconds = (int) Setting::get('entry_time_gap', 3600);
+                $timeGapAgo = now()->subSeconds($timeGapSeconds);
+
+                $recentEntry = MemberActivity::where('user_id', $user->id)
+                    ->where('location_id', $this->event->location_id)
+                    ->whereHas('activityType', function ($query) {
+                        $query->where('name', 'ENTRY');
+                    })
+                    ->where('activity_time', '>=', $timeGapAgo)
+                    ->exists();
+
+                if ($recentEntry) {
+                    return;
+                }
+
+                $entryActivityType = ActivityType::where('name', 'ENTRY')->first();
+                if (! $entryActivityType) {
+                    return;
+                }
+
+                $entryActivity = MemberActivity::create([
                     'user_id' => $user->id,
-                    'activity_type_id' => $activityType->id,
+                    'activity_type_id' => $entryActivityType->id,
                     'location_id' => $this->event->location_id,
                     'amenity_id' => null,
                     'activity_time' => now(),
-                    'description' => "Member attend event at {$this->event->title}",
+                    'description' => "Member Re-ENTRY to event {$this->event->title}",
                     'metadata' => [
                         'scanned_at' => now()->toIso8601String(),
-                        'event_code' => $this->event->event_code,
-                        'event_id' => $this->event->id,
                         'qr_code' => $user->qr_code,
+                        'event_code' => $this->event->event_code,
                         'device_info' => request()->header('User-Agent'),
                         'access_type' => 'built_in_scanner',
                         'ip_address' => request()->ip(),
                     ],
                 ]);
 
-                // Award points for ATTEND activity
                 app(PointsService::class)->award(
                     user: $user,
-                    activityName: PointsService::ACTIVITY_EVENT_ATTEND,
-                    description: 'Member attended event',
+                    activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
+                    description: "Member Re-ENTRY to event {$this->event->title} - entry_time_gap lapses",
                     locationId: $this->event->location_id,
-                    memberActivityId: $memberActivity->id,
+                    memberActivityId: $entryActivity->id,
                 );
-
-                // Award points for ENTRY activity
-                $pointsBefore = $user->total_points;
-                $pointsAwarded = 0;
-                
-                $user->refresh();
-                $pointsAwarded = $user->total_points - $pointsBefore;
-
-                Log::info('Member event attendance recorded', [
-                    'member_fin' => $user->fin,
-                    'event_code' => $this->event->event_code,
-                    'event_id' => $this->event->id,
-                    'activity_type' => 'ATTEND',
-                    'points_awarded' => $pointsAwarded,
-                ]);
-
-                // Set success message
-                $this->success = true;
-                $this->successMessage = "SUCCESS";
-                
-                // Dispatch event to update points header in real-time
-                $this->dispatch('points-updated');
-                
-                session()->flash('event-attend-success', 'SUCCESS');
-                $this->processing = false;
             });
+
+            if (! $attendActivityCreated) {
+                $this->error = 'You have already attended this event.';
+                $this->processing = false;
+                return;
+            }
+
+            $user->refresh();
+            $pointsAwarded = $user->total_points - $pointsBefore;
+
+            Log::info('Member event attendance recorded', [
+                'member_qr_code' => $user->qr_code,
+                'event_code' => $this->event->event_code,
+                'event_id' => $this->event->id,
+                'activity_type' => 'ATTEND',
+                'points_awarded' => $pointsAwarded,
+            ]);
+
+            // Set success message
+            $this->success = true;
+            $this->successMessage = "SUCCESS";
+
+            // Dispatch event to update points header in real-time
+            $this->dispatch('points-updated');
+
+            session()->flash('event-attend-success', 'SUCCESS');
+            $this->processing = false;
         } catch (\Exception $e) {
             Log::error('Failed to record event attendance', [
                 'error' => $e->getMessage(),

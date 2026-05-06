@@ -166,7 +166,7 @@
                 @endphp
                 <!-- Action Links -->
                 <div class="mt-3 flex flex-wrap items-center gap-2 text-sm">
-                    <button
+                    {{-- <button
                         type="button"
                         @click.stop="startLoading('interested')"
                         wire:click="markInterested"
@@ -193,7 +193,7 @@
                         </svg>
                         <span x-show="!interestedLoading" x-cloak>{{ $interestedLabel }}</span>
                         <span x-show="interestedLoading" x-cloak x-text="registrationStatus === 'interested' ? 'Liking...' : 'Unliking...'"></span>
-                    </button>
+                    </button> --}}
                     {{-- <button
                         type="button"
                         @click.stop="confirmRegister()"

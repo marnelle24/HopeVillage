@@ -205,8 +205,11 @@
                                         <div class="overflow-x-auto scrollbar-hide scroll-smooth md:px-0 px-4" style="scrollbar-width: none; -ms-overflow-style: none;">
                                             <div class="flex gap-4 pb-4" style="min-width: max-content;">
                                                 @foreach($group['vouchers'] as $voucher)
-                                                    <div class="shrink-0 w-80">
-                                                        <x-voucher-card :voucher="$voucher" type="merchant" :show-actions="true" />
+                                                    <div class="shrink-0 w-64">
+                                                        {{-- <x-voucher-card :voucher="$voucher" type="merchant" :show-actions="true" /> --}}
+                                                        @include('livewire.vouchers.partials.ticket-portrait',
+                                                            ['item' => $voucher, 'type' => 'merchant']
+                                                        )
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -241,8 +244,11 @@
                                         <div class="overflow-x-auto scrollbar-hide scroll-smooth md:px-0 px-4" style="scrollbar-width: none; -ms-overflow-style: none;">
                                             <div class="flex gap-4 pb-4" style="min-width: max-content;">
                                                 @foreach($group['vouchers'] as $adminVoucher)
-                                                    <div class="shrink-0 w-80 max-w-[320px]">
-                                                        <x-voucher-card :voucher="$adminVoucher" type="admin" :show-actions="true" />
+                                                    <div class="shrink-0 w-80">
+                                                        {{-- <x-voucher-card :voucher="$adminVoucher" type="admin" :show-actions="true" /> --}}
+                                                        @include('livewire.vouchers.partials.ticket-portrait',
+                                                            ['item' => $adminVoucher, 'type' => 'admin']
+                                                        )
                                                     </div>
                                                 @endforeach
                                             </div>

@@ -177,8 +177,8 @@
                                             <div class="text-sm text-gray-900">{{ Str::words($activity->location->name, 4, '...') }}</div>
                                         </td> --}}
                                         <td class="px-6 py-4 whitespace-nowrap text-right">
-                                            <div class="text-sm text-gray-900">{{ $activity->activity_time->format('d M Y') }}</div>
-                                            <div class="text-xs text-gray-500">{{ $activity->activity_time->format('g:i A') }}</div>
+                                            <div class="text-sm text-gray-900">{{ $activity->created_at->format('d M Y') }}</div>
+                                            <div class="text-xs text-gray-500">{{ $activity->created_at->format('g:i A') }}</div>
                                         </td>
                                     </tr>
                                 @empty

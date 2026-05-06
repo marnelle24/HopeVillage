@@ -31,9 +31,15 @@
 
             <!-- Stats Cards Grid -->
             <livewire:admin.dashboard-stats />
+            <br />
+            <livewire:admin.weekly-registration-traffic />
 
+            <br />
+            <!-- Entry Scanning Per Location Chart -->
+            <livewire:admin.entry-scans-per-location />
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+
                 <!-- Left Column - Charts (2/3 width) -->
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Analytics Charts -->

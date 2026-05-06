@@ -31,6 +31,27 @@ class EntryScansPerLocation extends Component
             ->with('activityType')
             ->get();
 
+        // De-duplicate member_attend_event (activity_type_id = 7) by user + metadata.event_id.
+        // Keep the latest row (activity_time, then id) for each combination.
+        $nonEventAttendActivities = $activities->where('activity_type_id', '!=', 7);
+        $dedupedEventAttendActivities = $activities
+            ->where('activity_type_id', 7)
+            ->sortByDesc(function ($activity) {
+                return sprintf(
+                    '%s-%010d',
+                    optional($activity->activity_time)->format('Y-m-d H:i:s.u') ?? '',
+                    $activity->id
+                );
+            })
+            ->unique(function ($activity) {
+                $eventId = data_get($activity, 'metadata.event_id');
+                return $activity->user_id . '|' . ($eventId ?? 'null');
+            });
+
+        $activities = $nonEventAttendActivities
+            ->concat($dedupedEventAttendActivities)
+            ->values();
+
         // Create array with all 30 days, filling missing days with 0
         $labels = [];
         for ($i = 29; $i >= 0; $i--) {

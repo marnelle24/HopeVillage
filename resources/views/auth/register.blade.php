@@ -383,7 +383,7 @@
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
                 <div class="mt-4">
-                    <x-label for="terms">
+                    {{-- <x-label for="terms">
                         <div class="flex items-start">
                             <x-checkbox 
                                 name="terms" 
@@ -403,13 +403,78 @@
                                 !!}
                             </div>
                         </div>
+                    </x-label> --}}
+
+                    <x-label for="terms">
+                        <div class="flex items-start gap-2" x-data="{ termsExpanded: false }">
+                            <x-checkbox 
+                                checked="true"
+                                name="terms" 
+                                value="1"
+                                id="terms" 
+                                class="focus:border-orange-500 focus:ring-orange-500 shrink-0 mt-0.5"
+                                required 
+                            />
+
+                            <div class="min-w-0 flex-1">
+                                <div
+                                    class="text-sm leading-relaxed text-gray-700 transition-[max-height] duration-200 ease-out"
+                                    :class="termsExpanded ? 'h-full' : 'h-24 overflow-hidden'"
+                                >
+                                    {!! 
+                                        match($lang) {
+                                            'bang' => 'হোপ ভিলেজ সদস্য হিসেবে নিবন্ধন করে, আপনি হোপ ইনিশিয়েটিভ অ্যালায়েন্সকে আপনার ব্যক্তিগত তথ্য সংগ্রহ, ব্যবহার, সংরক্ষণ ও প্রকাশ করার জন্য সম্মতি দিচ্ছেন—হোপ ভিলেজ সদস্যপদ অ্যাপের মাধ্যমে সেবা পরিচালনা ও প্রদানের জন্য, এবং হোপ ইনিশিয়েটিভ অ্যালায়েন্স ও হোপ ভিলেজে এর অংশীদার সংস্থাগুলি কর্তৃক আয়োজিত কর্মসূচি, সেবা ও কার্যক্রমে আপনার অংশগ্রহণ সহজ করার উদ্দেশ্যে। <br /><br />হোপ ইনিশিয়েটিভ অ্যালায়েন্স কর্তৃক প্রদত্ত সেবা, কর্মসূচি ও কার্যক্রম সম্পর্কিত আপডেট, ঘোষণা ও বিপণন তথ্যের জন্য আপনার সঙ্গে যোগাযোগের জন্যও আপনি সম্মতি দিচ্ছেন।',
+                                            'zh' => '注册成为 Hope Village 会员，即表示您同意 Hope Initiative Alliance 收集、使用、存储及披露您的个人资料，以用于通过 Hope Village 会员应用程序管理与提供服务，并便利您参与由 Hope Initiative Alliance 及其在 Hope Village 的合作机构所举办的计划、服务与活动。<br /><br />您亦同意 Hope Initiative Alliance 就其所提供的服务、计划及活动相关的更新、公告及推广信息与您联系。',
+                                            'ta' => 'Hope Village உறுப்பினராக பதிவு செய்வதன் மூலம், Hope Initiative Alliance உங்கள் தனிப்பட்ட தரவை சேகரித்தல், பயன்படுத்துதல், சேமித்தல் மற்றும் வெளிப்படுத்துவதற்கு ஒப்புதல் அளிக்கிறீர்கள் — Hope Village உறுப்பினர் செயலி மூலம் சேவைகளை நிர்வகித்தல் மற்றும் வழங்குதலுக்காகவும், மேலும் Hope Initiative Alliance மற்றும் Hope Village இல் அதன் கூட்டாளர் நிறுவனங்கள் ஏற்பாடு செய்யும் திட்டங்கள், சேவைகள் மற்றும் நடவடிக்கைகளில் உங்கள் பங்கேற்பை எளிதாக்குவதற்காகவும். <br /><br />Hope Initiative Alliance வழங்கும் சேவைகள், திட்டங்கள் மற்றும் நடவடிக்கைகள் தொடர்பான புதுப்பிப்புகள், அறிவிப்புகள் மற்றும் சந்தைப்படுத்தல் தகவல்கள் குறித்து Hope Initiative Alliance உங்களைத் தொடர்புகொள்வதற்கும் ஒப்புதல் அளிக்கிறீர்கள்.',
+                                            default => 'By registering as a Hope Village Member, you consent to Hope Initiative Alliance collecting, using, storing, and disclosing your personal data for the purposes of administering and providing services through the Hope Village membership app, as well as facilitating your participation in programmes, services, and activities organised by Hope Initiative Alliance and its partnering organisations at Hope Village. <br /><br />You also consent to being contacted by Hope Initiative Alliance regarding updates, announcements, and marketing information relating to services, programmes, and activities offered by Hope Initiative Alliance.',
+                                        }
+                                    !!}
+                                </div>
+                                <button
+                                    type="button"
+                                    class="flex items-center text-sm font-semibold text-orange-500 hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-1 rounded"
+                                    :class="termsExpanded ? 'mt-2' : ''"
+                                    @click="termsExpanded = !termsExpanded"
+                                    x-cloak
+                                >
+                                    {{-- add caret icon --}}
+                                    <span x-show="!termsExpanded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </span>
+                                    <span x-show="termsExpanded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    </span>
+                                    <span x-show="!termsExpanded">
+                                        {{ match($lang) {
+                                            'bang' => 'আরও দেখুন',
+                                            'zh' => '查看更多',
+                                            'ta' => 'மேலும் காண்க',
+                                            default => 'See more',
+                                        } }}
+                                    </span>
+                                    <span x-show="termsExpanded" x-cloak>
+                                        {{ match($lang) {
+                                            'bang' => 'কম দেখুন',
+                                            'zh' => '收起',
+                                            'ta' => 'குறைவாகக் காட்டு',
+                                            default => 'See less',
+                                        } }}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                     </x-label>
+
                 </div>
             @endif
 
             <!-- Google reCAPTCHA -->
             @if(config('services.recaptcha.site_key'))
-                <div class="mt-4 w-full">
+                <div class="mt-8 mb-4 w-full">
                     <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
                     @error('g-recaptcha-response')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

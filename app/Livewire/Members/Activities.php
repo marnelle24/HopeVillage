@@ -83,6 +83,31 @@ class Activities extends Component
             }
         }
 
+        // De-duplicate member_attend_event activities by user + metadata.event_id.
+        // Keep the latest row (activity_time, then id) for each combination.
+        $query->where(function ($outerQuery) {
+            $outerQuery->where('activity_type_id', '!=', 7)
+                ->orWhere(function ($eventQuery) {
+                    $eventQuery->where('activity_type_id', 7)
+                        ->whereNotExists(function ($subQuery) {
+                            $subQuery->selectRaw('1')
+                                ->from('member_activities as newer')
+                                ->whereColumn('newer.activity_type_id', 'member_activities.activity_type_id')
+                                ->whereColumn('newer.user_id', 'member_activities.user_id')
+                                ->whereRaw(
+                                    "JSON_UNQUOTE(JSON_EXTRACT(newer.metadata, '$.event_id')) = JSON_UNQUOTE(JSON_EXTRACT(member_activities.metadata, '$.event_id'))"
+                                )
+                                ->where(function ($newerRowQuery) {
+                                    $newerRowQuery->whereColumn('newer.activity_time', '>', 'member_activities.activity_time')
+                                        ->orWhere(function ($sameTimeQuery) {
+                                            $sameTimeQuery->whereColumn('newer.activity_time', 'member_activities.activity_time')
+                                                ->whereColumn('newer.id', '>', 'member_activities.id');
+                                        });
+                                });
+                        });
+                });
+        });
+
         return $query->orderByDesc('activity_time');
     }
 

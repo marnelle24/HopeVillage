@@ -16,7 +16,7 @@
 <div class="{{ $isAdmin ? 'bg-teal-50' : 'bg-orange-50' }} rounded-lg border border-gray-200 overflow-hidden shadow-xs w-full">
     <div class="flex min-h-32">
         <div class="w-[85px] min-w-[85px] {{ $leftBg }} text-white px-2 py-3 flex flex-col items-center justify-center text-center relative">
-            <div class="absolute -left-1 top-0 bottom-0 w-2 bg-white mask-[radial-gradient(circle_at_center,transparent_4px,black_5px)] mask-size-[8px_12px] mask-repeat-y"></div>
+            <div class="absolute -left-1 top-0 bottom-0 w-2 bg-white mask-[radial-gradient(circle_at_center,transparent_4px,black_5px)] mask-size-[13px_12px] mask-repeat-y"></div>
             <div class="h-8 w-8 rounded-full {{ $leftIconBg }} flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M5 7l1.5 11h11L19 7M9 11v4m6-4v4"></path>

@@ -4,11 +4,11 @@
     <livewire:admin.voucher-analytics />
 
     <!-- Weekly Registration Traffic Chart -->
-    <livewire:admin.weekly-registration-traffic />
+    {{-- <livewire:admin.weekly-registration-traffic /> --}}
 
     <!-- Recent Events Participants Chart -->
     <livewire:admin.recent-events-participants />
 
     <!-- Entry Scanning Per Location Chart -->
-    <livewire:admin.entry-scans-per-location />
+    {{-- <livewire:admin.entry-scans-per-location /> --}}
 </div>

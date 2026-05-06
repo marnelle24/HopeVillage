@@ -16,6 +16,7 @@ class MemberActivity extends Model
         'activity_type_id',
         'location_id',
         'amenity_id',
+        'event_id',
         'activity_time',
         'description',
         'metadata',
@@ -47,6 +48,11 @@ class MemberActivity extends Model
     public function amenity(): BelongsTo
     {
         return $this->belongsTo(Amenity::class);
+    }
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class);
     }
 
     public function pointLog(): HasOne
