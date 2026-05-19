@@ -8,16 +8,16 @@
                 <div class="flex flex-wrap items-center gap-2">
                     @can('marketplace.edit')
                         <a href="{{ route('admin.marketplace.cashier') }}" class="text-sm bg-green-600 hover:bg-green-700 text-white transition-all duration-300 py-2 px-3 rounded-full font-medium hover:text-green-100">
-                            {{ __('Cashier') }}
+                            {{ __('Cashier Checkout') }}
                         </a>
                     @endcan
-                    @if (auth()->user()?->canAccessAdminMarketplace())
+                    {{-- @if (auth()->user()?->canAccessAdminMarketplace())
                         <a href="{{ route('admin.marketplace.orders') }}" class="text-sm bg-orange-500 hover:bg-orange-600 text-white transition-all duration-300 py-2 px-3 rounded-full font-medium hover:text-orange-200">
                             {{ __('Confirm Orders') }}
                         </a>
-                    @endif
+                    @endif --}}
                     @can('marketplace.create')
-                        <a href="{{ route('admin.marketplace.create') }}" class="flex items-center gap-1 text-sm bg-slate-600 hover:bg-slate-700 text-white transition-all duration-300 py-2 px-3 rounded-full font-medium hover:text-slate-200">
+                        <a href="{{ route('admin.marketplace.create') }}" class="flex items-center gap-1 text-sm bg-orange-600 hover:bg-orange-700 text-white transition-all duration-300 py-2 px-3 rounded-full font-medium hover:text-orange-200">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>

@@ -96,7 +96,7 @@
                                 [
                                     'icon' => '<img width="30" height="30" src="https://img.icons8.com/cotton/50/online-store.png" alt="online-store"/>',
                                     'name' => 'Merchants',
-                                    'route' => route('member.vouchers'),
+                                    'route' => route('member.merchants.index'),
                                     'color' => 'secondary'
                                 ],
                                 [

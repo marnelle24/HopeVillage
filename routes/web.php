@@ -216,6 +216,14 @@ Route::middleware([
     Route::get('/member/news', \App\Livewire\Member\News\Index::class)->name('member.news');
     Route::get('/member/news/{slug}', \App\Livewire\Member\News\Profile::class)->name('member.news.profile');
 
+    // Partner merchants (blade wrapper pins the correct Livewire class for members)
+    Route::get('/member/merchants', function () {
+        return view('member.merchants');
+    })->name('member.merchants.index');
+    Route::get('/member/merchants/{merchant_code}', function (string $merchant_code) {
+        return view('member.merchant-profile', ['merchant_code' => $merchant_code]);
+    })->name('member.merchants.profile');
+
     // QR Code routes
     Route::get('/member/qr-code', [QrCodeController::class, 'show'])->name('member.qr-code');
 });
