@@ -115,6 +115,21 @@ class User extends Authenticatable
         return $this->user_type === 'merchant_user';
     }
 
+    /**
+     * Whether this admin may open any marketplace admin screens (items list, orders, etc.).
+     * Any explicit marketplace.* permission counts; Cashier still requires marketplace.edit.
+     */
+    public function canAccessAdminMarketplace(): bool
+    {
+        return $this->hasAnyPermission(
+            'marketplace.view',
+            'marketplace.profile',
+            'marketplace.create',
+            'marketplace.edit',
+            'marketplace.delete',
+        );
+    }
+
     // Relationships
     public function merchants(): BelongsToMany
     {
@@ -220,6 +235,11 @@ class User extends Authenticatable
     public function pointLogs(): HasMany
     {
         return $this->hasMany(PointLog::class);
+    }
+
+    public function marketplaceOrders(): HasMany
+    {
+        return $this->hasMany(MarketplaceOrder::class);
     }
 
     public function eventRegistrations(): HasMany

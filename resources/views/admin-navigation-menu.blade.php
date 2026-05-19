@@ -18,13 +18,8 @@
         }"
         x-cloak
         @keydown.escape.window="if ($store.adminNavTour.show) dismissNavTour()"
-        class="border-b border-gray-100 fixed top-0 left-0 right-0 transition-shadow shadow-sm duration-300 backdrop-blur-sm"
-        :class="{
-            'shadow-lg bg-gray-50': scrolledPast20,
-            'bg-gray-100': !scrolledPast20,
-            'z-[100]': $store.adminNavTour.show,
-            'z-[9]': !$store.adminNavTour.show,
-        }"
+        class="border-b border-gray-100 fixed top-0 left-0 right-0 z-[9] transition-shadow shadow-sm duration-300 backdrop-blur-sm"
+        :class="scrolledPast20 ? 'shadow-lg bg-gray-50' : 'bg-gray-100'"
     >
         <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,9 +53,23 @@
                                     {{ __('Profile') }}
                                 </x-dropdown-link>
 
-                                <x-dropdown-link href="{{ route('admin.settings.index') }}">
-                                    {{ __('Settings') }}
-                                </x-dropdown-link>
+                                @can('settings.view')
+                                    <x-dropdown-link href="{{ route('admin.settings.index') }}">
+                                        {{ __('Settings') }}
+                                    </x-dropdown-link>
+                                @endcan
+
+                                @can('update_user_permissions')
+                                    <x-dropdown-link href="{{ route('admin.user-permissions') }}">
+                                        {{ __('User Permissions') }}
+                                    </x-dropdown-link>
+                                @endcan
+
+                                @if (auth()->user()?->canAccessAdminMarketplace())
+                                    <x-dropdown-link href="{{ route('admin.marketplace.index') }}">
+                                        {{ __('Marketplace') }}
+                                    </x-dropdown-link>
+                                @endif
 
                                 <x-dropdown-link href="{{ route('admin.api-documentation.index') }}">
                                     {{ __('API Documentation') }}
@@ -88,8 +97,8 @@
                             x-transition:leave="transition ease-in duration-150"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-full mr-2 top-[80px] -translate-y-1/2 z-[110] w-64 max-w-[calc(100vw-8rem)] rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
-                            style="display: none;"
+                            class="absolute right-full mr-2 top-[80px] -translate-y-1/2 w-64 max-w-[calc(100vw-8rem)] rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
+                            style="display: none; z-index: 9999999999;"
                             role="status"
                             aria-live="polite"
                         >
@@ -203,6 +212,11 @@
                             {{ __('Merchants') }}
                         </x-responsive-nav-link>
                     @endcan
+                    @if (auth()->user()?->canAccessAdminMarketplace())
+                        <x-responsive-nav-link href="{{ route('admin.marketplace.index') }}" :active="request()->routeIs('admin.marketplace*')">
+                            {{ __('Marketplace') }}
+                        </x-responsive-nav-link>
+                    @endif
                     @can('point-system.view')
                         <x-responsive-nav-link href="{{ route('admin.point-system.index') }}" :active="request()->routeIs('admin.point-system*')">
                             {{ __('Point System') }}
@@ -250,6 +264,16 @@
                                 {{ __('Settings') }}
                             </x-responsive-nav-link>
                         @endcan
+                        @can('update_user_permissions')
+                            <x-responsive-nav-link href="{{ route('admin.user-permissions') }}">
+                                {{ __('User Permissions') }}
+                            </x-responsive-nav-link>
+                        @endcan
+                        @if (auth()->user()?->canAccessAdminMarketplace())
+                            <x-responsive-nav-link href="{{ route('admin.marketplace.index') }}">
+                                {{ __('Marketplace') }}
+                            </x-responsive-nav-link>
+                        @endif
                         <x-responsive-nav-link href="{{ route('admin.api-documentation.index') }}">
                             {{ __('API Documentation') }}
                         </x-responsive-nav-link>

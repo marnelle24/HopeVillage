@@ -2,37 +2,56 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use App\Models\Event;
-use App\Models\Setting;
-use App\Models\Voucher;
-use App\Models\PointLog;
 use App\Models\ActivityType;
 use App\Models\AdminVoucher;
+use App\Models\Event;
 use App\Models\MemberActivity;
+use App\Models\PointLog;
 use App\Models\PointSystemConfig;
+use App\Models\Setting;
+use App\Models\User;
+use App\Models\Voucher;
 use Illuminate\Support\Facades\DB;
 
 class PointsService
 {
     public const ACTIVITY_ACCOUNT_VERIFICATION = 'account_verification';
+
     public const ACTIVITY_REGISTRATION = 'member_registration';
+
     public const ACTIVITY_LOCATION_ENTRY = 'member_entry_location';
+
     public const ACTIVITY_EVENT_JOIN = 'member_join_event';
+
     public const ACTIVITY_EVENT_ATTEND = 'member_attend_event';
+
     public const ACTIVITY_VOUCHER_CLAIM = 'member_claim_voucher';
+
     public const ACTIVITY_VOUCHER_REDEEM = 'member_redeem_voucher';
+
     public const ACTIVITY_ADMIN_VOUCHER_CLAIM = 'member_claim_admin_voucher';
+
     public const ACTIVITY_REFERRAL = 'member_referral';
+
+    public const ACTIVITY_MARKETPLACE_REDEEM = 'marketplace_redeem';
+
+    public const ACTIVITY_MARKETPLACE_REFUND = 'marketplace_refund';
 
     // Fallback points (used only if no admin configuration exists)
     private const FALLBACK_POINTS_ACCOUNT_VERIFICATION = 10;
+
     private const FALLBACK_POINTS_REGISTRATION = 10;
+
     private const FALLBACK_POINTS_LOCATION_ENTRY = 10;
+
     private const FALLBACK_POINTS_EVENT_JOIN = 10;
+
     private const FALLBACK_POINTS_EVENT_ATTEND = 20;
+
     private const FALLBACK_POINTS_VOUCHER_CLAIM = 10;
+
     private const FALLBACK_POINTS_VOUCHER_REDEEM = 5;
+
     private const FALLBACK_POINTS_REFERRAL = 5;
 
     public function awardAccountVerification(User $user): void
@@ -55,7 +74,7 @@ class PointsService
             'location_id' => 1, // hardcoded location id for now
             'amenity_id' => null,
             'activity_time' => now(),
-            'description' => "Member account created.",
+            'description' => 'Member account created.',
             'metadata' => [
                 'scanned_at' => now()->toIso8601String(),
                 'location_code' => 1, // hardcoded location id for now
@@ -64,7 +83,7 @@ class PointsService
                 'access_type' => 'browser_application',
             ],
         ]);
-        
+
         $memberActivity->save();
 
         $this->award(
@@ -113,7 +132,7 @@ class PointsService
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_VOUCHER_CLAIM,
-            description: 'Member claimed voucher ' . $voucher->voucher_code,
+            description: 'Member claimed voucher '.$voucher->voucher_code,
             locationId: null,
         );
     }
@@ -123,7 +142,7 @@ class PointsService
         $this->award(
             user: $user,
             activityName: self::ACTIVITY_VOUCHER_REDEEM,
-            description: 'Member redeemed voucher ' . $voucher->voucher_code,
+            description: 'Member redeemed voucher '.$voucher->voucher_code,
             locationId: null,
         );
     }
@@ -137,7 +156,7 @@ class PointsService
             'location_id' => 1, // hardcoded location id for now
             'amenity_id' => null,
             'activity_time' => now(),
-            'description' => "Referred new member: " . $referredUser->name . " (" . $referredUser->qr_code . ")",
+            'description' => 'Referred new member: '.$referredUser->name.' ('.$referredUser->qr_code.')',
             'metadata' => [
                 'scanned_at' => now()->toIso8601String(),
                 'location_code' => 1, // hardcoded location id for now
@@ -152,7 +171,7 @@ class PointsService
         $this->award(
             user: $referrer,
             activityName: 'member_referral',
-            description: 'Referred new member: ' . $referredUser->name . ' (' . $referredUser->qr_code . ')',
+            description: 'Referred new member: '.$referredUser->name.' ('.$referredUser->qr_code.')',
             locationId: null,
             memberActivityId: $memberActivity->id,
             amenityId: null,
@@ -211,7 +230,7 @@ class PointsService
 
         // No admin config found, use fallback and create a default config
         $points = $this->getFallbackPoints($activityName);
-        
+
         return PointSystemConfig::query()->firstOrCreate(
             [
                 'activity_type_id' => $activityTypeId,
@@ -236,8 +255,8 @@ class PointsService
     ): void {
         // Check if point system is globally enabled
         $pointSystemEnabled = (bool) Setting::get('point_system_enabled', true);
-        
-        if (!$pointSystemEnabled) {
+
+        if (! $pointSystemEnabled) {
             // Point system is disabled, don't award points
             return;
         }
@@ -245,7 +264,7 @@ class PointsService
         DB::transaction(function () use ($user, $activityName, $description, $locationId, $memberActivityId, $amenityId) {
             $activityType = ActivityType::where('name', $activityName)->first();
             if (! $activityType) {
-                throw new \Exception('Activity type not found: ' . $activityName);
+                throw new \Exception('Activity type not found: '.$activityName);
             }
 
             // Get or create the point system configuration
@@ -287,50 +306,105 @@ class PointsService
         ?string $description = null,
         ?int $locationId = null,
         ?int $amenityId = null,
+        ?int $memberActivityId = null,
     ): void {
-        // Check if point system is globally enabled
+        DB::transaction(function () use ($user, $points, $activityName, $description, $locationId, $amenityId, $memberActivityId) {
+            $this->deductWithinTransaction($user, $points, $activityName, $description, $locationId, $amenityId, $memberActivityId);
+        });
+    }
+
+    /**
+     * Deduct points; caller must wrap in {@see DB::transaction} and lock rows as needed.
+     *
+     * @param  ?int  $memberActivityId  When set, stored on {@see PointLog} (e.g. marketplace redeem).
+     */
+    public function deductWithinTransaction(
+        User $user,
+        int $points,
+        string $activityName,
+        ?string $description = null,
+        ?int $locationId = null,
+        ?int $amenityId = null,
+        ?int $memberActivityId = null,
+    ): void {
         $pointSystemEnabled = (bool) Setting::get('point_system_enabled', true);
-        
-        if (!$pointSystemEnabled) {
+
+        if (! $pointSystemEnabled) {
             throw new \Exception('Point system is disabled.');
         }
 
-        // Check sufficient balance
         if ($user->total_points < $points) {
             throw new \Exception('Insufficient points balance.');
         }
 
-        DB::transaction(function () use ($user, $points, $activityName, $description, $locationId, $amenityId) {
-            $activityType = ActivityType::where('name', $activityName)->first();
-            if (! $activityType) {
-                throw new \Exception("Activity type '{$activityName}' does not exist.");
-            }
+        $activityType = $this->resolveActivityTypeForPointMovement($activityName);
 
-            // Get or create the point system configuration
-            $config = $this->getOrCreateConfig(
-                $activityType->id,
-                $locationId,
-                $amenityId,
-                $activityName,
-                $description
-            );
+        $config = $this->getOrCreateConfig(
+            $activityType->id,
+            $locationId,
+            $amenityId,
+            $activityName,
+            $description
+        );
 
-            // Create PointLog entry with negative points
-            PointLog::query()->create([
-                'user_id' => $user->id,
-                'member_activity_id' => null,
-                'point_system_config_id' => $config->id,
-                'activity_type_id' => $activityType->id,
-                'location_id' => $locationId,
-                'amenity_id' => $amenityId,
-                'points' => -$points, // Negative points for deduction
-                'description' => $description ?? $activityName,
-                'awarded_at' => now(),
-            ]);
+        PointLog::query()->create([
+            'user_id' => $user->id,
+            'member_activity_id' => $memberActivityId,
+            'point_system_config_id' => $config->id,
+            'activity_type_id' => $activityType->id,
+            'location_id' => $locationId,
+            'amenity_id' => $amenityId,
+            'points' => -$points,
+            'description' => $description ?? $activityName,
+            'awarded_at' => now(),
+        ]);
 
-            // Decrement user's running total
-            $user->decrement('total_points', $points);
-        });
+        $user->decrement('total_points', $points);
+    }
+
+    /**
+     * Credit points (e.g. marketplace order cancellation); caller must wrap in {@see DB::transaction}.
+     */
+    public function creditPointsWithinTransaction(
+        User $user,
+        int $points,
+        string $activityName,
+        ?string $description = null,
+        ?int $locationId = null,
+        ?int $amenityId = null,
+    ): void {
+        if ($points <= 0) {
+            return;
+        }
+
+        $pointSystemEnabled = (bool) Setting::get('point_system_enabled', true);
+        if (! $pointSystemEnabled) {
+            return;
+        }
+
+        $activityType = $this->resolveActivityTypeForPointMovement($activityName);
+
+        $config = $this->getOrCreateConfig(
+            $activityType->id,
+            $locationId,
+            $amenityId,
+            $activityName,
+            $description
+        );
+
+        PointLog::query()->create([
+            'user_id' => $user->id,
+            'member_activity_id' => null,
+            'point_system_config_id' => $config->id,
+            'activity_type_id' => $activityType->id,
+            'location_id' => $locationId,
+            'amenity_id' => $amenityId,
+            'points' => $points,
+            'description' => $description ?? $activityName,
+            'awarded_at' => now(),
+        ]);
+
+        $user->increment('total_points', $points);
     }
 
     /**
@@ -342,10 +416,51 @@ class PointsService
             user: $user,
             points: $adminVoucher->points_cost,
             activityName: self::ACTIVITY_ADMIN_VOUCHER_CLAIM,
-            description: 'Claimed admin voucher ' . $adminVoucher->voucher_code . ' - ' . $adminVoucher->name,
+            description: 'Claimed admin voucher '.$adminVoucher->voucher_code.' - '.$adminVoucher->name,
             locationId: null,
         );
     }
+
+    /**
+     * Resolve activity type (creating marketplace redeem/refund types when missing).
+     * Use before creating a {@see MemberActivity} row that will be linked from {@see PointLog}.
+     */
+    public function activityTypeForPointMovement(string $activityName): ActivityType
+    {
+        return $this->resolveActivityTypeForPointMovement($activityName);
+    }
+
+    /**
+     * Resolve activity type for point movements. Marketplace redeem/refund rows are created on demand
+     * if migrations that seed them have not been run.
+     */
+    private function resolveActivityTypeForPointMovement(string $activityName): ActivityType
+    {
+        if ($activityName === self::ACTIVITY_MARKETPLACE_REDEEM) {
+            return ActivityType::query()->firstOrCreate(
+                ['name' => self::ACTIVITY_MARKETPLACE_REDEEM],
+                [
+                    'description' => 'Points spent on marketplace items',
+                    'is_active' => true,
+                ],
+            );
+        }
+
+        if ($activityName === self::ACTIVITY_MARKETPLACE_REFUND) {
+            return ActivityType::query()->firstOrCreate(
+                ['name' => self::ACTIVITY_MARKETPLACE_REFUND],
+                [
+                    'description' => 'Points refunded from cancelled marketplace order',
+                    'is_active' => true,
+                ],
+            );
+        }
+
+        $activityType = ActivityType::query()->where('name', $activityName)->first();
+        if (! $activityType) {
+            throw new \Exception("Activity type '{$activityName}' does not exist.");
+        }
+
+        return $activityType;
+    }
 }
-
-

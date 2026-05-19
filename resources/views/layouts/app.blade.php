@@ -43,7 +43,7 @@
                     <div
                         x-show="$store.adminNavTour.show"
                         x-cloak
-                        class="fixed inset-0 bg-black/50 z-[90]"
+                        class="fixed inset-0 bg-black/50 z-50"
                         aria-hidden="true"
                         style="display: none;"
                     ></div>
@@ -149,7 +149,7 @@
             <!-- Page Heading -->
             @if (isset($header))
                 <header class="bg-white shadow px-4">
-                    <div class="{{ auth()->check() && auth()->user()->isAdmin() ? 'max-w-5xl' : 'max-w-md' }} mx-auto py-6">
+                    <div class="{{ auth()->check() && auth()->user()->isAdmin() ? 'max-w-6xl' : 'max-w-md' }} mx-auto py-6">
                         {{ $header }}
                     </div>
                 </header>

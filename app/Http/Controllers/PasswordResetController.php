@@ -21,7 +21,7 @@ class PasswordResetController extends Controller
     public function store(Request $request)
     {
         $resetMethod = $request->input('reset_method', 'whatsapp');
-        
+
         // Get identifier based on method
         if ($resetMethod === 'email') {
             $identifier = $request->input('email');
@@ -47,13 +47,23 @@ class PasswordResetController extends Controller
         $request->validate($rules);
 
         // Use custom action for all methods
-        $action = new RequestPasswordResetLink();
-        $message = $action([
-            'reset_method' => $resetMethod,
-            'identifier' => $identifier,
-        ]);
+        $action = new RequestPasswordResetLink;
+
+        try {
+            $message = $action([
+                'reset_method' => $resetMethod,
+                'identifier' => $identifier,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()
+                ->withInput($request->only(['email', 'whatsapp_number', 'sms_number', 'reset_method']))
+                ->withErrors([
+                    'reset' => __('We could not complete your request right now. Please try again later, or contact support if this continues.'),
+                ]);
+        }
 
         return back()->with('status', $message);
     }
 }
-

@@ -50,7 +50,7 @@
                                     <!-- Activity Type and Points -->
                                     <div class="flex items-center gap-2 mb-2 flex-wrap">
                                         <span class="badge badge-primary badge-xs">
-                                            {{ $activity->activityType->name ?? 'N/A' }}
+                                            {{ $activity->activityType->name === 'marketplace_redeem' ? 'Marketplace Purchase' : $activity->activityType->name }}
                                         </span>
                                         @if($activity->pointLog && $activity->pointLog->points > 0)
                                             <span class="badge badge-success badge-xs gap-1">

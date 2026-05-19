@@ -30,6 +30,7 @@ class UserPermissions extends Component
         'event',
         'member',
         'merchant',
+        'marketplace',
         'voucher',
         'admin-voucher',
         'point-system',
@@ -201,6 +202,9 @@ class UserPermissions extends Component
         }
 
         $user->syncPermissions($selectedPermissionNames);
+
+        $user->unsetRelation('permissions');
+        $user->forgetCachedPermissions();
 
         $this->saveSuccessMessage = __('Permissions updated.');
         $this->saveSuccessBannerKey++;

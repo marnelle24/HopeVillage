@@ -31,32 +31,6 @@
                     }}
                 </label>
                 <div class="space-y-2">
-                    {{-- <label class="flex items-center">
-                        <input 
-                            type="radio" 
-                            name="reset_method" 
-                            value="whatsapp"  
-                            class="mr-2"
-                            onchange="toggleInputFields()"
-                        >
-                        <span class="text-sm text-gray-700">{{ 
-                            request()->get('lang') === 'bang' ? 'হোয়াটসঅ্যাপ নম্বর' : 
-                            (request()->get('lang') === 'zh' ? 'WhatsApp 号码' : 'WhatsApp Number') 
-                        }}</span>
-                    </label> --}}
-                    {{-- <label class="flex items-center">
-                        <input 
-                            type="radio" 
-                            name="reset_method" 
-                            value="sms" 
-                            class="mr-2"
-                            onchange="toggleInputFields()"
-                        >
-                        <span class="text-sm text-gray-700">{{ 
-                            request()->get('lang') === 'bang' ? 'এসএমএস' : 
-                            (request()->get('lang') === 'zh' ? '短信' : 'SMS') 
-                        }}</span>
-                    </label> --}}
                     <label class="flex items-center">
                         <input 
                             type="radio" 
@@ -74,8 +48,8 @@
                 </div>
             </div>
 
-            <!-- Email Input -->
-            <div class="hidden" id="email-field">
+            <!-- Email Input (visible by default — matches checked "email" radio; avoids wrong field / HTML5 validation without JS) -->
+            <div class="block" id="email-field">
                 <x-label for="email" value="{{ 
                     request()->get('lang') === 'bang' ? 'ইমেল ঠিকানা' : 
                     (request()->get('lang') === 'zh' ? '电子邮件地址' : 'Email Address') 
@@ -90,12 +64,14 @@
                     type="email" 
                     name="email" 
                     :value="old('email')" 
+                    required
+                    autofocus
                     autocomplete="username" 
                 />
             </div>
 
             <!-- WhatsApp Input -->
-            <div class="block" id="whatsapp-field">
+            <div class="hidden" id="whatsapp-field">
                 <x-label for="whatsapp_number" value="{{ 
                     request()->get('lang') === 'bang' ? 'হোয়াটসঅ্যাপ নম্বর' : 
                     (request()->get('lang') === 'zh' ? 'WhatsApp 号码' : 'WhatsApp Number') 
@@ -111,8 +87,6 @@
                             request()->get('lang') === 'bang' ? 'যোগাযোগ নম্বর' : 
                             (request()->get('lang') === 'zh' ? '联系电话' : 'Mobile Number')
                         }}"
-                        required
-                        autofocus 
                         autocomplete="tel" 
                     />
                     <input type="hidden" name="whatsapp_country_code" id="whatsapp_country_code" value="{{ old('whatsapp_country_code', '+65') }}" />
@@ -356,11 +330,6 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             toggleInputFields();
-            
-            // Initialize intl-tel-input for visible field (WhatsApp by default)
-            setTimeout(() => {
-                whatsappIti = initIntlTelInput('whatsapp_number', 'whatsapp_country_code');
-            }, 100);
             
             // Handle form submission
             const form = document.getElementById('password-reset-form');

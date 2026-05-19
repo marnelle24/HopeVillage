@@ -110,6 +110,13 @@ Route::middleware([
     Route::get('/admin/admin-vouchers/{voucher_code}/edit', \App\Livewire\AdminVouchers\Form::class)->name('admin.admin-vouchers.edit');
     Route::get('/admin/admin-vouchers/{voucher_code}/profile', \App\Livewire\AdminVouchers\Profile::class)->name('admin.admin-vouchers.profile');
 
+    // Marketplace (points store)
+    Route::get('/admin/marketplace/cashier', \App\Livewire\Marketplace\Cashier::class)->name('admin.marketplace.cashier');
+    Route::get('/admin/marketplace/orders', \App\Livewire\Marketplace\Orders::class)->name('admin.marketplace.orders');
+    Route::get('/admin/marketplace/create', \App\Livewire\Marketplace\Form::class)->name('admin.marketplace.create');
+    Route::get('/admin/marketplace/{id}/edit', \App\Livewire\Marketplace\Form::class)->name('admin.marketplace.edit');
+    Route::get('/admin/marketplace', \App\Livewire\Marketplace\Index::class)->name('admin.marketplace.index');
+
     // Admin Voucher Ledger – Transaction History PDF (opens in new tab)
     Route::get('/admin/admin-voucher-ledger/{entry}/transaction-history-pdf', \App\Http\Controllers\AdminVoucherLedgerTransactionHistoryPdfController::class)
         ->name('admin.admin-voucher-ledger.transaction-history-pdf');
@@ -186,6 +193,13 @@ Route::middleware([
     Route::get('/member/vouchers', function () {
         return view('member.vouchers-v3');
     })->name('member.vouchers');
+
+    // Marketplace (points)
+    Route::get('/member/marketplace/my-orders', \App\Livewire\Member\Marketplace\MyOrders::class)->name('member.marketplace.my-orders');
+    Route::get('/member/marketplace/cart', function () {
+        return redirect()->route('member.marketplace.index');
+    })->name('member.marketplace.cart');
+    Route::get('/member/marketplace', \App\Livewire\Member\Marketplace\Browse::class)->name('member.marketplace.index');
 
     // Member Activities History
     Route::get('/member/activities', \App\Livewire\Member\Activities::class)

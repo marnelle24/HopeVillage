@@ -85,6 +85,8 @@
                                                     {{ ucfirst('News Category') }}
                                                 @elseif($model === 'announcement')
                                                     {{ ucfirst('Announcement') }}
+                                                @elseif($model === 'marketplace')
+                                                    {{ __('Marketplace') }}
                                                 @else
                                                     {{ ucfirst($model) }}
                                                 @endif

@@ -88,10 +88,16 @@
                                     'color' => 'accent'
                                 ],
                                 [
+                                    'icon' => '<img width="30" height="30" src="https://img.icons8.com/fluency/48/shopping-cart.png" alt="marketplace"/>',
+                                    'name' => 'Marketplace',
+                                    'route' => route('member.marketplace.index'),
+                                    'color' => 'info'
+                                ],
+                                [
                                     'icon' => '<img width="30" height="30" src="https://img.icons8.com/cotton/50/online-store.png" alt="online-store"/>',
                                     'name' => 'Merchants',
                                     'route' => route('member.vouchers'),
-                                    'color' => 'info'
+                                    'color' => 'secondary'
                                 ],
                                 [
                                     'icon' => '<img width="40" height="40" src="https://img.icons8.com/plasticine/50/share-2.png" alt="share-2"/>',

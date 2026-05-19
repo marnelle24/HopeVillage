@@ -215,6 +215,31 @@
 
                     <!-- Right Side: Form (1/4) -->
                     <div class="lg:col-span-2 space-y-4 sticky top-4">
+                        <div class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 space-y-3">
+                            <h3 class="font-semibold text-gray-800">{{ __('Admin shortcuts') }}</h3>
+                            <p class="text-sm text-gray-500">{{ __('Jump to permission-controlled areas.') }}</p>
+                            <div class="flex flex-col gap-2">
+                                @can('update_user_permissions')
+                                    <a
+                                        href="{{ route('admin.user-permissions') }}"
+                                        class="text-sm font-medium text-orange-600 hover:text-orange-800"
+                                    >
+                                        {{ __('Admin User Permissions') }}
+                                    </a>
+                                @endcan
+                                @if (auth()->user()?->canAccessAdminMarketplace())
+                                    <a
+                                        href="{{ route('admin.marketplace.index') }}"
+                                        class="text-sm font-medium text-orange-600 hover:text-orange-800"
+                                    >
+                                        {{ __('Marketplace (admin)') }}
+                                    </a>
+                                @endif
+                                @unless (auth()->user()?->can('update_user_permissions') || auth()->user()?->canAccessAdminMarketplace())
+                                    <p class="text-sm text-gray-400">{{ __('No additional shortcuts for your account.') }}</p>
+                                @endunless
+                            </div>
+                        </div>
                         <div 
                             id="settings-form"
                             class="bg-white overflow-hidden shadow-md sm:rounded-lg p-6 sticky top-4"
