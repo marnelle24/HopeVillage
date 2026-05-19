@@ -18,8 +18,11 @@
         }"
         x-cloak
         @keydown.escape.window="if ($store.adminNavTour.show) dismissNavTour()"
-        class="border-b border-gray-100 fixed top-0 left-0 right-0 z-[9] transition-shadow shadow-sm duration-300 backdrop-blur-sm"
-        :class="scrolledPast20 ? 'shadow-lg bg-gray-50' : 'bg-gray-100'"
+        class="border-b border-gray-100 fixed top-0 left-0 right-0 transition-shadow shadow-sm duration-300 backdrop-blur-sm"
+        :class="[
+            scrolledPast20 ? 'shadow-lg bg-gray-50' : 'bg-gray-100',
+            $store.adminNavTour?.show ? 'z-[99995]' : 'z-40',
+        ]"
     >
         <!-- Primary Navigation Menu -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,19 +89,17 @@
                         </x-dropdown>
                     </div>
 
-                    <!-- Tour callout: points to hamburger (first-time admin) -->
                     <div class="relative flex items-center">
+                        <!-- Tour callout (inline — reliable on first paint; nav z-index raised while tour is active) -->
                         <div
-                            x-show="$store.adminNavTour.show"
-                            x-cloak
+                            x-show="$store.adminNavTour?.show"
                             x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:enter-start="opacity-0"
+                            x-transition:enter-end="opacity-100"
                             x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 scale-100"
-                            x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-full mr-2 top-[80px] -translate-y-1/2 w-64 max-w-[calc(100vw-8rem)] rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
-                            style="display: none; z-index: 9999999999;"
+                            x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0"
+                            class="absolute right-full mr-2 top-[80px] z-[100000] w-64 max-w-[calc(100vw-8rem)] -translate-y-1/2 rounded-lg bg-white p-3 shadow-lg ring-1 ring-gray-200"
                             role="status"
                             aria-live="polite"
                         >
@@ -113,8 +114,7 @@
                             >
                                 {{ __('Got it') }}
                             </button>
-                            <!-- Arrow pointing right at hamburger -->
-                            <div class="absolute -right-2 top-4 h-0 w-0 -translate-y-1/2 border-y-8 border-l-8 border-y-transparent border-l-white" style="filter: drop-shadow(1px 0 0 rgb(229 231 235));"></div>
+                            <div class="absolute -right-2 top-5 h-0 w-0 -translate-y-1/2 border-y-8 border-l-8 border-y-transparent border-l-white" style="filter: drop-shadow(1px 0 0 rgb(229 231 235));"></div>
                         </div>
 
                         <!-- Hamburger: opens sidebar from the right -->

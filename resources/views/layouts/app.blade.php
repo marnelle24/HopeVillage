@@ -37,15 +37,33 @@
         <x-banner />
 
         @if (auth()->check() && auth()->user()->isAdmin())
-            {{-- Nav tour dimmer: fixed full viewport (state from Alpine store registered in resources/js/app.js) --}}
+            <script>
+                document.addEventListener('alpine:init', () => {
+                    if (!window.Alpine || window.Alpine.store('adminNavTour')) {
+                        return;
+                    }
+                    const seen =
+                        typeof localStorage !== 'undefined' &&
+                        localStorage.getItem('adminNavTour') === '1';
+                    window.Alpine.store('adminNavTour', {
+                        show: !seen,
+                        dismiss() {
+                            if (typeof localStorage !== 'undefined') {
+                                localStorage.setItem('adminNavTour', '1');
+                            }
+                            this.show = false;
+                        },
+                    });
+                });
+            </script>
+            {{-- Nav tour dimmer: fixed full viewport --}}
             <div x-data class="contents">
                 <template x-teleport="body">
                     <div
                         x-show="$store.adminNavTour.show"
                         x-cloak
-                        class="fixed inset-0 bg-black/50 z-50"
+                        class="fixed inset-0 z-[99990] bg-black/50"
                         aria-hidden="true"
-                        style="display: none;"
                     ></div>
                 </template>
             </div>
@@ -171,25 +189,6 @@
 
         @livewireScripts
         <script>
-            // Register before Alpine starts (DOMContentLoaded): ensures $store.adminNavTour exists for admin nav + tour overlay.
-            document.addEventListener('alpine:init', () => {
-                if (!window.Alpine) {
-                    return;
-                }
-                const isAdmin = @json(auth()->check() && auth()->user()->isAdmin());
-                const seen =
-                    typeof localStorage !== 'undefined' &&
-                    localStorage.getItem('hopevillage_admin_nav_tour_seen') === '1';
-                window.Alpine.store('adminNavTour', {
-                    show: isAdmin && !seen,
-                    dismiss() {
-                        if (typeof localStorage !== 'undefined') {
-                            localStorage.setItem('hopevillage_admin_nav_tour_seen', '1');
-                        }
-                        this.show = false;
-                    },
-                });
-            });
             document.addEventListener('livewire:init', () => {
                 if (!window.Livewire) return;
                 Livewire.on('notify', (data) => {
