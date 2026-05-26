@@ -41,6 +41,9 @@ Route::get('/member-activities', [MemberActivityController::class, 'index'])
     ->name('api.member-activities.index');
 
 // create an API that will that will add member in the event_registration when scanning the event QR code
-// The status would be `attended`, attended_at would be the current timestamp and the type would be `external_scanner`
+// The status would be `attended`, attended_at would be the current timestamp.
+// The `type` depends on the optional `source` field in the request body:
+//   - source=admin              -> `user_qr_code` (admin event profile page scan)
+//   - source omitted / other    -> `external_scanner` (public external scanner devices)
 Route::post('/event-registration/scan', [EventRegistrationController::class, 'scan'])
     ->name('api.event-registration.scan');

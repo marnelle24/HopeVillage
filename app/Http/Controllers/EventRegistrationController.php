@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\ActivityType;
 use App\Models\MemberActivity;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\PointsService;
 use Illuminate\Http\JsonResponse;
@@ -17,11 +18,18 @@ class EventRegistrationController extends Controller
 {
     /**
      * Handle event QR code scan to register member attendance
-     * 
+     *
      * Expects:
      * - event_code: Event's unique code (scanned from QR code)
      * - qr_code: Member's QR code (scanned from member QR code)
-     * 
+     * - source (optional): `admin` when called from the admin event profile
+     *   page's "Scan Member QR Code" modal. Any other value (or omitted)
+     *   is treated as a public external scanner device.
+     *
+     * The registration `type` is derived from `source`:
+     *   admin             -> user_qr_code
+     *   external scanner  -> external_scanner
+     *
      * @param Request $request
      * @return JsonResponse
      */
@@ -31,10 +39,21 @@ class EventRegistrationController extends Controller
         $validated = $request->validate([
             'event_code' => ['required', 'string', 'max:255'],
             'qr_code' => ['required', 'string', 'max:255'],
+            'source' => ['nullable', 'string', 'in:admin,external_scanner'],
         ]);
 
+        // Only scans initiated from the admin event profile page record the
+        // registration as `user_qr_code`; everything else stays
+        // `external_scanner` to preserve the existing public scanner contract.
+        $registrationType = ($validated['source'] ?? null) === 'admin'
+            ? 'user_qr_code'
+            : 'external_scanner';
+
         try {
-            return DB::transaction(function () use ($validated, $request) {
+            return DB::transaction(function () use ($validated, $request, $registrationType) {
+                $pointsBefore = null;
+                $pointsAwarded = 0;
+
                 // Normalize event code (trim and uppercase)
                 $normalizedEventCode = strtoupper(trim($validated['event_code']));
                 
@@ -88,6 +107,8 @@ class EventRegistrationController extends Controller
                     ], 422);
                 }
 
+                $pointsBefore = (int) $user->total_points;
+
                 // Find or create event registration
                 $registration = EventRegistration::firstOrCreate(
                     [
@@ -95,25 +116,32 @@ class EventRegistrationController extends Controller
                         'event_id' => $event->id,
                     ],
                     [
-                        'type' => 'external_scanner',
+                        'type' => $registrationType,
                         'status' => 'attended',
                         'registered_at' => now(),
                         'attended_at' => now(),
                     ]
                 );
 
-                // Update registration to attended if not already
-                if ($registration->status !== 'attended') {
-                    $registration->update([
-                        'status' => 'attended',
-                        'attended_at' => now(),
-                        'type' => 'external_scanner',
-                    ]);
-                } else {
-                    // If already attended, ensure type is external_scanner
-                    if ($registration->type !== 'external_scanner') {
+                // The admin-facing "already attended" message must reflect the
+                // registration row, not just the member-activity ledger.
+                //  - Newly-created registration  -> just attended (success)
+                //  - Existing but not yet attended -> promote and treat as success
+                //  - Existing and already attended -> true duplicate scan
+                $attendedJustNow = $registration->wasRecentlyCreated;
+
+                if (! $registration->wasRecentlyCreated) {
+                    if ($registration->status !== 'attended') {
                         $registration->update([
-                            'type' => 'external_scanner',
+                            'status' => 'attended',
+                            'attended_at' => now(),
+                            'type' => $registrationType,
+                        ]);
+                        $attendedJustNow = true;
+                    } elseif ($registration->type !== $registrationType) {
+                        // Already attended via another channel; just tag the scanner type.
+                        $registration->update([
+                            'type' => $registrationType,
                         ]);
                     }
                 }
@@ -140,7 +168,7 @@ class EventRegistrationController extends Controller
                             'event_id' => $event->id,
                             'qr_code' => $user->qr_code,
                             'device_info' => $request->header('User-Agent'),
-                            'access_type' => 'external_scanner',
+                            'access_type' => $registrationType,
                             'ip_address' => $request->ip(),
                         ],
                     ]
@@ -154,25 +182,44 @@ class EventRegistrationController extends Controller
                         locationId: $event->location_id,
                         memberActivityId: $memberActivity->id,
                     );
+
+                    // Mirror the member self-scan behaviour: award an additional
+                    // location ENTRY point if the member has no recent ENTRY at
+                    // this location within the configured entry_time_gap window.
+                    $this->maybeAwardEntryBonus($user, $event, $request, $registrationType);
                 }
 
-                $alreadyLogged = ! $memberActivity->wasRecentlyCreated;
+                $activityAlreadyLogged = ! $memberActivity->wasRecentlyCreated;
+                // "Already attended" is driven by the registration row, so a
+                // freshly-created or just-promoted registration always reports
+                // success even if a stale member-activity row existed.
+                $alreadyAttended = ! $attendedJustNow;
 
-                Log::info('Event registration scanned via external scanner', [
+                // Refresh and compute how many points (if any) were credited
+                // by this scan so the UI can surface it to the admin.
+                $user->refresh();
+                $pointsAwarded = max(0, ((int) $user->total_points) - ($pointsBefore ?? (int) $user->total_points));
+
+                Log::info('Event registration scanned', [
+                    'registration_type' => $registrationType,
+                    'source' => $validated['source'] ?? 'external_scanner',
                     'member_fin' => $user->fin,
                     'qr_code' => $user->qr_code,
                     'event_code' => $event->event_code,
                     'event_id' => $event->id,
                     'registration_id' => $registration->id,
+                    'registration_was_new' => $registration->wasRecentlyCreated,
+                    'attended_just_now' => $attendedJustNow,
                     'member_activity_id' => $memberActivity->id,
-                    'already_attended_logged' => $alreadyLogged,
+                    'activity_already_logged' => $activityAlreadyLogged,
+                    'points_awarded' => $pointsAwarded,
                     'device_info' => $request->header('User-Agent'),
                     'ip_address' => $request->ip(),
                 ]);
 
                 return response()->json([
                     'success' => true,
-                    'message' => $alreadyLogged
+                    'message' => $alreadyAttended
                         ? 'Member attendance was already recorded for this event'
                         : 'Member attendance recorded successfully',
                     'data' => [
@@ -191,13 +238,18 @@ class EventRegistrationController extends Controller
                             'status' => $registration->status,
                             'type' => $registration->type,
                             'attended_at' => $registration->attended_at->toIso8601String(),
+                            'was_new' => $registration->wasRecentlyCreated,
+                            'attended_just_now' => $attendedJustNow,
                         ],
                         'activity' => [
                             'id' => $memberActivity->id,
-                            'already_logged' => $alreadyLogged,
+                            // Kept for backwards compatibility / debugging.
+                            'already_logged' => $activityAlreadyLogged,
                         ],
+                        'already_attended' => $alreadyAttended,
+                        'points_awarded' => $pointsAwarded,
                     ],
-                ], $alreadyLogged ? 200 : 201);
+                ], $alreadyAttended ? 200 : 201);
             });
         } catch (\Exception $e) {
             Log::error('Failed to record event registration', [
@@ -211,5 +263,67 @@ class EventRegistrationController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
+    }
+
+    /**
+     * Award an extra ENTRY point at the event's location when the member has
+     * no recent ENTRY activity there within the configured entry_time_gap.
+     *
+     * Mirrors the bonus logic in {@see \App\Livewire\EventQrCodeModal::processEventAttendance}
+     * so admin scan (user_qr_code) and member self-scan / external-scanner flows
+     * stay consistent. The caller passes its `$registrationType` through so the
+     * resulting activity metadata reflects the actual scan source.
+     */
+    private function maybeAwardEntryBonus(User $user, Event $event, Request $request, string $registrationType): void
+    {
+        if (! $event->location_id) {
+            return;
+        }
+
+        $timeGapSeconds = (int) Setting::get('entry_time_gap', 3600);
+        $timeGapAgo = now()->subSeconds($timeGapSeconds);
+
+        $recentEntry = MemberActivity::where('user_id', $user->id)
+            ->where('location_id', $event->location_id)
+            ->whereHas('activityType', function ($query) {
+                $query->where('name', 'ENTRY');
+            })
+            ->where('activity_time', '>=', $timeGapAgo)
+            ->exists();
+
+        if ($recentEntry) {
+            return;
+        }
+
+        $entryActivityType = ActivityType::where('name', 'ENTRY')->first();
+        if (! $entryActivityType) {
+            return;
+        }
+
+        $entryActivity = MemberActivity::create([
+            'user_id' => $user->id,
+            'activity_type_id' => $entryActivityType->id,
+            'location_id' => $event->location_id,
+            'amenity_id' => null,
+            'activity_time' => now(),
+            'description' => "Member Re-ENTRY to event {$event->title}",
+            'metadata' => [
+                'scanned_at' => now()->toIso8601String(),
+                'qr_code' => $user->qr_code,
+                'event_code' => $event->event_code,
+                'event_id' => $event->id,
+                'device_info' => $request->header('User-Agent'),
+                'access_type' => $registrationType,
+                'ip_address' => $request->ip(),
+            ],
+        ]);
+
+        app(PointsService::class)->award(
+            user: $user,
+            activityName: PointsService::ACTIVITY_LOCATION_ENTRY,
+            description: "Member Re-ENTRY to event {$event->title} - entry_time_gap lapses",
+            locationId: $event->location_id,
+            memberActivityId: $entryActivity->id,
+        );
     }
 }

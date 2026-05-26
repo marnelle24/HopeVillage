@@ -68,7 +68,7 @@
                             <label for="pointSystemConfigId" class="block text-sm font-medium text-gray-700 mb-1">Activity & points <span class="text-red-500">*</span></label>
                             <select
                                 id="pointSystemConfigId"
-                                wire:model="pointSystemConfigId"
+                                wire:model.live="pointSystemConfigId"
                                 class="w-full px-3 py-2 border border-gray-300 text-gray-800 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 required
                             >
@@ -76,18 +76,44 @@
                                 @foreach($this->pointSystemConfigs as $config)
                                     <option value="{{ $config->id }}" class="text-gray-800">
                                         {{ $config->activityType?->description ?? $config->description ?? 'Activity' }}
-                                        {{-- @if($config->location)
-                                            ({{ $config->location->name }})
-                                        @endif --}}
                                         — {{ $config->points }} pts
                                     </option>
                                 @endforeach
                             </select>
-                            {{-- Activity Date --}}
                             @error('pointSystemConfigId')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        @if($this->isAttendEventActivity())
+                            <div>
+                                <label for="eventId" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Event <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="eventId"
+                                    wire:model="eventId"
+                                    class="w-full px-3 py-2 border border-gray-300 text-gray-800 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                                    required
+                                >
+                                    <option value="">— Select event —</option>
+                                    @foreach($this->events as $event)
+                                        <option value="{{ $event->id }}" class="text-gray-800">
+                                            {{ $event->title }}
+                                            @if($event->start_date)
+                                                — {{ $event->start_date->format('M j, Y') }}
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Tag this attendance to a specific event.
+                                </p>
+                                @error('eventId')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
 
                         <div>
                             <label for="activityDateTime" class="block text-sm font-medium text-gray-700 mb-1">Date & time <span class="text-red-500">*</span></label>

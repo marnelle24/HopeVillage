@@ -548,7 +548,7 @@ https://hopevillage.sg/api
 
 **Authentication:** Not Required (Public Endpoint)
 
-**Description:** Records member attendance at an event when scanning event QR codes using an external scanner. Creates or updates an event registration with status `attended`, sets `attended_at` to the current timestamp, and sets `type` to `external_scanner`.
+**Description:** Records member attendance at an event by scanning the member's QR code. Creates or updates an event registration with status `attended`, sets `attended_at` to the current timestamp, and sets `type` based on the caller (see `source` below). Public external scanner devices should omit `source` and will be recorded as `external_scanner`; the admin event profile page sends `source=admin` and is recorded as `user_qr_code`.
 
 ### Step-by-Step Instructions:
 
@@ -578,6 +578,7 @@ https://hopevillage.sg/api
 |-----------|------|----------|-------------|
 | `event_code` | string | Yes | Event's unique code (scanned from event QR code, max 255 characters) |
 | `qr_code` | string | Yes | Member's QR code (scanned from member QR code, max 255 characters) |
+| `source` | string | No | Either `admin` (admin event profile page) or `external_scanner` (default). Drives the resulting registration `type`: `admin` → `user_qr_code`, otherwise `external_scanner`. |
 
 ### Expected Response (201 Created):
 
@@ -666,21 +667,23 @@ https://hopevillage.sg/api
 ### Important Notes:
 
 - The event code is automatically normalized (trimmed and uppercased) before lookup
-- If a registration already exists for the member and event, it will be updated to `attended` status with `external_scanner` type
+- If a registration already exists for the member and event, it will be updated to `attended` status; the `type` is set/refreshed based on the `source` of the current scan (`user_qr_code` when `source=admin`, otherwise `external_scanner`)
 - The `attended_at` timestamp is set to the current time when the scan occurs
-- The registration type is always set to `external_scanner` for scans via this API endpoint
+- The registration `type` reflects the scan source: omit `source` (or send `external_scanner`) for public scanner devices; the admin event profile page sends `source=admin` and is recorded as `user_qr_code`
 - The event must have `status` set to `'active'` for the scan to succeed
 
 ### Testing Scenarios:
 
-1. **Test successful scan** - Should create/update registration with `attended` status and `external_scanner` type
-2. **Test with invalid event_code** - Should return 404
-3. **Test with inactive event** - Should return 422
-4. **Test with invalid qr_code** - Should return 404
-5. **Test with non-member user** - Should return 422
-6. **Test duplicate scan** - Should update existing registration (idempotent)
-7. **Test missing required fields** - Should return 422 validation error
-8. **Test with event code in different case** - Should work (normalized to uppercase)
+1. **Test successful scan (default / external scanner)** - Omit `source`; should create/update registration with `attended` status and `external_scanner` type
+2. **Test successful scan with `source=admin`** - Should create/update registration with `attended` status and `user_qr_code` type
+3. **Test with invalid event_code** - Should return 404
+4. **Test with inactive event** - Should return 422
+5. **Test with invalid qr_code** - Should return 404
+6. **Test with non-member user** - Should return 422
+7. **Test duplicate scan** - Should update existing registration (idempotent)
+8. **Test missing required fields** - Should return 422 validation error
+9. **Test with event code in different case** - Should work (normalized to uppercase)
+10. **Test with invalid `source` value** - Should return 422 validation error
 
 ---
 

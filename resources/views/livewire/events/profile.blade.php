@@ -243,13 +243,19 @@
                             <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Quick Actions</h3>
                             
                             <div class="space-y-3">
-                                {{-- <a href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" class="flex items-center justify-center gap-2 w-full bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 stroke-white group-hover:stroke-blue-700">
+                                @if(! $event->end_date->isPast())
+                                <button
+                                    type="button"
+                                    onclick="openEventQrScanner()"
+                                    class="flex items-center justify-center gap-2 w-full bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 stroke-white">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
                                     </svg>
-                                    Scan QR Code
-                                </a> --}}
+                                    Scan Member QR Code
+                                </button>
+                                @endif
                                 <a href="{{ route('admin.locations.events.edit', [$event->location->location_code, $event->id]) }}" class="flex items-center justify-center gap-2 w-full bg-yellow-600 hover:bg-yellow-700 hover:-translate-y-0.5 text-white text-center font-semibold py-4 px-4 rounded-lg transition-all duration-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
@@ -332,6 +338,363 @@
                 
                 <!-- Member Registrants Card -->
                 @livewire('events.participants', ['event_code' => $event->event_code])
+
+                @if(! $event->end_date->isPast())
+                <!-- Event Member QR Scanner Modal -->
+                <div
+                    id="event-qr-scanner-modal"
+                    class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center"
+                    style="display: none;"
+                >
+                    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Scan Member QR Code</h3>
+                            <button
+                                type="button"
+                                onclick="closeEventQrScanner()"
+                                class="text-gray-400 hover:text-gray-600"
+                            >
+                                <svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <p class="text-sm text-gray-600 mb-3">
+                            Scanning for event <span class="font-mono font-semibold">{{ $event->event_code }}</span>.
+                            Point camera at the member's QR code to mark attendance.
+                        </p>
+
+                        <div class="mb-4">
+                            <div class="rounded-xl overflow-hidden border border-gray-200 bg-black">
+                                <video id="event-qr-scanner-video" class="w-full h-64 object-cover" playsinline autoplay></video>
+                            </div>
+                            <div id="event-qr-scanner-error" class="mt-3 text-sm text-red-600 hidden"></div>
+                            <div id="event-qr-scanner-loading" class="mt-3 text-sm text-gray-600 hidden">Initializing camera...</div>
+
+                            <div id="event-qr-scan-response" class="mt-3 hidden">
+                                <div id="event-qr-scan-response-content" class="rounded-lg p-3 text-sm font-semibold"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button
+                                type="button"
+                                onclick="restartEventQrScanner()"
+                                class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+                            >
+                                Restart Scanner
+                            </button>
+                            <button
+                                type="button"
+                                onclick="closeEventQrScanner()"
+                                class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-all"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    (function () {
+                        const EVENT_CODE = @json($event->event_code);
+                        const SCAN_ENDPOINT = @json(route('api.event-registration.scan'));
+
+                        const state = {
+                            stream: null,
+                            detector: null,
+                            scanTimer: null,
+                            isScanning: false,
+                            lastScannedAt: 0,
+                            lastScannedValue: null,
+                        };
+
+                        function $(id) { return document.getElementById(id); }
+
+                        function log(action, data = {}) {
+                            console.log('[Event QR Scanner]', { action, event_code: EVENT_CODE, ...data });
+                        }
+
+                        function showError(message) {
+                            const el = $('event-qr-scanner-error');
+                            if (!el) return;
+                            el.textContent = message;
+                            el.classList.remove('hidden');
+                        }
+
+                        function hideError() {
+                            const el = $('event-qr-scanner-error');
+                            if (!el) return;
+                            el.classList.add('hidden');
+                            el.textContent = '';
+                        }
+
+                        function showResponse(type, message) {
+                            const wrapper = $('event-qr-scan-response');
+                            const content = $('event-qr-scan-response-content');
+                            if (!wrapper || !content) return;
+
+                            content.className = 'rounded-lg p-3 text-sm font-semibold';
+                            if (type === 'success') {
+                                content.classList.add('bg-green-100', 'border', 'border-green-400', 'text-green-800');
+                            } else {
+                                content.classList.add('bg-red-100', 'border', 'border-red-400', 'text-red-800');
+                            }
+                            content.textContent = message;
+                            wrapper.classList.remove('hidden');
+
+                            setTimeout(() => wrapper.classList.add('hidden'), 5000);
+                        }
+
+                        function showToast(type, message) {
+                            window.dispatchEvent(new CustomEvent('hv-toast', {
+                                detail: { type, message },
+                                bubbles: true,
+                                cancelable: true,
+                            }));
+                        }
+
+                        window.openEventQrScanner = function () {
+                            const modal = $('event-qr-scanner-modal');
+                            if (!modal) return;
+
+                            const response = $('event-qr-scan-response');
+                            if (response) response.classList.add('hidden');
+
+                            hideError();
+                            modal.classList.remove('hidden');
+                            modal.classList.add('flex');
+                            modal.style.display = 'flex';
+                            log('Scanner opened');
+                            startScanner();
+                        };
+
+                        window.closeEventQrScanner = function () {
+                            stopScanner();
+                            const modal = $('event-qr-scanner-modal');
+                            if (!modal) return;
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                            modal.style.display = 'none';
+                            log('Scanner closed');
+                        };
+
+                        window.restartEventQrScanner = function () {
+                            log('Scanner restart requested');
+                            stopScanner();
+                            setTimeout(startScanner, 100);
+                        };
+
+                        async function startScanner() {
+                            const video = $('event-qr-scanner-video');
+                            const loading = $('event-qr-scanner-loading');
+                            if (!video) return;
+
+                            hideError();
+                            if (loading) loading.classList.remove('hidden');
+
+                            if (!navigator.mediaDevices?.getUserMedia) {
+                                showError('Camera is not supported on this device/browser.');
+                                if (loading) loading.classList.add('hidden');
+                                return;
+                            }
+
+                            try {
+                                state.stream = await navigator.mediaDevices.getUserMedia({
+                                    video: { facingMode: { ideal: 'environment' } },
+                                    audio: false,
+                                });
+                                video.srcObject = state.stream;
+                                await video.play();
+                                log('Camera access granted');
+                            } catch (e) {
+                                showError('Camera permission denied or camera not available.');
+                                log('Camera access denied', { error: e.message });
+                                if (loading) loading.classList.add('hidden');
+                                return;
+                            }
+
+                            if (!('BarcodeDetector' in window)) {
+                                showError('QR scan is not supported on this browser. Please use Chrome (Android) or update your browser.');
+                                if (loading) loading.classList.add('hidden');
+                                stopScanner();
+                                return;
+                            }
+
+                            try {
+                                state.detector = new BarcodeDetector({ formats: ['qr_code'] });
+                            } catch (e) {
+                                showError('Failed to initialize QR scanner.');
+                                if (loading) loading.classList.add('hidden');
+                                stopScanner();
+                                return;
+                            }
+
+                            if (loading) loading.classList.add('hidden');
+                            state.isScanning = true;
+
+                            state.scanTimer = setInterval(async () => {
+                                if (!state.detector || !video || !state.isScanning) return;
+                                try {
+                                    const codes = await state.detector.detect(video);
+                                    if (codes && codes.length > 0) {
+                                        const value = codes[0].rawValue;
+                                        // Debounce: ignore the same code re-detected within 2.5s.
+                                        const now = Date.now();
+                                        if (value === state.lastScannedValue && (now - state.lastScannedAt) < 2500) {
+                                            return;
+                                        }
+                                        state.lastScannedValue = value;
+                                        state.lastScannedAt = now;
+                                        await handleScan(value);
+                                    }
+                                } catch (e) {
+                                    // Ignore transient detection errors
+                                }
+                            }, 300);
+                        }
+
+                        function stopScanner() {
+                            state.isScanning = false;
+                            if (state.scanTimer) {
+                                clearInterval(state.scanTimer);
+                                state.scanTimer = null;
+                            }
+                            if (state.stream) {
+                                state.stream.getTracks().forEach(t => t.stop());
+                                state.stream = null;
+                            }
+                            const video = $('event-qr-scanner-video');
+                            if (video) video.srcObject = null;
+                            state.detector = null;
+                        }
+
+                        function resumeScanning() {
+                            const video = $('event-qr-scanner-video');
+                            if (!video || !state.stream) {
+                                stopScanner();
+                                setTimeout(startScanner, 100);
+                                return;
+                            }
+                            if (state.scanTimer) {
+                                clearInterval(state.scanTimer);
+                                state.scanTimer = null;
+                            }
+                            if (!state.detector && 'BarcodeDetector' in window) {
+                                try {
+                                    state.detector = new BarcodeDetector({ formats: ['qr_code'] });
+                                } catch (e) {
+                                    return;
+                                }
+                            }
+                            state.isScanning = true;
+                            state.scanTimer = setInterval(async () => {
+                                if (!state.detector || !video || !state.isScanning) return;
+                                try {
+                                    const codes = await state.detector.detect(video);
+                                    if (codes && codes.length > 0) {
+                                        const value = codes[0].rawValue;
+                                        const now = Date.now();
+                                        if (value === state.lastScannedValue && (now - state.lastScannedAt) < 2500) {
+                                            return;
+                                        }
+                                        state.lastScannedValue = value;
+                                        state.lastScannedAt = now;
+                                        await handleScan(value);
+                                    }
+                                } catch (e) {
+                                    // Ignore transient detection errors
+                                }
+                            }, 300);
+                        }
+
+                        async function handleScan(memberQrCode) {
+                            if (!memberQrCode || !memberQrCode.trim()) {
+                                showToast('error', 'Invalid QR code. Please try again.');
+                                return;
+                            }
+
+                            // Pause detection to prevent rapid duplicate posts while we await
+                            // the API; the camera stream is kept alive for instant resume.
+                            state.isScanning = false;
+
+                            const loading = $('event-qr-scanner-loading');
+                            if (loading) {
+                                loading.textContent = 'Processing scan...';
+                                loading.classList.remove('hidden');
+                            }
+
+                            try {
+                                const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                                log('Sending scan to API', { qr_code: memberQrCode });
+
+                                const response = await fetch(SCAN_ENDPOINT, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        ...(csrf && { 'X-CSRF-TOKEN': csrf }),
+                                    },
+                                    body: JSON.stringify({
+                                        event_code: EVENT_CODE,
+                                        qr_code: memberQrCode.trim(),
+                                        // Tells the API this scan came from the admin
+                                        // event profile page so it records the
+                                        // registration as `user_qr_code`. Public
+                                        // external scanners omit this and fall back
+                                        // to the `external_scanner` type.
+                                        source: 'admin',
+                                    }),
+                                });
+
+                                const data = await response.json();
+                                if (loading) loading.classList.add('hidden');
+
+                                if (response.ok && data.success) {
+                                    const memberName = data.data?.member?.name ?? 'Member';
+                                    // Prefer the new top-level flag; fall back to the legacy nested
+                                    // flag so older API responses still work during rollout.
+                                    const alreadyAttended = (data.data?.already_attended ?? data.data?.activity?.already_logged) === true;
+                                    const pointsAwarded = Number(data.data?.points_awarded ?? 0);
+
+                                    let message;
+                                    if (alreadyAttended) {
+                                        message = `${memberName} has already attended this event.`;
+                                    } else if (pointsAwarded > 0) {
+                                        message = `${memberName} attended! ${pointsAwarded} point${pointsAwarded === 1 ? '' : 's'} awarded.`;
+                                    } else {
+                                        message = `${memberName} attended successfully.`;
+                                    }
+
+                                    log('Scan succeeded', { already_attended: alreadyAttended, points_awarded: pointsAwarded });
+                                    showToast(alreadyAttended ? 'info' : 'success', message);
+                                    showResponse(alreadyAttended ? 'error' : 'success', message);
+
+                                    if (pointsAwarded > 0) {
+                                        window.dispatchEvent(new CustomEvent('points-updated'));
+                                    }
+                                } else {
+                                    const errorMessage = data.message || data.error || 'Failed to record attendance.';
+                                    log('Scan failed', { response: data });
+                                    showToast('error', errorMessage);
+                                    showResponse('error', errorMessage);
+                                }
+                            } catch (e) {
+                                if (loading) loading.classList.add('hidden');
+                                log('Scan network error', { error: e.message });
+                                showToast('error', 'Network error. Please check your connection and try again.');
+                                showResponse('error', 'Network error. Please check your connection and try again.');
+                            } finally {
+                                setTimeout(resumeScanning, 1800);
+                            }
+                        }
+
+                        window.addEventListener('beforeunload', stopScanner);
+                    })();
+                </script>
+                @endif
             </div>
         </div>
     @else
