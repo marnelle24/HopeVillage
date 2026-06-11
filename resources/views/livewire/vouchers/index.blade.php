@@ -74,12 +74,20 @@
                         >
                             Merchant Vouchers
                         </button>
-                        <button
+                        {{-- <button
                             wire:click="setTab('admin')"
                             class="{{ $tab === 'admin' ? $activeColor : $inActiveColor }} whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200"
                         >
                             Admin Vouchers
-                        </button>
+                        </button> --}}
+                        
+                        <a
+                            href="{{ route('admin.admin-vouchers.index') }}"
+                            class="{{ $tab === 'admin' ? $activeColor : $inActiveColor }} whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200"
+                        >
+                            Admin Vouchers
+                        </a>
+                        
                     </nav>
                 </div>
 

@@ -408,9 +408,40 @@
                             isScanning: false,
                             lastScannedAt: 0,
                             lastScannedValue: null,
+                            useJsQR: false,
+                            canvas: null,
+                            context: null,
                         };
 
                         function $(id) { return document.getElementById(id); }
+
+                        function loadJsQR() {
+                            if (window.jsQR) return Promise.resolve(true);
+                            return new Promise((resolve, reject) => {
+                                const script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+                                script.onload = () => resolve(true);
+                                script.onerror = () => reject(new Error('Failed to load jsQR library'));
+                                document.head.appendChild(script);
+                            });
+                        }
+
+                        async function detectQrCode(video) {
+                            if (state.useJsQR) {
+                                if (!window.jsQR || !state.canvas || !state.context) return null;
+                                if (video.readyState !== video.HAVE_ENOUGH_DATA) return null;
+                                state.canvas.width = video.videoWidth;
+                                state.canvas.height = video.videoHeight;
+                                state.context.drawImage(video, 0, 0, state.canvas.width, state.canvas.height);
+                                const imageData = state.context.getImageData(0, 0, state.canvas.width, state.canvas.height);
+                                const code = window.jsQR(imageData.data, imageData.width, imageData.height);
+                                return code?.data ?? null;
+                            }
+
+                            if (!state.detector) return null;
+                            const codes = await state.detector.detect(video);
+                            return codes && codes.length > 0 ? codes[0].rawValue : null;
+                        }
 
                         function log(action, data = {}) {
                             console.log('[Event QR Scanner]', { action, event_code: EVENT_CODE, ...data });
@@ -515,31 +546,43 @@
                                 return;
                             }
 
-                            if (!('BarcodeDetector' in window)) {
-                                showError('QR scan is not supported on this browser. Please use Chrome (Android) or update your browser.');
-                                if (loading) loading.classList.add('hidden');
-                                stopScanner();
-                                return;
+                            // Prefer the native BarcodeDetector (Chrome/Android, etc.) and
+                            // fall back to the jsQR library for iOS Safari and other
+                            // browsers without native QR support.
+                            if ('BarcodeDetector' in window) {
+                                try {
+                                    state.detector = new BarcodeDetector({ formats: ['qr_code'] });
+                                    state.useJsQR = false;
+                                } catch (e) {
+                                    state.useJsQR = true;
+                                }
+                            } else {
+                                state.useJsQR = true;
                             }
 
-                            try {
-                                state.detector = new BarcodeDetector({ formats: ['qr_code'] });
-                            } catch (e) {
-                                showError('Failed to initialize QR scanner.');
-                                if (loading) loading.classList.add('hidden');
-                                stopScanner();
-                                return;
+                            if (state.useJsQR) {
+                                try {
+                                    await loadJsQR();
+                                    if (!state.canvas) {
+                                        state.canvas = document.createElement('canvas');
+                                        state.context = state.canvas.getContext('2d');
+                                    }
+                                } catch (e) {
+                                    showError('Failed to load QR scanner library. Please check your connection and try again.');
+                                    if (loading) loading.classList.add('hidden');
+                                    stopScanner();
+                                    return;
+                                }
                             }
 
                             if (loading) loading.classList.add('hidden');
                             state.isScanning = true;
 
                             state.scanTimer = setInterval(async () => {
-                                if (!state.detector || !video || !state.isScanning) return;
+                                if (!video || !state.isScanning) return;
                                 try {
-                                    const codes = await state.detector.detect(video);
-                                    if (codes && codes.length > 0) {
-                                        const value = codes[0].rawValue;
+                                    const value = await detectQrCode(video);
+                                    if (value) {
                                         // Debounce: ignore the same code re-detected within 2.5s.
                                         const now = Date.now();
                                         if (value === state.lastScannedValue && (now - state.lastScannedAt) < 2500) {
@@ -581,7 +624,10 @@
                                 clearInterval(state.scanTimer);
                                 state.scanTimer = null;
                             }
-                            if (!state.detector && 'BarcodeDetector' in window) {
+                            // Re-create the detector for BarcodeDetector users; the
+                            // jsQR path simply reuses the already-loaded library and
+                            // canvas, so no extra setup is required.
+                            if (!state.useJsQR && !state.detector && 'BarcodeDetector' in window) {
                                 try {
                                     state.detector = new BarcodeDetector({ formats: ['qr_code'] });
                                 } catch (e) {
@@ -590,11 +636,10 @@
                             }
                             state.isScanning = true;
                             state.scanTimer = setInterval(async () => {
-                                if (!state.detector || !video || !state.isScanning) return;
+                                if (!video || !state.isScanning) return;
                                 try {
-                                    const codes = await state.detector.detect(video);
-                                    if (codes && codes.length > 0) {
-                                        const value = codes[0].rawValue;
+                                    const value = await detectQrCode(video);
+                                    if (value) {
                                         const now = Date.now();
                                         if (value === state.lastScannedValue && (now - state.lastScannedAt) < 2500) {
                                             return;

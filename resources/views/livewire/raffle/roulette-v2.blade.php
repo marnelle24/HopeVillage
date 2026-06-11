@@ -484,7 +484,7 @@
                         </p>
                         
                         <p class="text-sm text-gray-600 mb-3">The winner is:</p>
-                        <p class="text-2xl font-bold text-primary break-all px-4 mb-6">
+                        <p class="text-2xl font-bold text-slate-800 break-all px-4 mb-6">
                             {{ $member['name'] ?? $winnerData['value'] }}
                         </p>
                         

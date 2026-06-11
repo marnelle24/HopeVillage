@@ -96,8 +96,14 @@
                                 $statusReason = $adminVoucher->getStatusReason();
                                 $isExpired = $statusReason === 'Expired';
                                 $isFull = $adminVoucher->usage_limit && $adminVoucher->usage_count >= $adminVoucher->usage_limit;
+
+                                $validFrom = $adminVoucher->valid_from;
+                                $validUntil = $adminVoucher->valid_until;
+                                $validDays = (int) round($validFrom->diffInDays($validUntil));
+
+                                $isValidityExpired = $validUntil && now()->gt($validUntil);
                                 
-                                if ($isExpired) {
+                                if ($isExpired || $isValidityExpired) {
                                     $statusLabel = 'Expired';
                                     $statusBg = 'bg-red-500';
                                 } elseif ($isFull) {
@@ -108,6 +114,7 @@
                                     $statusBg = 'bg-green-500';
                                 }
                             @endphp
+
                             <div class="absolute top-2 left-0 z-10">
                                 <span class="text-xs text-white {{ $statusBg }} px-2 py-1 drop-shadow-lg shadow uppercase rounded-br-lg rounded-tr-lg">
                                     {{ $statusLabel }}
@@ -145,14 +152,9 @@
 
                                         @if($adminVoucher->valid_from || $adminVoucher->valid_until)
                                             <div class="flex flex-col mt-1">
-                                                @php
-                                                    $validFrom = $adminVoucher->valid_from;
-                                                    $validUntil = $adminVoucher->valid_until;
-                                                    $validDays = $validFrom->diffInDays($validUntil);
-                                                @endphp
                                                 <span class="text-sm text-gray-600">
                                                     Validity Period:
-                                                    @if($isExpired)
+                                                    @if($isExpired || $isValidityExpired)
                                                         <span class="text-sm text-red-600 font-semibold">Expired</span>
                                                     @else
                                                         @if($validDays < 1)
@@ -169,13 +171,13 @@
                                                             @endif
                                                         @else
                                                              <span class="text-sm text-green-700 font-semibold">
-                                                                ({{ $validDays }} days)
+                                                                {{ $validDays > 1 ? $validDays . ' days' : $validDays . ' day' }}
                                                             </span>       
                                                         @endif
                                                     @endif
                                                 </span>
                                                 {{-- place the number of days valid based on the valid date difference in days --}}
-                                                <span class="text-xs {{ $isExpired ? 'text-red-600' : 'text-gray-600' }}">
+                                                <span class="text-xs {{ $isValidityExpired ? 'text-red-600' : 'text-gray-600' }}">
                                                     {{ $adminVoucher->valid_from ? $adminVoucher->valid_from->format('d M Y g:i A') : 'N/A' }}
                                                     {{ $adminVoucher->valid_from ? ' - ' : '' }}
                                                     {{ $adminVoucher->valid_until ? $adminVoucher->valid_until->format('d M Y g:i A') : 'N/A' }}
